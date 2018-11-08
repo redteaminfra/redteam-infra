@@ -1,0 +1,4 @@
+Unattended-Upgrade::Automatic-Reboot "true";
+auto-upgrades:APT::Periodic::Update-Package-Lists "1";
+auto-upgrades:APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::Download-Upgradeable-Packages "1";

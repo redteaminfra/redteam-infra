@@ -1,0 +1,9 @@
+*~
+*#
+#*#
+.vagrant
+__pycache__
+.cobaltstrike.license
+external/aws/host-share/bootstrap-puppet.tgz
+network-name
+external/aws/*/homebase/homebase-*

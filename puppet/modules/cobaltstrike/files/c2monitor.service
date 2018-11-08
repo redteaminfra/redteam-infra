@@ -1,0 +1,13 @@
+[Unit]
+Description=cobaltstrike c2monitor
+After=cobaltstrike.service
+
+[Service]
+WorkingDirectory=/opt/cobaltstrike/
+ExecStart=/bin/bash /opt/cobaltstrike/agscript localhost 50050 c2monitor $PASSWORD /opt/c2-monitor.cna
+EnvironmentFile=/opt/cobaltstrike/ipenv
+Type=simple
+User=root
+
+[Install]
+WantedBy=multi-user.target

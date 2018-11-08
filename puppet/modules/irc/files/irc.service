@@ -1,0 +1,11 @@
+[Unit]
+Description=IRC Server
+
+[Service]
+WorkingDirectory=/opt/irc/
+ExecStart=/bin/bash /opt/irc/irc-wrapper.sh
+Type=simple
+User=root
+
+[Install]
+WantedBy=multi-user.target

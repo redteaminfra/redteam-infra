@@ -1,0 +1,13 @@
+[Unit]
+Description=cobaltstrike ircbot
+After=cobaltstrike.service
+
+[Service]
+WorkingDirectory=/opt/cobaltstrike/
+ExecStart=/bin/bash /opt/cobaltstrike/agscript localhost 50050 IRCBot $PASSWORD /opt/IRCBot.cna
+EnvironmentFile=/opt/cobaltstrike/ipenv
+Type=simple
+User=root
+
+[Install]
+WantedBy=multi-user.target

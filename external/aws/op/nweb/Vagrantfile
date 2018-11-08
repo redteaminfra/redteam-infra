@@ -1,0 +1,118 @@
+# -*- mode: ruby -*-
+
+require 'json'
+
+vpc = nil
+
+# Require vagrant-aws and vagrant-triggers plugins
+unless Vagrant.has_plugin?("vagrant-aws")
+  STDERR.puts "vagrant-aws plugin not installed"
+  exit!
+end
+
+unless Vagrant.has_plugin?("vagrant-triggers")
+  STDERR.puts "vagrant-triggers plugin not installed"
+  exit!
+end
+
+# VPC configuration settings
+vpcfile = ENV['VPC_JSON']
+
+if not vpcfile
+  STDERR.puts "VPC_JSON environment not set"
+  exit!
+end
+begin
+  file = File.read(vpcfile)
+  outer = JSON.parse(file)
+  # vpc name is outer key
+  outer.each do |key, value|
+    vpc = value
+    vpc['name'] = key
+  end
+rescue Errno::ENOENT
+  STDERR.puts "file #{vpcfile} does not exist"
+  exit!
+rescue JSON::ParserError
+  STDERR.puts "file #{vpcfile} has malformed json"
+  exit!
+end
+
+begin
+  subnet = File.read("../../subnet")
+rescue Errno::ENOENT
+  STDERR.puts "file subnet does not exist"
+  exit!
+end
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define :nweb do |nweb|
+
+    nweb.vm.box = "nweb"
+    ec2name = "nweb"
+
+    nweb.vm.provider :aws do |aws, domain|
+
+      # For AWS_KEY and AWS_SECRET:
+      # You have to log into aws  and then use IAM.
+      # From IAM, make a user and add to the group redteam.
+      # Click on the newly created user and go to the Security credentials tab.
+      # see under access key for the values for AWS_KEY and AWS_SECRET.
+      #
+      # AWS_SECRET is the name of the keypair in EC2 for remote access
+      # AWS_KEYPATH is the pathname for the private key of the keypair
+      aws.access_key_id = ENV['AWS_KEY']
+      aws.secret_access_key = ENV['AWS_SECRET']
+      aws.keypair_name = ENV['AWS_KEYNAME']
+
+      domain.ssh.username = "ubuntu"
+      domain.ssh.keys_only = true
+      domain.ssh.private_key_path = ENV['AWS_KEYPATH']
+      domain.ssh.proxy_command = "ssh homebase-#{vpc['name']} nc -q0 nweb-#{vpc['name']}.infra.us %p" 
+
+      aws.ami = "ami-b2d463d2"              # xenial
+      aws.instance_type = "t2.medium"
+      aws.region = vpc["region"]
+      aws.security_groups = [
+        vpc["security_groups"]["VPC Allow all traffic"]
+      ]
+      aws.tags = {
+        'Name' => "nweb-#{vpc['name']}"
+      }
+      aws.associate_public_ip = true
+      aws.subnet_id = vpc["subnet_id"]
+      aws.private_ip_address = "#{subnet}.14"
+    end
+
+    nweb.vm.provision "shell", :path => "../../vagrant_setup.sh"
+
+    nweb.vm.provision "shell", inline: <<-SHELL
+    if [ ! -L /etc/infra/site ]; then
+       mkdir -p /etc/infra && ln -s external/aws/op/nweb/puppet/manifests/site.pp /etc/infra/site
+    fi
+    SHELL
+
+    nweb.vm.provision "shell",
+        inline: "hostnamectl set-hostname nweb-#{vpc['name']}"
+
+    nweb.vm.provision "puppet" do |puppet|
+        puppet.manifests_path   = "puppet/manifests"
+        puppet.manifest_file   = "site.pp"
+        puppet.module_path      = "../../../../puppet/modules"
+        puppet.options          = ["--verbose --debug"]
+    end
+
+    # re-enable unattended upgrades
+    nweb.vm.provision "shell", inline: <<-SHELL
+    apt-get install -y --reinstall apt
+    apt-get install unattended-upgrades
+    systemctl enable apt-daily.timer
+    systemd-run --on-active=1m /usr/bin/unattended-upgrade
+    shutdown -r now
+    SHELL
+
+    config.vm.synced_folder "../../host-share", "/tmp/host-share", type: "rsync"
+
+  end
+end

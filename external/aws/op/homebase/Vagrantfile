@@ -1,0 +1,208 @@
+# -*- mode: ruby -*-
+
+require 'json'
+require 'tempfile'
+
+vpc = nil
+ec2name = nil
+
+# Require vagrant-aws and vagrant-triggers plugins
+unless Vagrant.has_plugin?("vagrant-aws")
+  STDERR.puts "vagrant-aws plugin not installed"
+  exit!
+end
+
+unless Vagrant.has_plugin?("vagrant-triggers")
+  STDERR.puts "vagrant-triggers plugin not installed"
+  exit!
+end
+
+# VPC configuration settings
+vpcfile = ENV['VPC_JSON']
+
+if not vpcfile
+  STDERR.puts "VPC_JSON environment not set"
+  exit!
+end
+begin
+  file = File.read(vpcfile)
+  outer = JSON.parse(file)
+  # vpc name is outer key
+  outer.each do |key, value|
+    vpc = value
+    vpc['name'] = key
+  end
+rescue Errno::ENOENT
+  STDERR.puts "file #{vpcfile} does not exist"
+  exit!
+rescue JSON::ParserError
+  STDERR.puts "file #{vpcfile} has malformed json"
+  exit!
+end
+
+begin
+  subnet = File.read("../../subnet")
+rescue Errno::ENOENT
+  STDERR.puts "file subnet does not exist"
+  exit!
+end
+
+begin
+  license = File.read("../../host-share/.cobaltstrike.license")
+rescue Errno::ENOENT
+  STDERR.puts "../../host-share/.cobaltstrike.license does not not exist"
+   exit!
+end
+
+begin
+  sshKeys = Dir.empty?('../../host-share/sshkeys')
+  if sshKeys
+    STDERR.puts "git submodules not present"
+    exit!
+  end
+end
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define :homebase do |homebase|
+
+    homebase.vm.box = "homebase"
+    ec2name = "homebase"
+
+    homebase.vm.provider :aws do |aws, domain|
+
+      # For AWS_KEY and AWS_SECRET:
+      # You have to log into aws  and then use IAM.
+      # From IAM, make a user and add to the group redteam.
+      # Click on the newly created user and go to the Security credentials tab.
+      # see under access key for the values for AWS_KEY and AWS_SECRET.
+      #
+      # AWS_SECRET is the name of the keypair in EC2 for remote access
+      # AWS_KEYPATH is the pathname for the private key of the keypair
+      aws.access_key_id = ENV['AWS_KEY']
+      aws.secret_access_key = ENV['AWS_SECRET']
+      aws.keypair_name = ENV['AWS_KEYNAME']
+
+      domain.ssh.username = "ec2-user"
+      domain.ssh.keys_only = true
+      domain.ssh.private_key_path = [ENV['AWS_KEYPATH'], "~/.ssh/id_rsa"]
+
+      aws.ami = "ami-aaf078d2"              # kali rolling 2018.1
+      aws.instance_type = "t2.medium"       # t2.medium for testing
+      # aws.instance_type = "m4.4xlarge"    # m4.4xlarge for operations
+      aws.region = vpc["region"]
+      aws.security_groups = [
+        vpc["security_groups"]["SSH From Company"],
+        vpc["security_groups"]["VPC Allow all traffic"]
+      ]
+      aws.tags = {
+        'Name' => "homebase-#{vpc['name']}"
+      }
+      aws.associate_public_ip = true
+      aws.subnet_id = vpc["subnet_id"]
+      aws.private_ip_address = "#{subnet}.10"
+      aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 50 }]
+    end
+
+    config.vm.synced_folder "../../host-share", "/tmp/host-share/", type: "rsync"
+
+    # bootstrap the git repo that it will push on creation of homebase
+    # this is a little wonky, but this keeps us from hosting this git
+    # repo externally.
+    homebase.trigger.before :up do
+      run "bash -c \"cd $(git rev-parse --show-toplevel); tar -czf external/aws/host-share/bootstrap-puppet.tgz .git\""
+    end
+
+    homebase.vm.provision "shell",
+        inline: "hostnamectl set-hostname homebase-#{vpc['name']}"
+
+    homebase.vm.provision "shell", :path => "../../vagrant_setup.sh"
+
+    homebase.vm.provision "shell", inline: <<-SHELL
+    if [ ! -L /etc/infra/site ]; then
+       mkdir -p /etc/infra && ln -s external/aws/op/homebase/puppet/manifests/site.pp /etc/infra/site
+    fi
+    SHELL
+
+    homebase.vm.provision "puppet" do |puppet|
+        puppet.manifests_path   = "puppet/manifests"
+        puppet.manifest_file   = "site.pp"
+        puppet.module_path      = "../../../../puppet/modules"
+        puppet.options          = ["--verbose --debug"]
+    end
+
+    # trigger the opsec rule
+    # re-enable unattended upgrades
+    # chmod 700 /root (#34)
+    homebase.vm.provision "shell", inline: <<-SHELL
+    # plop the 99unattended-upgrades file on homebase w/o puppet
+    echo VW5hdHRlbmRlZC1VcGdyYWRlOjpBdXRvbWF0aWMtUmVib290ICJ0cnVlIjsKYXV0by11cGdyYWRlczpBUFQ6OlBlcmlvZGljOjpVcGRhdGUtUGFja2FnZS1MaXN0cyAiMSI7CmF1dG8tdXBncmFkZXM6QVBUOjpQZXJpb2RpYzo6VW5hdHRlbmRlZC1VcGdyYWRlICIxIjsKQVBUOjpQZXJpb2RpYzo6RG93bmxvYWQtVXBncmFkZWFibGUtUGFja2FnZXMgIjEiOwo= | base64 -d > /etc/apt/apt.conf.d/99unattended-upgrades
+
+    apt-get install -y --reinstall apt
+    apt-get install unattended-upgrades
+    systemctl enable apt-daily.timer
+    chmod 700 /root
+    SHELL
+
+    # Trigger after the VM is booted in AWS to get an easy copy-paste ssh config
+    homebase.trigger.after :up do
+        vpcname = vpc['name']
+        file = Tempfile.new('vgrntssh')
+        hostname = nil
+        proxycommand = nil
+        begin
+          run "bash -c 'vagrant ssh-config >> #{file.path}'"
+          file.rewind
+          file.read().each_line do |line|
+            hostname = line.strip if line.include? "HostName"
+            proxycommand = line.strip if line.include? "ProxyCommand"
+          end
+        ensure
+          file.unlink
+        end
+        stanza =
+<<SSH
+Host homebase-#{vpcname}
+     #{hostname}
+     #{proxycommand}
+     User <SSH_USER>
+     IdentityFile ~/.ssh/id_rsa
+     #Uncomment AddressFamily if you have WSL errors to force ipv4
+     #AddressFamily inet
+     LocalForward 50050 127.0.0.1:50050
+     LocalForward 5000 #{subnet}.14:80
+     LocalForward 9001 127.0.0.1:9001
+     ##Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshKeys users.json
+     #Your port number is (5900 + (UID - 6000) + 1)
+     #LocalForward 5901 127.0.0.1:59xx
+
+Host proxy01-#{vpcname}
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     User <SSH_USER>
+
+Host proxy02-#{vpcname}
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     User <SSH_USER>
+
+Host elk-#{vpcname}
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     User <SSH_USER>
+     LocalForward 5601 #{subnet}.13:5601
+
+Host nweb-#{vpcname}
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     User <SSH_USER>
+SSH
+        stanzafile = "homebase-#{vpc['name']}"
+        File.open(stanzafile, 'w') do |file|
+          file.write(stanza)
+        end
+
+        STDOUT.puts <<INSTRUCTIONS
+Copy the generated file (#{stanzafile}) into you ssh config like this:
+cat #{stanzafile} >> ~/.ssh/config
+INSTRUCTIONS
+
+    end
+  end
+end

@@ -1,0 +1,12 @@
+[Unit]
+Description=cobaltstrike teamserver
+
+[Service]
+WorkingDirectory=/opt/cobaltstrike/
+ExecStart=/opt/cobaltstrike/teamserver $IP PASSWORD /opt/malleable/amazon.profile
+EnvironmentFile=/opt/cobaltstrike/ipenv
+Type=simple
+User=root
+
+[Install]
+WantedBy=multi-user.target

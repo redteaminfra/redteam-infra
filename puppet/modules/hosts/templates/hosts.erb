@@ -1,0 +1,20 @@
+<%# localhost mappings %>
+127.0.0.1 localhost
+127.0.0.1 <%= @hostname %>
+
+<%# 
+    Hosts inside of vpc 
+    Requires the $vpc variable to be set which will be the name of the vpc. This is done in `hosts/config.pp`.
+    Requires the $subnet variable to be set which will be the first 3 octets of the subnet IP. This is done in `hosts/config.pp`.
+%>
+
+<%= @subnet %>.10 homebase-<%= @vpc %>.infra.us
+<%= @subnet %>.11 proxy01-<%= @vpc %>.infra.us
+<%= @subnet %>.12 proxy02-<%= @vpc %>.infra.us
+<%= @subnet %>.13 elk-<%= @vpc %>.infra.us
+<%= @subnet %>.13 elk.infra.us
+<%= @subnet %>.14 nweb-<%= @vpc %>.infra.us
+
+
+# blackhole asciinema to prevent accidental asciinema upload on any machine
+127.0.0.1 asciinema.org

@@ -1,0 +1,1 @@
+java -XX:ParallelGCThreads=4 -XX:+AggressiveHeap -XX:+UseParallelGC -Xmx4096m -Xms4096m -classpath ./cobaltstrike.jar aggressor.headless.Start $*

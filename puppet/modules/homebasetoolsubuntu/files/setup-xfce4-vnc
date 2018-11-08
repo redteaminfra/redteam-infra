@@ -1,0 +1,106 @@
+#!/bin/bash
+
+if [[ "$EUID" -eq 0 ]]; then
+  echo -e "Sorry, you cannot run this as root \n"
+  echo -e "just run this script with your normal UID \n"
+  exit
+fi
+
+if [ ! -d ~/.vnc ]; then
+    mkdir ~/.vnc
+
+    cat << EOF > ~/.vnc/xstartup
+#!/bin/bash
+
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+# vncconfig gives cut-n-paste support as well as resizing
+vncconfig -iconic &
+
+# xfce4 is our default desktop env
+xfce4-session
+EOF
+    chmod +x ~/.vnc/xstartup
+
+    # your vnc password is your username
+    vncpasswd -f <<< $(whoami) > ~/.vnc/passwd
+    chmod 600 ~/.vnc/passwd
+fi
+
+sudo cp -R /opt/cobaltstrike $HOME
+sudo chown -R $(whoami):$(whoami) $HOME/cobaltstrike
+sudo cp -v /root/.cobaltstrike.license $HOME
+sudo chown $(whoami):$(whoami) $HOME/.cobaltstrike.license
+
+# avoid pounding CS servers
+
+sleep 0.$[ ( $RANDOM % 100 )]s # lousy toctou prevention
+
+while [ -f /tmp/update_lock ]; do
+    echo "."
+    sleep 5s
+done
+
+touch /tmp/update_lock
+timeout --foreground 5m bash -c "cd ~/cobaltstrike/ && ./update.sh"
+rm /tmp/update_lock
+
+# Fix for Issue 28
+sed -i 's/-jar/-Xmx4096m -Xms4096m -jar/g' $HOME/cobaltstrike/cobaltstrike
+
+if [ ! -d ~/Desktop ] ; then
+    mkdir ~/Desktop
+fi
+
+if [ ! -f ~/Desktop/cobalt.desktop ]; then
+    cat <<EOF > ~/Desktop/cobalt.desktop
+[Desktop Entry]
+
+Type=Application
+Version=1.0
+Name=cobalt strike
+Icon=cobalt-strike.png
+Exec=bash -c "cd $HOME/cobaltstrike && ./cobaltstrike"
+EOF
+    chmod 755 ~/Desktop/cobalt.desktop
+fi
+
+
+VNCNUMBER=$(($(id -u) - 6000 + 1))
+PIDFILE="$HOME/.vnc/$(hostname):$VNCNUMBER.pid"
+if [[ -e $PIDFILE && -e /proc/$(cat $PIDFILE) ]]; then
+    # vnc might be running or might be stale
+    echo "vnc is running"
+else
+    vncserver :$VNCNUMBER
+fi
+
+#if crontab doesn't have vnc starting on boot, make it so
+crontab -l | grep setup-xfce4-vnc || {
+    ( crontab -l ; echo $'SHELL=/bin/bash\n@reboot /usr/local/bin/setup-xfce4-vnc' ) | crontab -
+}
+
+if [ ! -d ~/proxy01 ] ; then
+    mkdir ~/proxy01
+    cat <<EOF > ~/proxy01/proxychains.conf
+strict_chain
+proxy_dns
+tcp_read_time_out 15000
+tcp_connect_time_out 8000
+
+[ProxyList]
+socks5  192.168.1.11 1080
+EOF
+fi
+
+if [ ! -d ~/proxy02 ] ; then
+    mkdir ~/proxy02
+    cat <<EOF > ~/proxy02/proxychains.conf
+strict_chain
+proxy_dns
+tcp_read_time_out 15000
+tcp_connect_time_out 8000
+
+[ProxyList]
+socks5  192.168.1.12 1080
+EOF
+fi

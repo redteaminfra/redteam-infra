@@ -1,0 +1,222 @@
+#Author: Adam Luvshis <adam.m.luvshis@intel.com>
+
+global('%beaconList');
+global('%sleepList');
+
+%beaconList = %();
+%sleepList = %();
+
+on heartbeat_1m {
+	$alertFileHandle = openFile("/opt/cobaltstrike/logs/C2-Monitor.log", "append");
+	$saveBeaconFileHandle = openFile("/opt/cobaltstrike/logs/C2-Saved-Beacons.log", "write");
+	%beaconList = getAllBeaconInfo($saveBeaconFileHandle);	#Get the relevant beacon info we care about and save the data
+	checkBeacons($alertFileHandle);
+}
+
+sub openFile {
+	local('$filehandle $file $operation');
+	$file = $1;
+	$operation = $2;
+
+	if($operation eq "append") {
+		$filehandle = openf(">>$file");
+	}
+	else if($operation eq "write") {
+		$filehandle = openf(">$file");
+	}
+	else {
+		$filehandle = openf("$file");
+	}
+
+	if(checkError($error)) {
+		println("Could not open file: $error");
+	}
+
+	return $filehandle;
+}
+
+sub writeFile {
+	local('$filehandle $msg');
+	$filehandle = $1;
+	$msg = $2;
+	println($filehandle, $msg);
+}
+
+sub readFile {
+	local('$filehandle');
+	$filehandle = $1;
+
+	$data = "";
+	while(!-eof $filehandle) {
+		$data .= readln($filehandle);
+		if($data ne $null) {
+			$data .= " - ";
+		}
+		else {
+			$data = $null;
+		}
+	}
+
+	return $data;
+}
+
+sub closeFile {
+	local('$filehandle');
+	$filehandle = $1;
+	closef($filehandle);
+}
+
+sub getAllBeaconInfoInitial {
+	local('$filehandle');
+	$filehandle = openFile("/opt/cobaltstrike/logs/C2-Saved-Beacons.log", "read");
+	$beaconData = readFile($filehandle);
+	closeFile($filehandle);
+
+	if($beaconData eq $null) {
+		foreach $beacon(beacons()) {
+			$beaconID = $beacon["id"];
+			$computerName = $beacon["computer"];
+			$proxyAddress = $beacon["external"];
+			$lastCheckin = $beacon["lastf"];
+			$alertFlag = 0; 	#0 to check it, 1 alert generated and then set note.
+
+			%beaconList[$beaconID] = %(hostname => $computerName, proxy => $proxyAddress, last => $lastCheckin, alerted => $alertFlag);
+		}
+	}
+	else {
+		@splitBeaconData = split(" - ", $beaconData);
+		foreach $beacon(@splitBeaconData){ 
+			@splitBeacon = split(" => %", $beacon);
+			$beaconID = @splitBeacon[0];
+			$metaData = @splitBeacon[1];
+			@splitMetaData = split(", ", $metaData);
+			foreach $entry (@splitMetaData) {
+				@split = split(" => ", $entry);
+				if('\(proxy' iswm @split[0]) {
+					$proxyAddress = substr(@split[1], 1, strlen(@split[1])-1);
+				}
+				else if('hostname' iswm @split[0]) {
+					$computerName = substr(@split[1], 1, strlen(@split[1])-1);
+				}
+				else if('last' iswm @split[0]) {
+					$lastCheckIn = substr(@split[1], 1, strlen(@split[1])-1);
+				}
+				else if('alerted' iswm @split[0]) {
+					$alertFlag = left(@split[1], 1);
+				}
+			}
+			%beaconList[$beaconID] = %(hostname => $computerName, proxy => $proxyAddress, last => $lastCheckin, alerted => $alertFlag);
+		}
+	}
+
+	return %beaconList;
+}
+
+sub getAllBeaconInfo {
+	local('$filehandle');
+	$filehandle = $1;
+	foreach $beacon(beacons()) {
+		$beaconID = $beacon["id"];
+		$computerName = $beacon["computer"];
+		$proxyAddress = $beacon["external"];
+		$lastCheckin = $beacon["lastf"];
+		$alertFlag = %beaconList[$beaconID]['alerted'];
+		$note = $beacon["note"];
+
+		if(%beaconList[$beaconID]['alerted'] == 1 && ($note !hasmatch "C2 Died" || $note !hasmatch "C2 Sleeping")) {
+			$alertFlag = 0;
+		}
+
+		%beaconList[$beaconID] = %(hostname => $computerName, proxy => $proxyAddress, last => $lastCheckin, alerted => $alertFlag);
+
+		$ourData = $beaconID . " => " . %beaconList[$beaconID];
+		writeFile($filehandle, $ourData);
+	}
+
+	closeFile($filehandle);
+	return %beaconList;
+}
+
+sub checkBeacons {
+	local('$filehandle $message');
+	$filehandle = $1;		#$1 contains the file handle passed in from checkbeacons for on heartbeat
+	$deadTimeLimit = 86400; #24h in seconds
+	foreach $key(keys(%beaconList)) {
+		$lastCheckLetter = right(%beaconList[$key]['last'], 1);
+		$lastCheckTime = left(%beaconList[$key]['last'], strlen(%beaconList[$key]['last']) - 1);
+		if($lastCheckLetter eq 'm') {
+			$timeConverted = $lastCheckTime * 60;
+		}
+		else if($lastCheckLetter eq 'h') {
+			$timeConverted = $lastCheckTime * 3600;
+		}
+		else{
+			$timeConverted = $lastCheckTime;
+		}
+
+		if($key in %sleepList) {
+			$sleepTimer = %sleepList[$key];
+			$lagTime = $sleepTimer * 2;
+		}
+
+		if(($sleepTimer ne $null) && ($timeConverted > $lagTime) && (%beaconList[$key]['alerted'] == 0)) {
+			$message = "C2 Died: Exceeded Sleep Timer - ";
+			$message .= %beaconList[$key]['hostname'];
+			$message .= " - Proxy: ";
+			$message .= %beaconList[$key]['proxy'];
+			$message .= " - Beacon ID: ";
+			$message .= $key;
+			writeFile($filehandle, $message);
+			bnote($key, "C2 Died - Exceeded Sleep Timer");
+			%beaconList[$key]['alerted'] = 1;
+		}
+		else if(($sleepTimer ne $null) && ($lagTime > $timeConverted) && (%beaconList[$key]['alerted'] == 0)) {
+			$message = "C2 Sleeping: Still sleeping - ";
+			$message .= %beaconList[$key]['hostname'];
+			$message .= " - Proxy: ";
+			$message .= %beaconList[$key]['proxy'];
+			$message .= " - Beacon ID: ";
+			$message .= $key;
+			writeFile($filehandle, $message);
+			bnote($key, "C2 Sleeping - Has not completed sleep time yet");
+			%beaconList[$key]['alerted'] = 1;
+		}
+		else if(($timeConverted >= $deadTimeLimit) && (%beaconList[$key]['alerted'] == 0)) {
+			$message = "C2 Died: Exceeded 24hr Time Limit - ";
+			$message .= %beaconList[$key]['hostname'];
+			$message .= " - Proxy: ";
+			$message .= %beaconList[$key]['proxy'];
+			$message .= " - Beacon ID: ";
+			$message .= $key;
+			writeFile($filehandle, $message);
+			bnote($key, "C2 Died - Exceeded 24hr Time Limit");
+			%beaconList[$key]['alerted'] = 1;
+		}
+	}
+	closeFile($filehandle);
+}
+
+on beacon_input {
+	$beacon_id = $1;
+	$who_ran_command = $2;
+	$command = $3;
+
+	@command_length = split(" ", $command);
+
+	if(("sleep isin @command") && ((size(@command_length) == 2) || (size(@command_length) == 3))) {
+		$sleepTime = @command_length[1];
+		%sleepList[$beacon_id] = $sleepTime;
+	}
+}
+
+on beacon_initial {
+	$beaconID = $1;
+	$computerName = beacon_info($beaconID, "computer");
+	$proxyAddress = beacon_info($beaconID, "external");
+	$last = "5s"; 	#Give a time so the lag timer actually kicks in. Ignore actual time.
+	$alertFlag = 0;
+
+	%beaconList[$beaconID] = %(hostname => $computerName, proxy => $proxyAddress, last => $lastCheckin, alerted => $alertFlag);
+}
+
+%beaconList = getAllBeaconInfoInitial();		#Ran on connect to team server, pulls from log file.

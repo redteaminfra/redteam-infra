@@ -1,0 +1,157 @@
+# -*- mode: ruby -*-
+
+networkName = nil
+
+begin
+  networkName = File.read("../network-name")
+rescue Errno::ENOENT
+  STDERR.puts "file network-name does not exist"
+  exit!
+end
+
+networkId = nil
+
+begin
+  networkId = File.read("../network-id")
+rescue Errno::ENOENT
+  STDERR.puts "file network-id does not exist"
+  exit!
+end
+
+begin
+  license = File.read("../host-share/.cobaltstrike.license")
+rescue Errno::ENOENT
+  STDERR.puts ".cobaltstrike.license not not exist"
+   exit!
+end
+
+begin
+  subnet = File.read("../subnet")
+rescue Errno::ENOENT
+  STDERR.puts "file subnet does not exist"
+  exit!
+end
+
+begin
+  sshKeys = Dir.empty?('../host-share/sshkeys')
+  if sshKeys
+    STDERR.puts "git submodules not present"
+    exit!
+  end
+end
+
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define :infrastructure do |infrastructure|
+
+    infrastructure.vm.box = "internal"
+    infrastructure.vm.hostname = "homebase"
+
+    # check for triggers
+    unless Vagrant.has_plugin?("vagrant-triggers")
+      STDERR.puts "vagrant-triggers plugin not installed"
+      exit!
+    end
+
+    infrastructure.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      domain.cpus = 2
+    end
+
+    # macvtap bridge to get IP to IGBN
+    infrastructure.vm.network :public_network,
+      :dev => "enp1s0f0",
+      :mode => "bridge",
+      :type => "direct",
+       use_dhcp_assigned_default_route: true
+
+    # Internal network for git and SSH automation
+    infrastructure.vm.network :public_network,
+      :dev => "virbr#{networkId}",
+      :mode => "bridge",
+      :type => "bridge",
+      :ip => "#{subnet}.10"
+
+    #options for libvirt vagrant provider
+    config.vm.provider :libvirt do |libvirt|
+      libvirt.driver = "kvm"
+      libvirt.storage_pool_name = "virtimages"
+      libvirt.autostart = true
+      libvirt.random_hostname = true
+      libvirt.memory = 128000
+    end
+
+    # bootstrap the git repo that it will push on creation of homebase
+    # this is a little wonky, but this keeps us from hosting this git
+    # repo externally.
+    config.trigger.before :up do
+      run "bash -c \"cd $(git rev-parse --show-toplevel); tar -czf internal/host-share/bootstrap-puppet.tgz .git\""
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+    if [ ! -L /etc/infra/site ]; then
+       mkdir -p /etc/infra && ln -s Internal/homebase/puppet/manifests/site.pp /etc/infra/site
+    fi
+    SHELL
+
+    config.vm.provision "shell", :path => "../vagrant_setup.sh"
+
+    config.vm.provision "shell",
+        inline: "hostnamectl set-hostname homebase-#{networkName}"
+
+    config.vm.provision "puppet" do |puppet|
+        puppet.manifests_path = "puppet/manifests"
+        puppet.manifest_file  = "site.pp"
+        puppet.module_path    = "../../puppet/modules"
+        puppet.options        = ["--verbose --debug"]
+    end
+
+    config.vm.synced_folder "../host-share", "/tmp/host-share", type: "rsync"
+
+    # re-enable unattended upgrades
+    config.vm.provision "shell", inline: <<-SHELL
+      apt-get install -y --reinstall apt
+      apt-get install unattended-upgrades
+      systemctl enable apt-daily.timer
+      systemd-run --on-active=1m /usr/bin/unattended-upgrade
+    SHELL
+
+    # Trigger after the VM is booted in AWS to get an easy copy-paste ssh config
+    config.trigger.after :up do
+        hostname = run "vagrant ssh -c \"hostname -I | cut -d ' ' -f2\""
+        stanza =
+<<SSH
+Host homebase-#{networkName}
+     HostName #{hostname}
+     User <SSH_USER>
+     IdentityFile ~/.ssh/id_rsa
+     LocalForward 50050 127.0.0.1:50050
+     LocalForward 5000 #{subnet}.14:80
+     LocalForward 9001 127.0.0.1:9001
+     #Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshKeys users.json
+     #Your port number is (5900 + (UID - 6000) + 1)
+     #LocalForward 5901 127.0.0.1:59xx
+
+Host nweb-#{networkName}
+     Proxycommand ssh homebase-#{networkName} nc -q0 %h.infra.us %p
+     User <SSH_USER>
+
+Host elk-#{networkName}
+     Proxycommand ssh homebase-#{networkName} nc -q0 %h.infra.us %p
+     User <SSH_USER>
+     LocalForward 5601 #{subnet}.13:5601
+
+SSH
+        stanzafile = "homebase-#{networkName}"
+        File.open(stanzafile, 'w') do |file|
+          file.write(stanza)
+        end
+
+        STDOUT.puts <<INSTRUCTIONS
+Copy the generated file (#{stanzafile}) into you ssh config like this:
+cat #{stanzafile} >> ~/.ssh/config
+INSTRUCTIONS
+    end
+  end
+end

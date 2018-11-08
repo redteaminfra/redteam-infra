@@ -1,0 +1,11 @@
+[Unit]
+Description=nweb
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/nweb/nweb-server
+ExecStart=/bin/bash run-server.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target

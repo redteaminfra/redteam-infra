@@ -1,0 +1,12 @@
+[Unit]
+Description=elastalert
+After=elasticsearch-es-01.service 
+
+[Service]
+WorkingDirectory=/etc/elastalert
+ExecStart=/usr/bin/python -m elastalert.elastalert --start NOW
+Type=simple
+User=root
+
+[Install]
+WantedBy=multi-user.target

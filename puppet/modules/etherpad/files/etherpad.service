@@ -1,0 +1,11 @@
+[Unit]
+Description=etherpad service
+
+[Service]
+WorkingDirectory=/home/etherpad/etherpad
+ExecStart=/home/etherpad/etherpad/bin/run.sh
+Type=simple
+User=etherpad
+
+[Install]
+WantedBy=multi-user.target

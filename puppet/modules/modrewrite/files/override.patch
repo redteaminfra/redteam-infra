@@ -1,0 +1,10 @@
+--- /etc/apache2/apache2.conf   2017-12-18 17:42:48.233403603 +0000
++++ /etc/apache2/apache2.conf.override  2017-12-18 17:51:08.439217311 +0000
+@@ -163,7 +163,7 @@
+ 
+ <Directory /var/www/>
+        Options Indexes FollowSymLinks
+-       AllowOverride None
++       AllowOverride All
+        Require all granted
+ </Directory>
