@@ -4,7 +4,7 @@
 
 Repeatable, Modular, Dynamic, Auditable and Secure infrastructure is now available for Red Team engagements / operations thanks to Mike Leibowitz and Topher Timzen.
 
-https://github.com/Intel/redteam-infra
+https://github.com/redteaminfra/redteam-infra
 
 This training session will bring you up to speed on:
 
@@ -23,14 +23,14 @@ Due to the need for more advanced key deployment, the SSH key repo was rearchite
 
 - Ease of provision across multiple environments
 
-The repo is public https://github.com/intel/redteam-ssh
+The repo is public https://github.com/redteaminfra/redteam-ssh
 
 - Documentation available in the README
 
 ### New User
 
 1. ssh-keygen –b 4096
-1. Git clone https://github.com/Intel/redteam-ssh
+1. Git clone https://github.com/redteaminfra/redteam-ssh
 1. Cd sshkeys
 1. user_tool.py -j users.json add -u '<YOUR USERNAME>' -n '<YOUR NAME>' -k <PATH OF PUBLIC KEY> -t volunteer
 1. Git add users.json
@@ -42,7 +42,7 @@ The repo is public https://github.com/intel/redteam-ssh
 Did you forget your ssh keypair or lose your private key? Read the users.json file to find the UID associated with your username.
 
 1. `ssh-keygen –b 4096`
-1. Git clone https://github.com/Intel/redteam-ssh
+1. Git clone https://github.com/redteaminfra/redteam-ssh
 1. Cd sshkeys
 1. user_tool.py mod -j <json_file> --uid <uid> [-n <name>] [-u <username>] [-k <PATH OF PUBLIC KEY>] -t volunteer
 

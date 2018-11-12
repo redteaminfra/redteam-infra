@@ -17,7 +17,7 @@ vagrant up
 
 Because vagrant makes a local .vagrant folder to house all information about an instance, we need a copy of that repository for every operation we spin up on an internal host. On the chance that a change is required for the infrastructure a fork is deal.
 
-1. Fork https://github.com/intel/redteam-infra on github.com
+1. Fork https://github.com/redteaminfra/redteam-infra on github.com
 1. git clone <forkurl> <engadgement name>
 1. `make-network.sh <name of engagement>`
 1. Push changes to fork and if needed push them to infrastructure

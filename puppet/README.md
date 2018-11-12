@@ -141,7 +141,7 @@ The idea behind this module is to manage user creation/deactivation
 cleanly and repeatably. The ssh keys and user identities are stored in
 an internal github project.  This basically means that we have a VM on
 an internal resource that pushes to homebase every time something is pushed to the
-ssh keys repo on github.com/intel/redteam-ssh
+ssh keys repo on github.com/redteaminfra/redteam-ssh
 
 The moving parts:
 ```
@@ -183,7 +183,7 @@ The moving parts:
 ```
 
 Each homebase machine has a repo for users and ssh keys, which a VM on
-an internal host periodically pulls from github.com/intel/redteam-ssh  and pushes to.
+an internal host periodically pulls from github.com/redteaminfra/redteam-ssh  and pushes to.
 Puppet then periodically checks out the repo and runs a script that
 applies the changes.
 
