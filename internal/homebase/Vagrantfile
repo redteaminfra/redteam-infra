@@ -133,7 +133,7 @@ Host homebase-#{networkName}
      #Your port number is (5900 + (UID - 6000) + 1)
      #LocalForward 5901 127.0.0.1:59xx
 
-Host nweb-#{networkName}
+Host natlas-#{networkName}
      Proxycommand ssh homebase-#{networkName} nc -q0 %h.infra.us %p
      User <SSH_USER>
 

@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
   config.vm.define :infrastructure do |infrastructure|
 
     infrastructure.vm.box = "internal"
-    infrastructure.vm.hostname = "nweb"
+    infrastructure.vm.hostname = "natlas"
 
     # check for triggers
     unless Vagrant.has_plugin?("vagrant-triggers")
@@ -69,12 +69,12 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
     if [ ! -L /etc/infra/site ]; then
-       mkdir -p /etc/infra && ln -s internal/nweb/puppet/manifests/site.pp /etc/infra/site
+       mkdir -p /etc/infra && ln -s internal/natlas/puppet/manifests/site.pp /etc/infra/site
     fi
     SHELL
 
     config.vm.provision "shell",
-        inline: "hostnamectl set-hostname nweb-#{networkName}"
+        inline: "hostnamectl set-hostname natlas-#{networkName}"
 
     config.vm.provision "puppet" do |puppet|
         puppet.manifests_path = "puppet/manifests"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Scan collection and search tool
+After=network.target
+ 
+[Service]
+Type=simple
+User=natlas
+WorkingDirectory=/opt/natlas/natlas-server
+ExecStart=/bin/bash /opt/natlas/natlas-server/run-server.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

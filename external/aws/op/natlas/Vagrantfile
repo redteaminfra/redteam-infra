@@ -47,12 +47,12 @@ end
 
 Vagrant.configure("2") do |config|
 
-  config.vm.define :nweb do |nweb|
+  config.vm.define :natlas do |natlas|
 
-    nweb.vm.box = "nweb"
-    ec2name = "nweb"
+    natlas.vm.box = "natlas"
+    ec2name = "natlas"
 
-    nweb.vm.provider :aws do |aws, domain|
+    natlas.vm.provider :aws do |aws, domain|
 
       # For AWS_KEY and AWS_SECRET:
       # You have to log into aws  and then use IAM.
@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
       domain.ssh.username = "ubuntu"
       domain.ssh.keys_only = true
       domain.ssh.private_key_path = ENV['AWS_KEYPATH']
-      domain.ssh.proxy_command = "ssh homebase-#{vpc['name']} nc -q0 nweb-#{vpc['name']}.infra.us %p" 
+      domain.ssh.proxy_command = "ssh homebase-#{vpc['name']} nc -q0 natlas-#{vpc['name']}.infra.us %p" 
 
       aws.ami = "ami-b2d463d2"              # xenial
       aws.instance_type = "t2.medium"
@@ -78,25 +78,25 @@ Vagrant.configure("2") do |config|
         vpc["security_groups"]["VPC Allow all traffic"]
       ]
       aws.tags = {
-        'Name' => "nweb-#{vpc['name']}"
+        'Name' => "natlas-#{vpc['name']}"
       }
       aws.associate_public_ip = true
       aws.subnet_id = vpc["subnet_id"]
       aws.private_ip_address = "#{subnet}.14"
     end
 
-    nweb.vm.provision "shell", :path => "../../vagrant_setup.sh"
+    natlas.vm.provision "shell", :path => "../../vagrant_setup.sh"
 
-    nweb.vm.provision "shell", inline: <<-SHELL
+    natlas.vm.provision "shell", inline: <<-SHELL
     if [ ! -L /etc/infra/site ]; then
-       mkdir -p /etc/infra && ln -s external/aws/op/nweb/puppet/manifests/site.pp /etc/infra/site
+       mkdir -p /etc/infra && ln -s external/aws/op/natlas/puppet/manifests/site.pp /etc/infra/site
     fi
     SHELL
 
-    nweb.vm.provision "shell",
-        inline: "hostnamectl set-hostname nweb-#{vpc['name']}"
+    natlas.vm.provision "shell",
+        inline: "hostnamectl set-hostname natlas-#{vpc['name']}"
 
-    nweb.vm.provision "puppet" do |puppet|
+    natlas.vm.provision "puppet" do |puppet|
         puppet.manifests_path   = "puppet/manifests"
         puppet.manifest_file   = "site.pp"
         puppet.module_path      = "../../../../puppet/modules"
@@ -104,7 +104,7 @@ Vagrant.configure("2") do |config|
     end
 
     # re-enable unattended upgrades
-    nweb.vm.provision "shell", inline: <<-SHELL
+    natlas.vm.provision "shell", inline: <<-SHELL
     apt-get install -y --reinstall apt
     apt-get install unattended-upgrades
     systemctl enable apt-daily.timer

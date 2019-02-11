@@ -210,9 +210,9 @@ in the shell provisioner stage and then utilized in the site manifests.
 ELK server will have Kibana and Elastic while all other machines in the VPC
 ship logs to it with logstash.
 
-## Nweb
+## Natlas
 
-Nweb will spin up an nweb instance for port scanning. It includes an nmap-agent and an nweb systemd service.
+Natlas will spin up an [natlas instance](https://github.com/natlas/natlas) for port scanning. It includes an nmap-agent and an natlas systemd service.
 
 ## IRC
 

@@ -1,6 +1,6 @@
 node "default" {
   include 'gitpuppet'
-  include 'nweb'
+  include 'natlas'
   include 'ssh'
   include 'unattendedupgrades'
   include 'mollyguard'

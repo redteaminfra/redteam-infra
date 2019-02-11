@@ -189,7 +189,7 @@ Host elk-#{vpcname}
      User <SSH_USER>
      LocalForward 5601 #{subnet}.13:5601
 
-Host nweb-#{vpcname}
+Host natlas-#{vpcname}
      Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
      User <SSH_USER>
 SSH

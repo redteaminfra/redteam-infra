@@ -25,7 +25,7 @@ Because vagrant makes a local .vagrant folder to house all information about an 
 ## Boxes to Standup
 
 1. Homebase
-1. Nweb
+1. Natlas
 1. ELK
 
 ## Virbr

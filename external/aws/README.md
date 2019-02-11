@@ -80,9 +80,9 @@ subnets.
 
   All logs from machines in the VPC are sent to the Elastic Stack.
 
-* Nweb
+* Natlas
 
-  A dedicated nweb instance providing port scanning capabilities as well as
+  A dedicated natlas instance providing port scanning capabilities as well as
   the web interface to see the results.
 
 ## Ongoing VPC Structure
@@ -91,9 +91,9 @@ subnets.
 
   As above, this will have a homebase machine and similar ssh structure.
 
-* nweb
+* natlas
 
-  Nweb scanning is a continuous activity that we should always be doing.
+  Natlas scanning is a continuous activity that we should always be doing.
   
 # How to Play
 
@@ -194,10 +194,10 @@ In order to successfully standup machines in the VPC for operations, the machine
 
 1. homebase
 1. proxies
-1. Nweb
+1. Natlas
 1. elkServer
 
-After homebase is deployed you will need to edit the SSH stanza in order for proxies, nweb, and elkServer to successfully deploy. Vagrant spits out a command for this and modifies `~/.ssh/config`
+After homebase is deployed you will need to edit the SSH stanza in order for proxies, natlas, and elkServer to successfully deploy. Vagrant spits out a command for this and modifies `~/.ssh/config`
 
 Once homebase is deployed, just change directories to each of the other boxes. 
 

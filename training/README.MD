@@ -157,7 +157,7 @@ Host proxy02-testing
      Proxycommand ssh homebase-testing nc -q0 %h.infra.us %p
      User < USERNAME >
 
-Host nweb-testing
+Host natlas-testing
      Proxycommand ssh homebase-testing nc -q0 %h.infra.us %p
      User < USERNAME >
 ```
@@ -180,7 +180,7 @@ VNC is available on Homebase which will grant you local access to
 
 - Cobalt Strike
 
-- Nweb
+- Natlas
 
 - Running Kali desktop environment
 

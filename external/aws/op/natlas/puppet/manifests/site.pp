@@ -2,7 +2,7 @@ node "default" {
     include 'hostsexternal'
     include 'gitpuppet'
     include 'ssh'
-    include 'nweb'
+    include 'natlas'
     include 'unattendedupgrades'
     include 'yama'
     include 'mollyguard'
