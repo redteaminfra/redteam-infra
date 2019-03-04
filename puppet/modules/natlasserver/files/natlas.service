@@ -1,5 +1,5 @@
 [Unit]
-Description=Scan collection and search tool
+Description=Natlas Server
 After=network.target
  
 [Service]

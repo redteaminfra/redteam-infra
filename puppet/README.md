@@ -214,6 +214,8 @@ ship logs to it with logstash.
 
 Natlas will spin up an [natlas instance](https://github.com/natlas/natlas) for port scanning. It includes an nmap-agent and an natlas systemd service.
 
+There are two modules, one for the server and one for the agent in `natlasserver` and `natlasagent`
+
 ## IRC
 
 IRC will stand up a very minimal miniircd IRC Server.
