@@ -66,6 +66,10 @@ up in a branch on your machine prior to pushing to github.
 
 # Puppet Modules for Infra
 
+## Backflips
+
+TODO
+
 ## cobaltstrike
 
 1. Add a teamserver password in the `PASSWORD` field in `modules/cobaltstrike/files/teamserver.sh`
@@ -83,14 +87,29 @@ If you want to only use staged beacons to support N+1 proxies. This method will 
 1. Create a listener by setting the "host" field to the team server IP address and add the proxy IPs as the external beacons.
 1. Create a stageless beacon with a Proxy of one of the AWS IPS. For example `http://AWS-IP:80` in the stageless beacon configuration.
 
-Cobalt Strike also contains a `c2-monitor.cna` aggressor script that runs as a headless script to provide the ELK instance with beacon information useful for alerting. This script will keep track of cobalt strike beacons and will alert an operator when they timeout or don't phone back within a certain threshold. It will also keep track of beacon state if the team server is restarted. 
+Cobalt Strike also contains a `c2-monitor.cna` aggressor script that runs as a headless script to provide the ELK instance with beacon information useful for alerting. This script will keep track of cobalt strike beacons and will alert an operator when they timeout or don't phone back within a certain threshold. It will also keep track of beacon state if the team server is restarted.
 
-## Mod Rewrite
+## Dante
 
-This module is used on the proxies to perform a mod_rewrite on apache to redirect CobaltStrike C2 traffic back to homebase.
-This module requires a Malleable C2 profile and a redirection URL for invalid C2 URI's.
+TODO
 
-Currently this module only supports the amazon C2 profile. Work is in progress to automate the C2 modrewriter.
+## ELK
+
+Contains files that tell instances which files to pipe through logstash.
+
+`ls.conf` is currently used for elk, natlas and homebase
+
+`proxy.conf` is currently used for the proxies.
+
+Consult any `site.pp` for information on how to apply these.
+
+This module relies on `logstash`
+
+## Etherpad
+
+Stands up a local instance of Etherpad for collaborative note-taking.
+
+Etherpad is on 127.0.0.1:9001 and is locally forwarded with SSH
 
 ## gitpuppet
 
@@ -119,6 +138,10 @@ push to the repo and changes are automatically applied.
 Homebase runs a git-daemon that other machines can periodically pull
 from and apply in a similar way.
 
+## Homebase tools
+
+A small collection of packages that are useful for homebase operations.
+
 ## Hosts
 
 * host file
@@ -135,6 +158,92 @@ from and apply in a similar way.
 
   * asciinema is blackholed to prevent accidental asciinema upload mistakes
 
+## Hostsexternal, internal and hb
+
+Silly bootstrapper to assign every instance a realistic hostname via ruby erb. This is necessary and rather annoying.
+
+## IRC
+
+IRC will stand up a very minimal miniircd IRC Server.
+IRC default listens on port 6667. A sed command is used to ensure s.bind() is on localhost.
+
+## Logstashconfig
+
+Applied to all instances so they know how to ship logs to the ELK instance.
+
+Logging is being done with an elastic stack running on elk-vpc. This is
+provisioned in two ways. Because we aren't using puppet librarian we needed
+a way to have modules supported from the forge. These are installed
+in the shell provisioner stage and then utilized in the site manifests.
+ELK server will have Kibana and Elastic while all other machines in the VPC
+ship logs to it with logstash.
+
+This module relies on `elk`
+
+## Loot
+
+Creates `/loot` to store loot. We need a more secure way to handle loot and it is a change inbound.
+
+## Mod Rewrite
+
+This module is used on the proxies to perform a mod_rewrite on apache to redirect CobaltStrike C2 traffic back to homebase.
+This module requires a Malleable C2 profile and a redirection URL for invalid C2 URI's.
+
+Currently this module only supports the amazon C2 profile. Work is in progress to automate the C2 modrewriter.
+
+## Mollyguard
+
+Installs the `mollyguard` package to force typing in the hostname to avoid accidental reboots.
+
+## Monitoring
+
+This module will create rules to alert on within the ELK instance using elastalert.
+
+`C2Dead.yaml` will alert an operator when a beacon exceeds a threshold as defined in the cobaltstrike file `c2-monitor.cna`.
+
+`C2Compromised.yaml` will alert an operator when a proxy server (hosting your domain / first entry point to C2) is hit by your organizations IP space without a successful htaccess redirect. This is a pretty sure sign that your blue team has hunted you down and you need to be ready to move proxies or get a game plan going!
+
+To configure C2Compromised to alert on IPs hitting you, reference your external OUTBOUND IPs as defined from the README in `external`.
+
+```
+filter:
+- query:
+    query_string:
+      query: "host: proxy* AND \"200\" AND NOT \"/s/ref\" AND (client: [IP TO IP]  OR client: [IP TO IP] )"
+```
+
+To configure both of these, make sure you fill out the "email" section in both of the aforementioned files. The authors have used phone numbers in the past
+
+```
+email:
+- "<PHONE OF OPERATOR 1>@domain"
+- "<PHONE OF OPERATOR 1>@domain"
+```
+
+You'll also need to add auth for AWS SMS if you go this route in `puppet/modules/monitoring/files/authFile.yaml`.
+
+## Natlas
+
+Natlas will spin up an [natlas instance](https://github.com/natlas/natlas) for port scanning. It includes an nmap-agent and an natlas systemd service.
+
+There are two modules, one for the server and one for the agent in `natlasserver` and `natlasagent`
+
+## Nmap
+
+Bootstraps the installation of `nmap 7.60` becuase at the time our instances did not automatically install it.
+
+## OPSEC
+
+Homebase has a set of iptables rules to prevent new outbound
+connections to <victim.target> DMZ IP space.  This is designed to prevent an
+opsec mistake of running an exploit or scan from homebase.  Users
+should instead use one of the proxy boxes for attack traffice.
+
+The IPs in this module should all of the CIDR ranges your company uses. Consult an ASN record or your companies internal documentation for this information.
+
+## Proxytools
+
+A variety of tools installed on the proxies.
 
 ## ssh
 
@@ -195,57 +304,6 @@ applies the changes.
 * User changing keys
 * User changing name
 
-## IPTables
-
-Homebase has a set of iptables rules to prevent new outbound
-connections to <victim.target> DMZ IP space.  This is designed to prevent an
-opsec mistake of running an exploit or scan from homebase.  Users
-should instead use one of the proxy boxes for attack traffice.
-
-## OPSEC
-
-This module is applied to homebase to prevent it from being able to do anything outbound to your companies IP address space.  
-
-The IPs in this module should all of the CIDR ranges your company uses. Consult an ASN record or your companies internal documentation for this information. 
-
-## Logging
-
-Logging is being done with an elastic stack running on elk-vpc. This is
-provisioned in two ways. Because we aren't using puppet librarian we needed
-a way to have modules supported from the forge. These are installed
-in the shell provisioner stage and then utilized in the site manifests.
-ELK server will have Kibana and Elastic while all other machines in the VPC
-ship logs to it with logstash.
-
-## Natlas
-
-Natlas will spin up an [natlas instance](https://github.com/natlas/natlas) for port scanning. It includes an nmap-agent and an natlas systemd service.
-
-There are two modules, one for the server and one for the agent in `natlasserver` and `natlasagent`
-
-## IRC
-
-IRC will stand up a very minimal miniircd IRC Server.
-IRC default listens on port 6667. A sed command is used to ensure s.bind() is on localhost.
-
-## Homebase tools
-
-A small collection of packages that are useful for homebase operations.
-
-## Unattended Upgrades
-
-Manages a file that ought to keep unattended upgrades working and installs the packages
-
-## Etherpad
-
-Stands up a local instance of Etherpad for collaborative note-taking.
-
-Etherpad is on 127.0.0.1:9001 and is locally forwarded with SSH
-
-## Mollyguard
-
-Installs the `mollyguard` package to force typing in the hostname to avoid accidental reboots.
-
 ## Tinyproxy
 
 Installs [tinyproxy](https://tinyproxy.github.io/) on the proxies.  This is a very simple http proxy that allows 192.168.0.0/16 to use it.  All ports are available for CONNECT, so you can effectively use this as an arbitrary tcp proxy.  Using depends on application, but in general, environment variables will do for most tools:
@@ -256,29 +314,14 @@ https_proxy=$http_proxy
 curl http://example.com
 ```
 
-## Monitoring
+## Unattended Upgrades
 
-This module will create rules to alert on within the ELK instance using elastalert.
+Manages a file that ought to keep unattended upgrades working and installs the packages
 
-`C2Dead.yaml` will alert an operator when a beacon exceeds a threshold as defined in the cobaltstrike file `c2-monitor.cna`. 
+## Volunteer SSH
 
-`C2Compromised.yaml` will alert an operator when a proxy server (hosting your domain / first entry point to C2) is hit by your organizations IP space without a successful htaccess redirect. This is a pretty sure sign that your blue team has hunted you down and you need to be ready to move proxies or get a game plan going! 
+Allows SSH keys with the volunteer tag to SSH to this instance. Consult [RedTeam-ssh](https://github.com/redteaminfra/redteam-ssh) for more detail on tags.
 
-To configure C2Compromised to alert on IPs hitting you, reference your external OUTBOUND IPs as defined from the README in `external`. 
+## Yama
 
-```
-filter:
-- query:
-    query_string:
-      query: "host: proxy* AND \"200\" AND NOT \"/s/ref\" AND (client: [IP TO IP]  OR client: [IP TO IP] )"
-```
-
-To configure both of these, make sure you fill out the "email" section in both of the aforementioned files. The authors have used phone numbers in the past 
-
-```
-email:
-- "<PHONE OF OPERATOR 1>@domain" 
-- "<PHONE OF OPERATOR 1>@domain"
-```
-
-You'll also need to add auth for AWS SMS if you go this route in `puppet/modules/monitoring/files/authFile.yaml`. 
+Disable ptrace!
