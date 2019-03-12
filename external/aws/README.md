@@ -94,14 +94,14 @@ subnets.
 * natlas
 
   Natlas scanning is a continuous activity that we should always be doing.
-  
+
 # How to Play
 
 ## How to start
 
-The first thing you'll need to do is setup IAM in AWS and generate an EC2 keypair. 
+The first thing you'll need to do is setup IAM in AWS and generate an EC2 keypair.
 
-To do so, from IAM in AWS make a user and add that user to the group "redteam". 
+To do so, from IAM in AWS make a user and add that user to the group "redteam".
 
 Click on the newly created user and go to the "Security Credentials" tab. See under access and obtain the values for "AWS_KEY" and "AWS_SECRET"
 
@@ -117,7 +117,7 @@ export AWS_SECRET="SECRET"
 export AWS_KEYNAME=USERNAME
 export AWS_KEYPATH=~/.aws/PRIVATEKEY.pem
 ```
-From there run `source ~/.aws/awssetup.sh` before doing any deployments. 
+From there run `source ~/.aws/awssetup.sh` before doing any deployments.
 
 You also need to setup your AWS credentials in `~/.aws/credentials`
 
@@ -127,7 +127,7 @@ aws_access_key_id = <STUFF>
 aws_secret_access_key = <THINGS>
 ```
 
-Also set `~/.aws/config` to your zone such as 
+Also set `~/.aws/config` to your zone such as
 
 ```
 [default]
@@ -140,11 +140,11 @@ Because vagrant makes a local `.vagrant` folder to house all information about a
 
 1. git clone https://github.com/redteaminfra/redteam-infra <OPNAME>
 1. Make a new repo in RedTeamInfra called <OPNAME>
-1. git remote rm origin 
+1. git remote rm origin
 1. git remote add origin git@github.com:redteaminfra/<OPNAME>
 1. git push origin master
 
-Once the repo is forked and cloned, you may need to make some additional modifications to the puppet modules depending on your use cases. View the README in the puppet repo for additional documentation. 
+Once the repo is forked and cloned, you may need to make some additional modifications to the puppet modules depending on your use cases. View the README in the puppet repo for additional documentation.
 
 The infra repo makes use of submodules for SSH, make sure to init those (vagrant will yell at you if you don't)
 
@@ -165,9 +165,11 @@ You will need to configure a few select things in order to spin up homebase
 
 1. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. If not, there are a few things you'll need to comment out such as all of the references to the `.cobaltstrike.license` in `Vagrantfile` for homebase.
 1. Put a list of OPs in `external/aws/ips.py` that your company uses for OUTBOUND traffic. This will be used for both SSH inbound and OPSEC rules
-1. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that will be used for OUTBOUND traffic. These are to prevent OPSEC mistakes from homebase.
+1. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that your organization owns. These are to prevent OPSEC mistakes from homebase.
 1. Add auth for AWS SMS to `puppet/modules/monitoring/files/authFile.yaml`
+1. Add OUTBOUND company traffic IPs to `puppet/modules/monitoring/files/C2Compromised.yaml`
 1. Add public keys to `external/sketch/provision.sh` inside the `authorized_keys` blob for users you want to access the redirector instances.
+
 
 ## Make a new VPC
 
@@ -199,7 +201,7 @@ In order to successfully standup machines in the VPC for operations, the machine
 
 After homebase is deployed you will need to edit the SSH stanza in order for proxies, natlas, and elkServer to successfully deploy. Vagrant spits out a command for this and modifies `~/.ssh/config`
 
-Once homebase is deployed, just change directories to each of the other boxes. 
+Once homebase is deployed, just change directories to each of the other boxes.
 
 There are a few puppet modules you will need to modify for every op. View what to change in the `puppet/README`
 

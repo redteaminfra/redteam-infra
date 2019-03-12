@@ -22,7 +22,6 @@ Must have ability to verify configuration is deployed as per specification.
 
 Must not require having unnecessary information exposed outside of <target.victim>.
 
-
 With this in mind, we have a git server/git client model for storing puppet configuration.  Homebase serves as our git server and all other machines in the VPC/zone will periodically check out the git repo (this very git repo) and apply the state.
 
 # Development Workflow
@@ -83,6 +82,8 @@ If you want to only use staged beacons to support N+1 proxies. This method will 
 
 1. Create a listener by setting the "host" field to the team server IP address and add the proxy IPs as the external beacons.
 1. Create a stageless beacon with a Proxy of one of the AWS IPS. For example `http://AWS-IP:80` in the stageless beacon configuration.
+
+Cobalt Strike also contains a `c2-monitor.cna` aggressor script that runs as a headless script to provide the ELK instance with beacon information useful for alerting. This script will keep track of cobalt strike beacons and will alert an operator when they timeout or don't phone back within a certain threshold. It will also keep track of beacon state if the team server is restarted. 
 
 ## Mod Rewrite
 
@@ -201,6 +202,12 @@ connections to <victim.target> DMZ IP space.  This is designed to prevent an
 opsec mistake of running an exploit or scan from homebase.  Users
 should instead use one of the proxy boxes for attack traffice.
 
+## OPSEC
+
+This module is applied to homebase to prevent it from being able to do anything outbound to your companies IP address space.  
+
+The IPs in this module should all of the CIDR ranges your company uses. Consult an ASN record or your companies internal documentation for this information. 
+
 ## Logging
 
 Logging is being done with an elastic stack running on elk-vpc. This is
@@ -248,3 +255,30 @@ http_proxy=http://192.168.1.11:8888/
 https_proxy=$http_proxy
 curl http://example.com
 ```
+
+## Monitoring
+
+This module will create rules to alert on within the ELK instance using elastalert.
+
+`C2Dead.yaml` will alert an operator when a beacon exceeds a threshold as defined in the cobaltstrike file `c2-monitor.cna`. 
+
+`C2Compromised.yaml` will alert an operator when a proxy server (hosting your domain / first entry point to C2) is hit by your organizations IP space without a successful htaccess redirect. This is a pretty sure sign that your blue team has hunted you down and you need to be ready to move proxies or get a game plan going! 
+
+To configure C2Compromised to alert on IPs hitting you, reference your external OUTBOUND IPs as defined from the README in `external`. 
+
+```
+filter:
+- query:
+    query_string:
+      query: "host: proxy* AND \"200\" AND NOT \"/s/ref\" AND (client: [IP TO IP]  OR client: [IP TO IP] )"
+```
+
+To configure both of these, make sure you fill out the "email" section in both of the aforementioned files. The authors have used phone numbers in the past 
+
+```
+email:
+- "<PHONE OF OPERATOR 1>@domain" 
+- "<PHONE OF OPERATOR 1>@domain"
+```
+
+You'll also need to add auth for AWS SMS if you go this route in `puppet/modules/monitoring/files/authFile.yaml`. 
