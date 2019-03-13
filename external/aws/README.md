@@ -146,7 +146,17 @@ Because vagrant makes a local `.vagrant` folder to house all information about a
 
 Once the repo is forked and cloned, you may need to make some additional modifications to the puppet modules depending on your use cases. View the README in the puppet repo for additional documentation.
 
-The infra repo makes use of submodules for SSH, make sure to init those (vagrant will yell at you if you don't)
+## SSH Setup
+
+The infra repo makes use of submodules for SSH from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh), make sure to create those as submodules or init those if cloning a staged repo (vagrant will yell at you if you don't)
+
+```
+git clone <Your redteam-ssh repo with team keys in it> # git clone https://github.com/redteaminfra/redteam-ssh
+cd redteam-infra/external/aws
+git submodule add https://github.com/redteaminfra/redteam-ssh host-share/sshkeys
+```
+
+OR if you have a submodule already defined
 
 ```
 git submodule init
@@ -163,14 +173,13 @@ Ensure SSHKEY repo is up to date
 
 You will need to configure a few select things in order to spin up homebase
 
-1. Create a git submodule from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh) that contains a valid users.json. The git submodule should be owned by you and placed in `host-share/sshkeys`. You should have at least one user with an `infra` tag. 
+1. Create a git submodule from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh) that contains a valid users.json. The git submodule should be owned by you and placed in `host-share/sshkeys`. You should have at least one user with an `infra` tag. See above instructions for SSH Setup for more detail on how to do this. 
 1. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. If not, there are a few things you'll need to comment out such as all of the references to the `.cobaltstrike.license` in `Vagrantfile` for homebase.
 1. Put a list of OPs in `external/aws/ips.py` that your company uses for OUTBOUND traffic. This will be used for both SSH inbound and OPSEC rules
 1. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that your organization owns. These are to prevent OPSEC mistakes from homebase.
 1. Add auth for AWS SMS to `puppet/modules/monitoring/files/authFile.yaml`
 1. Add OUTBOUND company traffic IPs to `puppet/modules/monitoring/files/C2Compromised.yaml`
 1. Add public keys to `external/sketch/provision.sh` inside the `authorized_keys` blob for users you want to access the redirector instances.
-
 
 ## Make a new VPC
 
