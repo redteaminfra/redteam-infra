@@ -10,6 +10,7 @@ cd /etc/
 git clone https://github.com/Yelp/elastalert.git
 
 cd elastalert
+pip install -r requirements.txt
 python setup.py install
 
 # write config
