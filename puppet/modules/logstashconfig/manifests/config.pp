@@ -15,7 +15,7 @@ class logstashconfig::config {
 
   # this is so gross b/c the service file is actually created by a
   # puppetforge module and on kali, the service is wrong.  This
-  # fixes #67 actually for both new and existing homebases.
+  # fixes an issue for both new and existing homebases.
   $service_file = "/etc/systemd/system/logstash.service"
   exec { "ensure_${service_file}_exist":
     command => "bash -c 'test -f ${service_file} && sed -i -e \"s/^Group=logstash/Group=adm/\" ${service_file}' && systemctl daemon-reload && systemctl restart logstash ;true",
