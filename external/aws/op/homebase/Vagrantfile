@@ -116,7 +116,7 @@ Vagrant.configure("2") do |config|
     homebase.vm.provision "shell",
         inline: "hostnamectl set-hostname homebase-#{vpc['name']}"
 
-    homebase.vm.provision "shell", :path => "../../vagrant_setup.sh"
+    homebase.vm.provision "shell", :path => "../../../setup.sh"
 
     homebase.vm.provision "shell", inline: <<-SHELL
     if [ ! -L /etc/infra/site ]; then

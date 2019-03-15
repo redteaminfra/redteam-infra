@@ -89,10 +89,10 @@ Vagrant.configure("2") do |config|
       aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 50 }]
     end
 
-    elk.vm.provision "shell", :path => "../../vagrant_setup.sh"
+    elk.vm.provision "shell", :path => "../../../setup.sh"
     
     elk.vm.provision "shell", :path => "puppet.sh"
-
+    
     elk.vm.provision "shell", inline: <<-SHELL
     if [ ! -L /etc/infra/site ]; then
        mkdir -p /etc/infra && ln -s external/aws/op/elkServer/puppet/manifests/site.pp /etc/infra/site

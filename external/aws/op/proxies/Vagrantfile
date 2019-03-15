@@ -87,7 +87,7 @@ Vagrant.configure("2") do |config|
     vmName = "proxy#{i}-#{vpc['name']}"
 
     # Provision each proxy instance
-    config.vm.provision "shell", :path => "../../vagrant_setup.sh"
+    config.vm.provision "shell", :path => "../../../setup.sh"
     config.vm.synced_folder "../../host-share", "/tmp/host-share", type: "rsync"
 
     config.vm.define vmName do |instance|
