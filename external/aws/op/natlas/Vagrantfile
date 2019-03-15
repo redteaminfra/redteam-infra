@@ -85,7 +85,7 @@ Vagrant.configure("2") do |config|
       aws.private_ip_address = "#{subnet}.14"
     end
 
-    natlas.vm.provision "shell", :path => "../../../setup.sh"
+    natlas.vm.provision "shell", :path => "../../../global/setup.sh"
 
     natlas.vm.provision "shell", inline: <<-SHELL
     if [ ! -L /etc/infra/site ]; then
@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
     shutdown -r now
     SHELL
 
-    config.vm.synced_folder "../../host-share", "/tmp/host-share", type: "rsync"
+    config.vm.synced_folder "../../../global/host-share", "/tmp/host-share", type: "rsync"
 
   end
 end
