@@ -34,20 +34,20 @@ subnets.
    will have a security group in place to prevent opsec mistakes.
 
    To facilitate easier ssh config, this machine will have an A record
-   on the infra.us domain.  For example, if the public IP was
+   on the infra.redteam domain.  For example, if the public IP was
    123.456.789.012, op-example.inc.red, would point to that IP.  The
    /etc/hosts file on this machine contains entries for the other
    machines in the VPC as subdomains of the A record.  For example:
    ```
-   192.168.0.3   proxy-1.op-example.infra.us
-   192.168.0.4   proxy-2.op-example.infra.us
-   192.168.0.5   proxy-3.op-example.infra.us
+   192.168.0.3   proxy-1.op-example.infra.redteam
+   192.168.0.4   proxy-2.op-example.infra.redteam
+   192.168.0.5   proxy-3.op-example.infra.redteam
    ```
 
    This way, one can ssh into the VPC with the following snippet in .ssh/config:
    ```
-   Host *.op-example.infra.us
-      ProxyCommand tsocks ssh op-example.infra.us nc -q0 %h 22
+   Host *.op-example.infra.redteam
+      ProxyCommand tsocks ssh op-example.infra.redteam nc -q0 %h 22
    ```
 
   For testing purposes use t2.medium as machine type ($0.0464 per

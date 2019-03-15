@@ -305,20 +305,20 @@ Host homebase-demo
      #LocalForward 5901 127.0.0.1:59xx
 
 Host proxy01-demo
-     Proxycommand ssh homebase-demo nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-demo nc -q0 %h.infra.redteam %p
      User demo
 
 Host proxy02-demo
-     Proxycommand ssh homebase-demo nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-demo nc -q0 %h.infra.redteam %p
      User demo
 
 Host elk-demo
-     Proxycommand ssh homebase-demo nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-demo nc -q0 %h.infra.redteam %p
      User demo
      LocalForward 5601 192.168.1.13:5601
 
 Host natlas-demo
-     Proxycommand ssh homebase-demo nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-demo nc -q0 %h.infra.redteam %p
      User demo
 ```
 

@@ -95,7 +95,7 @@ Vagrant.configure("2") do |config|
       # the line below sends ssh through the homebase for this vpc.
       # This requires that the host stanza be placed in your
       # .ssh/config prior to spinning up the proxies
-      instance.ssh.proxy_command = "ssh homebase-#{vpc['name']} nc -q0 proxy0#{i}-#{vpc['name']}.infra.us %p"
+      instance.ssh.proxy_command = "ssh homebase-#{vpc['name']} nc -q0 proxy0#{i}-#{vpc['name']}.infra.redteam %p"
       instance.vm.provision "shell", inline: "hostnamectl set-hostname #{vmName}"
 
       instance.vm.provider :aws do |aws|

@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
       domain.ssh.username = "ubuntu"
       domain.ssh.keys_only = true
       domain.ssh.private_key_path = ENV['AWS_KEYPATH']
-      domain.ssh.proxy_command = "ssh homebase-#{vpc['name']} nc -q0 elk-#{vpc['name']}.infra.us %p" 
+      domain.ssh.proxy_command = "ssh homebase-#{vpc['name']} nc -q0 elk-#{vpc['name']}.infra.redteam %p" 
 
       aws.ami = "ami-b2d463d2"          # xenial
                                         # t2.large for operations

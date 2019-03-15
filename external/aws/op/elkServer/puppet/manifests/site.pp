@@ -5,7 +5,7 @@ node "default" {
     include 'unattendedupgrades'
     include 'yama'
     include 'mollyguard'
-    include 'monitoring'
+  #  include 'monitoring'
 
 # ELK Setup
 
@@ -18,14 +18,14 @@ node "default" {
 
    elasticsearch::instance { 'es-01':
     config => {
-      'network.host' => 'elk.infra.us',
+      'network.host' => 'elk.infra.redteam',
     }
   } 
 
   class { 'logstash':
     logstash_group  => 'adm',
     settings => {
-      'http.host' => 'elk.infra.us',
+      'http.host' => 'elk.infra.redteam',
     }
   }
 
@@ -35,9 +35,9 @@ node "default" {
 
   class { 'kibana' :
     config => {
-      'server.host'       => 'elk.infra.us',
+      'server.host'       => 'elk.infra.redteam',
       'server.port'       => '5601',
-      'elasticsearch.url' => 'http://elk.infra.us:9200',
+      'elasticsearch.url' => 'http://elk.infra.redteam:9200',
     }
   }
 

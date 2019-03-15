@@ -8,7 +8,7 @@ class logstashconfig::config {
   }
 
   exec { "named_logstash" :
-    command => "/bin/bash -c 'echo server=elk-$(hostname | cut -d - -f2- | tr -d \"\n\").infra.us' >> /etc/default/logstash",
+    command => "/bin/bash -c 'echo server=elk-$(hostname | cut -d - -f2- | tr -d \"\n\").infra.redteam' >> /etc/default/logstash",
     unless => "/bin/grep -q server /etc/default/logstash",
     refreshonly => true,
   }

@@ -99,13 +99,13 @@ Public-facing subnets can be issued to a VPC to allow for external usage of inst
 A VPC will be defined for each engagement that will prevent cross-contamination between parallel and past engagements to minimize data exposed inside of AWS at a given time. It also provides us the ability to keep the same architecture across each operation. 
 
 Each VPC will contain the internal IP space of 192.168.0.0/16, which we use 192.168.1.0/24.
-An internal network topology is setup inside each VPC inside the infra.us domain. Furthermore, each VPC will be prefixed with an engagement name such as BOX-OPERATION.infra.us. 
+An internal network topology is setup inside each VPC inside the infra.redteam domain. Furthermore, each VPC will be prefixed with an engagement name such as BOX-OPERATION.infra.redteam. 
 
-Important Note: infra.us is internal routing inside the VPC in /etc/hosts
+Important Note: infra.redteam is internal routing inside the VPC in /etc/hosts
 
 ### Homebase
 
-Homebase-[Op Name].infra.us
+Homebase-[Op Name].infra.redteam
 
 - 192.168.1.10
 - Kali machine with SSH open to victim.target
@@ -115,7 +115,7 @@ Homebase-[Op Name].infra.us
 
 ### Proxies
 
-Proxy Machines (proxy[01,02]-[Op Name].infra.us)
+Proxy Machines (proxy[01,02]-[Op Name].infra.redteam)
 
 - 192.168.1.11, 192.168.1.12
 - These machines receive C2 traffic from victim.target and are indictable by blue. The proxies serve two functions, forward and reverse. 
@@ -124,14 +124,14 @@ Proxy Machines (proxy[01,02]-[Op Name].infra.us)
 
 ### Natlas
 
-Natlas (natlas-[Op Name].infra.us)
+Natlas (natlas-[Op Name].infra.redteam)
 
 - 192.168.1.14
 - Port scanning machine that hosts Natlas
 
 ### Elastic
 
-Elastic Stack (elk-[Op Name].infra.us)
+Elastic Stack (elk-[Op Name].infra.redteam)
 
 - 192.168.1.13
 - Centralized logging server
@@ -150,15 +150,15 @@ Host homebase-testing
      LocalForward 5000 192.168.1.14:80
 
 Host proxy01-testing
-     Proxycommand ssh homebase-testing nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-testing nc -q0 %h.infra.redteam %p
      User < USERNAME >
 
 Host proxy02-testing
-     Proxycommand ssh homebase-testing nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-testing nc -q0 %h.infra.redteam %p
      User < USERNAME >
 
 Host natlas-testing
-     Proxycommand ssh homebase-testing nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-testing nc -q0 %h.infra.redteam %p
      User < USERNAME >
 ```
 

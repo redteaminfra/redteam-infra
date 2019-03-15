@@ -8,12 +8,12 @@
     Requires the $subnet variable to be set which will be the first 3 octets of the subnet IP. This is done in `hosts/config.pp`.
 %>
 
-<%= @subnet %>.10 homebase-<%= @vpc %>.infra.us
-<%= @subnet %>.11 proxy01-<%= @vpc %>.infra.us
-<%= @subnet %>.12 proxy02-<%= @vpc %>.infra.us
-<%= @subnet %>.13 elk-<%= @vpc %>.infra.us
-<%= @subnet %>.13 elk.infra.us
-<%= @subnet %>.14 natlas-<%= @vpc %>.infra.us
+<%= @subnet %>.10 homebase-<%= @vpc %>.infra.redteam
+<%= @subnet %>.11 proxy01-<%= @vpc %>.infra.redteam
+<%= @subnet %>.12 proxy02-<%= @vpc %>.infra.redteam
+<%= @subnet %>.13 elk-<%= @vpc %>.infra.redteam
+<%= @subnet %>.13 elk.infra.redteam
+<%= @subnet %>.14 natlas-<%= @vpc %>.infra.redteam
 
 
 # blackhole asciinema to prevent accidental asciinema upload on any machine

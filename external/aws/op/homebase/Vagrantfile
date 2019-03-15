@@ -177,20 +177,20 @@ Host homebase-#{vpcname}
      #LocalForward 5901 127.0.0.1:59xx
 
 Host proxy01-#{vpcname}
-     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.redteam %p
      User <SSH_USER>
 
 Host proxy02-#{vpcname}
-     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.redteam %p
      User <SSH_USER>
 
 Host elk-#{vpcname}
-     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.redteam %p
      User <SSH_USER>
      LocalForward 5601 #{subnet}.13:5601
 
 Host natlas-#{vpcname}
-     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.us %p
+     Proxycommand ssh homebase-#{vpcname} nc -q0 %h.infra.redteam %p
      User <SSH_USER>
 SSH
         stanzafile = "homebase-#{vpc['name']}"

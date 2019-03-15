@@ -2,7 +2,7 @@
 
 DIR=$(mktemp -d)
 VPC=$(hostname | /usr/bin/cut -d '-' -f2- | tr -d '\n')
-gitserver="homebase-$VPC.infra.us"
+gitserver="homebase-$VPC.infra.redteam"
 
 cd $DIR && \
     git clone git://$gitserver/git/sshKeys && \
