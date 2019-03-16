@@ -151,7 +151,7 @@ SSLProxyCheckPeerExpire off
 ```
 1. Reload apache.
 1. Test with curl.
-1. Setup https reverse listeners on cobalt strike.  Staged listeners will not work.  Set domain to IP and A record for this proxy.
+1. Setup https reverse listeners on cobalt strike. Set domain to IP and A record for this proxy.
 1. Drop binaries on target and get listeners
 
 ## Enabling Automatic SSH sync
