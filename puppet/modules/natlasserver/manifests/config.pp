@@ -19,6 +19,11 @@ class natlasserver::config {
         require => Exec["untar-natlas-server"],
     }
 
+    exec {"sed-server":
+        command => "/bin/sed 's/127.0.0.1/0.0.0.0/g' /opt/natlas/natlas-server/run-server.sh  -i",
+        require => Exec["untar-natlas-server"],
+    }
+
     exec {"setup-secret":
         cwd => "/opt/natlas/natlas-server",
         command => "/bin/echo SECRET_KEY=$(openssl rand -base64 32) >> .env",
