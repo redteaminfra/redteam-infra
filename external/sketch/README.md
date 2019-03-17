@@ -25,4 +25,5 @@ Sets up a simpleproxy redirector and associated systemd service file
 1. On trusted host:
   1. cat install_proxy.py | base64 -w0 | xclip -i
 1. On untrusted host:
-  1. echo '\<xpaste\>' | base64 -d | sudo python - \<IP\> \<LPORT\> \<RPORT\>
+  1. echo '\<xpaste\>' | base64 -d | sudo python - \<IP of a proxy\> 443 443
+  1. echo '\<xpaste\>' | base64 -d | sudo python - \<IP of a proxy\> 80 80
