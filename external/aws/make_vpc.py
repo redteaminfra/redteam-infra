@@ -242,7 +242,7 @@ def make_vpc(region, vpc_name):
     }
 
 
-    json_file = vpc.id + '.json'
+    json_file = vpc_name + '-' + vpc.id + '.json'
     print('[+] Saving JSON data to', json_file)
     with open(json_file, 'w') as f:
         f.write(json.dumps(vpc_info, indent=4))
