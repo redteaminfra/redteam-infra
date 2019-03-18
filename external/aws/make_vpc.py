@@ -79,7 +79,7 @@ def make_http_security(ec2, vpc_id):
 def make_https_security(ec2, vpc_id):
     vpc = VPC(ec2, vpc_id,
               name = 'HTTPS_From_Company',
-              desc ='HTTPS From Company',
+              desc ='HTTPS From COMPANY',
               perms = [
                   {
                       'IpProtocol' : 'tcp',
@@ -93,7 +93,7 @@ def make_https_security(ec2, vpc_id):
 def make_http_security_anywhere(ec2, vpc_id):
     vpc = VPC(ec2, vpc_id,
               name = 'HTTP_From_Anywhere',
-              desc ='HTTP From Anywhere',
+              desc ='HTTP From ANYWHERE',
               perms = [
                   {
                       'IpProtocol' : 'tcp',
@@ -107,7 +107,7 @@ def make_http_security_anywhere(ec2, vpc_id):
 def make_https_security_anywhere(ec2, vpc_id):
     vpc = VPC(ec2, vpc_id,
               name = 'HTTPS_From_Anywhere',
-              desc ='HTTPS From Anywhere',
+              desc ='HTTPS From ANYWHERE',
               perms = [
                   {
                       'IpProtocol' : 'tcp',
@@ -121,7 +121,7 @@ def make_https_security_anywhere(ec2, vpc_id):
 def make_dns_security(ec2, vpc_id):
     vpc = VPC(ec2, vpc_id,
               name = 'DNS_From_World',
-              desc = 'DNS from World',
+              desc = 'DNS from ANYWHERE',
               perms = [
                   {
                       'IpProtocol' : 'tcp',
@@ -141,7 +141,7 @@ def make_dns_security(ec2, vpc_id):
 def make_4444_security(ec2, vpc_id):
     vpc = VPC(ec2, vpc_id,
               name = '4444_From_Company',
-              desc = '4444 From Company',
+              desc = '4444 From COMPANY',
               perms = [
                   {
                       'IpProtocol' : 'tcp',
@@ -155,7 +155,7 @@ def make_4444_security(ec2, vpc_id):
 def make_2222_from_world(ec2, vpc_id):
     vpc = VPC(ec2, vpc_id,
               name = '2222_From_Anywhere',
-              desc = '2222 From Anywhere',
+              desc = '2222 From ANYWHERE',
               perms = [
                   {
                       'IpProtocol' : 'tcp',
