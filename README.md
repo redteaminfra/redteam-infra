@@ -12,22 +12,11 @@ See `contributing.md`
 
 ## Setup
 
-View `Internal` for hosting on an internal host or `External` for hosting on AWS.
-
-This project currently relies on Vagrant version 2.0.1. 2.1 introduced new features that have not been ported to the Vagrantfiles. 
+View `external/cloudProvider` for setup instructions
 
 ## What What?  In The Puppet
 
 See `puppet/README.md` for information on puppet modules
-
-## SSH Users
-
-Both `Internal` and `External` use a ssh submodule
-
-```
-git submodule init
-git submodule update
-```
 
 ## Rebasing Op repos
 
@@ -36,7 +25,7 @@ git submodule update
 1. Add original repo as remote
 
 ```
-git remote add infra git@github.com:intel/redteam-infra
+git remote add infra git@github.com:redteam-infra/redteam-infra
 ```
 
 ### Workflow
@@ -48,12 +37,12 @@ This can probably be abbreviated, this is what I do.
     ```
     $ git show -s --pretty=short infra/master
     commit 52d09519a84bf4cca3af80287958e506627d755f (infra/master)
-    Author: ctimzen <topher.timzen@intel.com>
+    Author: ctimzen <topher.timzen@red.com>
 
 
     $ git show -s --pretty=short master
     commit a2a80ce163ecd131ee2b34293acec83a5aed4153 (HEAD -> master, origin/master, origin/HEAD)
-    Author: Michael Leibowitz <michael.leibowitz@intel.com>
+    Author: Michael Leibowitz <michael.leibowitz@red.team>
 
 
     ```

@@ -1,6 +1,6 @@
 class nmap::packages {
     $packages = ['gcc',
-                'g++', 
+                'g++',
                 'make']
     package { $packages: ensure => "installed"}
 }

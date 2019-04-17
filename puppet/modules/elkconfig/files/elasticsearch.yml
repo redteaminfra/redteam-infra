@@ -1,0 +1,3 @@
+http.port: 9200
+network.bind_host: 0.0.0.0
+

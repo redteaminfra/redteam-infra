@@ -15,13 +15,17 @@ happen prior to or during an engagement.
 
 # VPC Structure
 
-Each VPC uses the same internal IP space of 192.168.0.0/16.  We use
-the subnet of 192.168.0.0/24 for now.  If needed, we can use other
-subnets.
+Each VPC uses the same internal IP space of 192.168.0.0/16. Within that, we use 3 subnets
+
+192.168.0.0/24 is our bastion / homebase subnet
+
+192.168.1.0/24 is our logging and subnet
+
+192.168.2.0/24 is our proxy subnet
 
 ## Machines in an operation VPC
 
-* Homebase (192.168.0.2)
+* Homebase (192.168.0.10)
 
    Each VPC has at least one machine, named homebase, which is a kali
    box with ssh open to target.victim.  It hosts things like cobalt strike and
@@ -39,9 +43,9 @@ subnets.
    /etc/hosts file on this machine contains entries for the other
    machines in the VPC as subdomains of the A record.  For example:
    ```
-   192.168.0.3   proxy-1.op-example.infra.redteam
-   192.168.0.4   proxy-2.op-example.infra.redteam
-   192.168.0.5   proxy-3.op-example.infra.redteam
+   192.168.2.11   proxy-1.op-example.infra.redteam
+   192.168.2.12   proxy-2.op-example.infra.redteam
+   192.168.2.13   proxy-3.op-example.infra.redteam
    ```
 
    This way, one can ssh into the VPC with the following snippet in .ssh/config:
@@ -52,9 +56,21 @@ subnets.
 
   For testing purposes use t2.medium as machine type ($0.0464 per
   Hour) currently.  However, for operations, please use m4.4xlarge as
-  machine type ($0.8 per Hour) currenlty.  See homebase/Vagrantfile
+  machine type ($0.8 per Hour) currenlty.
 
-* Proxy Machines
+* Elastic Stack Machine (192.168.1.13)
+
+  This machine functions as our centralized logging server. It contains an elastic stack
+  (elasticsearch, logstash, kibana).
+
+  All logs from machines in the VPC are sent to the Elastic Stack.
+
+* Natlas (192.168.1.14)
+
+  A dedicated natlas instance providing port scanning capabilities as well as
+  the web interface to see the results.
+
+* Proxy Machines (192.168.2.0/24)
 
   These are the machines that receive C2 traffic from target.victim proxies
   are therefore indictable by defenders.  They need They serve two proxy
@@ -73,30 +89,9 @@ subnets.
   Additionally, each proxy has an http proxy listening on port 8888 on
   the private network.
 
-* Elastic Stack Machine
+# Setup
 
-  This machine functions as our centralized logging server. It contains an elastic stack
-  (elasticsearch, logstash, kibana).
-
-  All logs from machines in the VPC are sent to the Elastic Stack.
-
-* Natlas
-
-  A dedicated natlas instance providing port scanning capabilities as well as
-  the web interface to see the results.
-
-## Machine standup order
-
-In order to successfully standup machines in the VPC for operations, the machines should be broughtup in the following order.
-
-1. homebase
-1. proxies
-1. Natlas
-1. elkServer
-
-After homebase is deployed you will need to edit the SSH stanza in order for proxies, natlas, and elkServer to successfully deploy. Vagrant spits out a command for this and modifies `~/.ssh/config`
-
-Once homebase is deployed, just change directories to each of the other boxes.
+## Setup restrictions
 
 There are a few puppet modules you will need to modify for every op. View what to change in the `puppet/README`
 
@@ -105,9 +100,42 @@ There are a few puppet modules you will need to modify for every op. View what t
 
 Additionally follow the directions in `Setup Rules for VPC`
 
+## Repo Setup
+
+Because terraform makes a local folder to house all information about state, we need a copy of this repository for every VPC we need in AWS.
+
+1. git clone https://github.com/redteaminfra/redteam-infra <OPNAME>
+1. Make a new repo in RedTeamInfra called <OPNAME>
+1. git remote rm origin
+1. git remote add origin git@github.com:redteaminfra/<OPNAME>
+1. git push origin master
+
+Once the repo is forked and cloned, you may need to make some additional modifications to the puppet modules depending on your use cases. View the README in the puppet repo for additional documentation.
+
+## What to do
+
+In order to start an OP VPC you will need to
+
+1. fork repo to https://github/Intel/redteam-infra/
+1. change homebase to m4.4xlarge
+1. change ELK to t2.large
+
+## Setup Rules for VPC
+
+You will need to configure a few select things in order to spin up homebase
+
+1. Create a git submodule from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh) that contains a valid users.json. The git submodule should be owned by you and placed in `host-share/sshkeys`. You should have at least one user with an `infra` tag. See above instructions for SSH Setup (in /external/README.md) for more detail on how to do this.
+1. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. Also, put your licence in `/global/host-share/.cobaltstrike.licence`
+1. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that your organization owns. These are to prevent OPSEC mistakes from homebase.
+1. Add auth for AWS SMS to `puppet/modules/monitoring/files/authFile.yaml`
+1. Add OUTBOUND company traffic IPs to `puppet/modules/monitoring/files/C2Compromised.yaml`
+1. Add public keys to `external/sketch/provision.sh` inside the `authorized_keys` blob for users you want to access the redirector instances.
+
+For each individual cloud, consult the README in the cloud providers folder.
+
 ## SSH Setup
 
-The infra repo makes use of submodules for SSH from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh), make sure to create those as submodules or init those if cloning a staged repo (vagrant will yell at you if you don't)
+The infra repo makes use of submodules for SSH from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh), make sure to create those as submodules or init those if cloning a staged repo
 
 ```
 git clone <Your redteam-ssh repo with team keys in it> # git clone https://github.com/redteaminfra/redteam-ssh

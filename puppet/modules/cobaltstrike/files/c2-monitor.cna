@@ -78,14 +78,14 @@ sub getAllBeaconInfoInitial {
 			$computerName = $beacon["computer"];
 			$proxyAddress = $beacon["external"];
 			$lastCheckin = $beacon["lastf"];
-			$alertFlag = 0; 	#0 to check it, 1 alert generated and then set note.
+			$alertFlag = 0;	#0 to check it, 1 alert generated and then set note.
 
 			%beaconList[$beaconID] = %(hostname => $computerName, proxy => $proxyAddress, last => $lastCheckin, alerted => $alertFlag);
 		}
 	}
 	else {
 		@splitBeaconData = split(" - ", $beaconData);
-		foreach $beacon(@splitBeaconData){ 
+		foreach $beacon(@splitBeaconData){
 			@splitBeacon = split(" => %", $beacon);
 			$beaconID = @splitBeacon[0];
 			$metaData = @splitBeacon[1];
@@ -213,7 +213,7 @@ on beacon_initial {
 	$beaconID = $1;
 	$computerName = beacon_info($beaconID, "computer");
 	$proxyAddress = beacon_info($beaconID, "external");
-	$last = "5s"; 	#Give a time so the lag timer actually kicks in. Ignore actual time.
+	$last = "5s";	#Give a time so the lag timer actually kicks in. Ignore actual time.
 	$alertFlag = 0;
 
 	%beaconList[$beaconID] = %(hostname => $computerName, proxy => $proxyAddress, last => $lastCheckin, alerted => $alertFlag);

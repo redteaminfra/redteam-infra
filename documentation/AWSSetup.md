@@ -8,7 +8,7 @@ This document will serve as a stepping stone to setup and deploy redteam-infra i
 
 - python3
 - python3-venv
-- [Version 2.0.1](https://releases.hashicorp.com/vagrant/2.0.1/) (See issue [#2](https://github.com/redteaminfra/redteam-infra/issues/2])
+- Terraform
 
 ## Keypairs
 
@@ -51,7 +51,7 @@ region=us-west-2
 
 ## Repo Setup
 
-Because vagrant makes a local .vagrant folder to house all information about an instance, we need a copy of that repository for every VPC we need in AWS. On the chance that a change is required for the infrastructure a fork is deal.
+Because terraform makes a local file to keep state to house all information about an instance, we need a copy of that repository for every VPC we need in AWS. On the chance that a change is required for the infrastructure a fork is deal.
 
 We'll just use the open source implementation for this walkthrough, but you'll want to fork it and keep somewhere privately for anything you change during operations.
 
@@ -162,18 +162,9 @@ You will need to configure a few select things in order to spin up homebase
 
 We've already done the above!
 
-2. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. If not, there are a few things you'll need to comment out such as all of the references to the `.cobaltstrike.license` in `Vagrantfile` for homebase. You will also want to throw your license `touch external/global/host-share/.cobaltstrike.licence`
+2. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. and uncomment out `#include cobaltstrike` in the homebase site.pp. You will also want to throw your license `touch external/global/host-share/.cobaltstrike.licence`
 
-Let's just get a trial for cobalt strike for this demo and put a fake licence fill into that file location. If you are not using cobalt strike just remove the `cobaltstrike` module from the homebase `site.pp` in `external/aws/op/homebase/puppet/manifests/site.pp` and the check from the `Vagrantfile` that looks like this
-
-```
-begin
-  license = File.read("../../../global/host-share/.cobaltstrike.license")
-rescue Errno::ENOENT
-  STDERR.puts "../../../global/host-share/.cobaltstrike.license does not not exist"
-   exit!
-end
-```
+Let's just get a trial for cobalt strike for this demo and put a fake licence fill into that file location. If you are not using cobalt strike just remove the `cobaltstrike` module from the homebase `site.pp` in `external/aws/op/homebase/puppet/manifests/site.pp`.
 
 You can get a trial from [here](https://trial.cobaltstrike.com/).
 
@@ -181,21 +172,13 @@ Once done, plop that tgz in `puppet/modules/cobaltstrike/files/`
 
 You can also download the artifact kit and put it in the same directory from above. It will be installed via puppet.
 
-We also want to just touch the license so Vagrant succeeds
+We also want to just touch the license so terraform succeeds
 
 `touch external/global/host-share/.cobaltstrike.licence`
 
-3. Put a list of OPs in `external/aws/ips.py` that your company uses for OUTBOUND traffic. This will be used for both SSH inbound and OPSEC rules
+1. Put a list of OPs in `external/aws/ips.py` that your company uses for OUTBOUND traffic. This will be used for both SSH inbound and OPSEC rules
 
 For this you will need to consult your organization. Exercise up to the reader! For this demo, we will assume our organization uses an OUTBOUND proxy via 10.10.10.10/32
-
-```
-{ aws } master > cat ips.py
-#!/usr/bin/env python3
-# -*_ coding utf-8 -*-
-
-COMPANY_OUTBOUND = [{'CidrIp': '10.10.10.10/32'}]
-```
 
 4. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that your organization owns. These are to prevent OPSEC mistakes from homebase.
 
@@ -229,64 +212,19 @@ EOF
 
 We'll skip this for now as we use sketch on zero trust proxies. Consult the [README](https://github.com/redteaminfra/redteam-infra/blob/master/external/sketch/README.md) for now
 
-## Make VPC
 
-These commands will be ran from `external/aws`. Make sure that you have sourced your AWS configs from the above Keypairs section
-
-1. `virtualenv -p python3 venv`
-1. `. venv/bin/activate`
-1. `pip3 install -r requirements.txt`
-1. `./make_vpc.py -n <OP NAME>`
-
-You will wind up with a JSON blob for your new VPC.
+You will also need to setup a `variables.tfvars` file in external/aws/veriables.tfvars
 
 ```
-(venv) { aws } master > cat vpc-0ea03eb482236dff0.json
-{
-    "demo": {
-        "region": "us-west-2",
-        "vpc_id": "vpc-0ea03eb482236dff0",
-        "routing_id": "rtb-0c0fb8d1fa3e17636",
-        "subnet_id": "subnet-0b096b12ce7ad0d35",
-        "security_groups": {
-            "SSH From COMPANY": "sg-01997e72ce6362405",
-            "HTTP From COMPANY": "sg-05c6c2b8d41a8393f",
-            "HTTPS From Company": "sg-07ca4d00e63a629eb",
-            "HTTP From Anywhere": "sg-0ae237fba75201793",
-            "HTTPS From Anywhere": "sg-0f119d8ef28740df1",
-            "DNS from World": "sg-01cf8b82feb6de6fd",
-            "4444 From Company": "sg-03869ac59c14fe381",
-            "VPC Allow all traffic": "sg-083980300a94cd414"
-        }
-    }
-}
+key_name = "<Location of your key ie ~/.ssh/deploy. Note; this cannot be a password protected key>"
+op_name = "<OP NAME HERE>"
+aws_key_name = "<Name you will give your key in AWS>"
 ```
 
-## Spin up a Homebase in that VPC
-
-It is important that you subscribe to the Kali Linux AMI by searching for "ami-0f95cde6ebe3f5ec3" in the AWS marketplace for us-west.
-
-Note: vagrant ssh does not work for reasons I don't fully understand.
-
-1. `./make_boxes.sh`
-1. `vagrant plugin install vagrant-aws`
-1. `vagrant plugin install vagrant-triggers`
-1. `cd /op/homebase`
-1. Set the VPC\_JSON env variable to point to the vpc json made above (export VPC_JSON = <FILE>)
-1. Set the AWS\_KEY, AWS\_SECRET, AWS\_KEYPATH, environment variables used above
-1. Vagrant up --provider aws
+## Spin up infra
 
 
-After homebase is stood up, plop the SSH Stanza into your ~/.ssh/config as instructed in the output of `vagrant up`
-
-```
-    homebase: Created symlink /etc/systemd/system/timers.target.wants/apt-daily.timer → /lib/systemd/system/apt-daily.timer.
-==> homebase: Running triggers after up...
-==> homebase: Executing command "bash -c vagrant ssh-config >> /tmp/vgrntssh20190314-6881-9yj8ai"...
-==> homebase: Command execution finished.
-Copy the generated file (homebase-demo) into you ssh config like this:
-cat homebase-demo >> ~/.ssh/config
-```
+After homebase is stood up, plop the SSH Stanza into your ~/.ssh/config as instructed in the output of `terraform apply`. You will also have a file on disk named homebase-opname.
 
 You'll want to change the SSH config as well to point to your user and keypair
 
@@ -321,13 +259,6 @@ Host natlas-demo
      Proxycommand ssh homebase-demo nc -q0 %h.infra.redteam %p
      User demo
 ```
-
-## Spin up the rest
-
-Now go through and spin up the rest of the boxes in `/op` making sure you still have your AWS creds sourced and the VPC_JSON blob.
-
-1. cd <box>
-1. Vagrant up --provider aws
 
 ## Hack the Planet
 

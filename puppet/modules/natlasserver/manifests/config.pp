@@ -29,7 +29,7 @@ class natlasserver::config {
         command => "/bin/echo SECRET_KEY=$(openssl rand -base64 32) >> .env",
         require => Exec["untar-natlas-server"],
     }
-    
+
     exec { "setup-server":
         cwd => "/opt/natlas/natlas-server",
         command => "/bin/bash setup-server.sh",

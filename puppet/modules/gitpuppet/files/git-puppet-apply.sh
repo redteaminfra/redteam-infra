@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 DIR=$(mktemp -d)
 VPC=$(hostname | /usr/bin/cut -d '-' -f2- | tr -d '\n')

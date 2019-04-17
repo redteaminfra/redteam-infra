@@ -11,14 +11,14 @@ class monitoring::config {
       notify => Exec['create_elastalert'],
       refreshonly => true,
   }
-  
+
   exec { "create_elastalert":
       cwd => "/etc/elastalert",
       command => "/usr/bin/python setup.py install",
       refreshonly => true,
       notify => Exec['create_elastalert_rules'],
   }
-  
+
   exec { "create_elastalert_rules":
       cwd => "/etc/elastalert",
       command => "/bin/mkdir -p /etc/elastalert/rules",

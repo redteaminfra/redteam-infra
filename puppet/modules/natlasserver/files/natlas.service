@@ -1,7 +1,7 @@
 [Unit]
 Description=Natlas Server
 After=network.target
- 
+
 [Service]
 Type=simple
 User=natlas

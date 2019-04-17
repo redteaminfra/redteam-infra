@@ -1,0 +1,37 @@
+<% require 'json' %>
+<% @seclists = JSON.load(File.read("seclists.json")) %>
+<% @seclists.each do |s| %>
+resource "oci_core_security_list" "<%= s["name"] %>" {
+  compartment_id = "${var.compartment_id}"
+  display_name   = "<%= s["display_name"] %>"
+  vcn_id         = "${oci_core_vcn.infra_vcn.id}"
+
+<% if s["egress"].empty? %>
+  egress_security_rules = []
+
+<% end %>
+<% s["egress"].each do |e| %>
+  egress_security_rules {
+    protocol = "${var.network_protocol["<%= e["protocol"]  %>"]}"
+    destination = "<%= e["destination"]  %>"
+    <% if e.has_key? "ports" %>
+<%= options(e["ports"], e["protocol"]) %>
+    <% end %>
+  }
+<% end %>
+<% if s["ingress"].empty? %>
+   ingress_security_rules = []
+
+<% end %>
+<% s["ingress"].each do |i| %>
+  ingress_security_rules {
+    protocol = "${var.network_protocol["<%= i["protocol"]  %>"]}"
+    source = "<%= i["source"]  %>"
+    <% if i.has_key? "ports" %>
+<%= options(i["ports"], i["protocol"]) %>
+    <% end %>
+  }
+<% end %>
+}
+
+<% end %>

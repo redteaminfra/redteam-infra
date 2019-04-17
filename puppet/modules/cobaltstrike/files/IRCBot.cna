@@ -8,7 +8,7 @@ global('%credentials');
 
 #Get the initial credentials stored on the team server to compare against later. This is done as soon as the script executes / bot connects to server
 sub getCredentials {
-	$flag = $1; 		#init / new_cred_check
+	$flag = $1;		#init / new_cred_check
 	foreach $entry (credentials()) {
 		$host = $entry['host'];
 		$realm = $entry['realm'];
@@ -148,7 +148,7 @@ on irc_public {
 		}
 	}
 	else if($text eq "!help") {
-		@commands = @("!beacons (outputs all beacon metadata)", "!csusers (lists users on CStrike Server)", 
+		@commands = @("!beacons (outputs all beacon metadata)", "!csusers (lists users on CStrike Server)",
 						"!help (this menu)", "!quit (makes bot disconnect)", "!addtarget ip host os (adds a new target to CStrike Server)");
 		$msg = "\c2Following commands are available:";
 		irc_msg($handle, $channel, $msg);
@@ -188,7 +188,7 @@ on beacon_initial {
 }
 
 #Check for logonpasswords command, if recently executed, check credentials again to see if anything new was found
-on beacon_tasked { 
+on beacon_tasked {
 	$id = $1;
 	$output = $2;
 	$when = $3;

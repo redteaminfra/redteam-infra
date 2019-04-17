@@ -2,19 +2,23 @@
 127.0.0.1 localhost
 127.0.0.1 <%= @hostname %>
 
-<%# 
-    Hosts inside of vpc 
+<%#
+    Hosts inside of vpc
     Requires the $vpc variable to be set which will be the name of the vpc. This is done in `hosts/config.pp`.
     Requires the $subnet variable to be set which will be the first 3 octets of the subnet IP. This is done in `hosts/config.pp`.
 %>
 
-<%= @subnet %>.10 homebase-<%= @vpc %>.infra.redteam
-<%= @subnet %>.11 proxy01-<%= @vpc %>.infra.redteam
-<%= @subnet %>.12 proxy02-<%= @vpc %>.infra.redteam
-<%= @subnet %>.13 elk-<%= @vpc %>.infra.redteam
-<%= @subnet %>.13 elk.infra.redteam
-<%= @subnet %>.14 natlas-<%= @vpc %>.infra.redteam
+# Homebase Subnet
+<%= @subnet %>.0.10 homebase-<%= @vpc %>.infra.redteam
 
+# Logging and Utility Subnet
+<%= @subnet %>.1.13 elk-<%= @vpc %>.infra.redteam
+<%= @subnet %>.1.13 elk.infra.redteam
+<%= @subnet %>.1.14 natlas-<%= @vpc %>.infra.redteam
+
+# Proxy subnet
+<%= @subnet %>.2.11 proxy01-<%= @vpc %>.infra.redteam
+<%= @subnet %>.2.12 proxy02-<%= @vpc %>.infra.redteam
 
 # blackhole asciinema to prevent accidental asciinema upload on any machine
 127.0.0.1 asciinema.org

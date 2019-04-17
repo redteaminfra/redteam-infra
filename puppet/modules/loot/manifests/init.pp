@@ -6,7 +6,7 @@ class loot {
         group => 'root',
         mode => '1777',
     }
-    
+
     file {'/loot/README.md':
         ensure => 'file',
         path => '/loot/README.md',
@@ -16,7 +16,7 @@ class loot {
         source => "puppet:///modules/loot/README.md",
         require => File["/loot"],
     }
-    
+
     file {'/loot/TEMPLATE.md':
         ensure => 'file',
         path => '/loot/TEMPLATE.md',

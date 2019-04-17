@@ -2,7 +2,7 @@ class nmap::config {
 
     exec { "download_nmap_source":
         command => "/usr/bin/wget https://nmap.org/dist/nmap-7.60.tar.bz2 -O /tmp/nmap.tar.bz2",
-    	creates => '/tmp/nmap.tar.bz2',
+	    creates => '/tmp/nmap.tar.bz2',
 		notify => Exec["extract_nmap"],
 	}
 
@@ -12,7 +12,7 @@ class nmap::config {
         refreshonly => true,
 		notify => Exec["make_nmap"],
 	}
-    
+
 	exec { "make_nmap":
 		cwd => "/tmp/nmap-7.60",
         command => "/bin/bash -c './configure && make && make install'",

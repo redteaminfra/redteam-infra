@@ -9,7 +9,7 @@ class gitpuppet {
     }
 
     exec { 'site.pp':
-        command => 'bash -c "find /tmp/vagrant-puppet/ -name site.pp -exec cp -v {} /etc/infra \\;"',
+        command => 'bash -c "cp -v $(readlink /tmp/host-share/puppet/manifests/site.pp) /etc/infra"',
         creates => '/etc/infra/site.pp',
         require => File['/etc/infra'],
         path => ['/bin/', '/usr/bin/']

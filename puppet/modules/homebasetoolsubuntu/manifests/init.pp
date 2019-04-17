@@ -6,6 +6,6 @@ class homebasetoolsubuntu {
       owner => 'root',
       mode => '755',
       ensure => present,
-      source => "puppet:///modules/homebasetools/setup-xfce4-vnc"
+      source => "puppet:///modules/homebasetoolsubuntu/setup-xfce4-vnc"
     }
 }

@@ -1,4 +1,3 @@
 class cobaltstrike::packages {
-    $packages = ['default-jre', 'mingw-w64']
-    package { $packages: ensure => "installed"}
+    ensure_packages(['mingw-w64'], { ensure => 'present' })
 }

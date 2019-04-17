@@ -4,18 +4,30 @@ class gitserver {
     $gitinfrarepo = "${gitdir}/infra"
     $gitsshrepo = "${gitdir}/sshKeys"
 
-    package { ['git-daemon-sysvinit']:
+    package { ['git']:
         ensure => 'installed',
         notify => [Exec['gitsshbare'], Exec['gitinfrabare']]
     }
 
-    file { '/etc/default/git-daemon':
-        path => '/etc/default/git-daemon',
+    # gitdaemon:x:189:65534::/nonexistent:/usr/sbin/nologin
+    user { 'gitdaemon':
+      ensure => 'present',
+      gid => '65534',
+      home => '/nonexistent',
+      password => '*',
+      password_max_age => '99999',
+      password_min_age => '0',
+      shell => '/usr/sbin/nologin',
+      uid => '189'
+    }
+
+    file { '/etc/systemd/system/git-daemon.service':
+        path => '/etc/systemd/system/git-daemon.service',
         owner => 'root',
         mode => '644',
         ensure => present,
-        source => "puppet:///modules/gitserver/git-daemon",
-        require => Package['git-daemon-sysvinit'],
+        source => "puppet:///modules/gitserver/git-daemon.service",
+        require => Package['git'],
         notify => Exec['enable-git-daemon']
     }
 
@@ -30,12 +42,19 @@ class gitserver {
         command => 'systemctl start git-daemon.service',
         path => ['/bin/'],
         refreshonly => true,
-        require => Exec['enable-git-daemon']
+        require => [User['gitdaemon'], Exec['enable-git-daemon']]
     }
 
     group { 'infra':
         name => 'infra',
         ensure => 'present'
+    }
+
+    file {'/var/lib/git':
+        ensure => directory,
+        recurse => true,
+        owner => "gitdaemon",
+        require => User['gitdaemon'],
     }
 
     exec { 'gitinfrabare':
@@ -45,7 +64,7 @@ class gitserver {
         cwd => "${gitdir}",
         path => ['/usr/bin/'],
         creates => ["${gitinfrarepo}"],
-        require => [ Package['git-daemon-sysvinit'], Group['infra'] ],
+        require => [ Package['git'], Group['infra'] ],
         notify => [ Exec['unpack'], File_Line["${gitinfrarepo}/config"] ]
     }
 
@@ -64,7 +83,7 @@ class gitserver {
         path => ['/usr/bin/'],
         creates => "${gitsshrepo}",
         notify => [ File_Line["${gitsshrepo}/config"] ],
-        require => [ Package['git-daemon-sysvinit'], Group['infra'] ]
+        require => [ Package['git'], Group['infra'] ]
     }
 
     file_line { "${gitsshrepo}/config":

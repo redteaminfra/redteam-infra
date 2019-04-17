@@ -32,7 +32,7 @@ As with everything, there is more than one way to do it.  If you don't know what
 
 Note!  The workflow below only works on the master branch
 
-1. vagrant up
+1. terraform apply
 1. hack; hack; hack
 1. ```git add; git commit```
 1. ```git push homebase-xxx:/var/lib/git/infra```
@@ -45,15 +45,15 @@ Note!  The workflow below only works on the master branch
 This lets you play with changes in master on homebase, then pretty it
 up in a branch on your machine prior to pushing to github.
 
-1. vagrant up
+1. terraform apply
 1. ssh into homebase
-  1. ```git clone /var/lib/git/infra```
-  1. ```cd infra```
-  1. ```BASELINE=$(git rev-parse HEAD)```
-  1. hack; hack; hack
-  1. ```git add; git commit```
-  1. ```git push```
-  1. ```git format-patch $BASELINE```
+1. ```git clone /var/lib/git/infra```
+1. ```cd infra```
+1. ```BASELINE=$(git rev-parse HEAD)```
+1. hack; hack; hack
+1. ```git add; git commit```
+1. ```git push```
+1. ```git format-patch $BASELINE```
 1. ```scp 'homebase-xxx:infra/*patch' .```
 1. ```git checkout -b topic```
 1. ```git am < *.patch```
@@ -125,8 +125,7 @@ lives, which checks out the git repo and applies the changes
 ## gitserver
 
 This module sets up a git server that holds the puppet modules.  It
-uses a tarball of this very git repo, which is created on `vagrant up`
-by the vagrant plugin vagrant-triggers.
+uses a tarball of this very git repo, which is created on `terraform apply`.
 
 * `/var/lib/git/infra`
 

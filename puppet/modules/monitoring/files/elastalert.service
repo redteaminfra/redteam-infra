@@ -1,6 +1,6 @@
 [Unit]
 Description=elastalert
-After=elasticsearch-es-01.service 
+After=elasticsearch-es-01.service
 
 [Service]
 WorkingDirectory=/etc/elastalert

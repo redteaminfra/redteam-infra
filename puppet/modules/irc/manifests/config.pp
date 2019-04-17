@@ -13,9 +13,9 @@ class irc::config {
         require => Exec["clone_irc"],
 	    owner => 'irc',
     }
-	
+
 	exec { 'localhost_bind':
-		command => "/bin/sed -i 's/s.bind((self.address, port))/s.bind((\"127.0.0.1\", port))/g' /opt/irc/miniircd", 
+		command => "/bin/sed -i 's/s.bind((self.address, port))/s.bind((\"127.0.0.1\", port))/g' /opt/irc/miniircd",
 	}
 
     file { "/opt/irc/irc-wrapper.sh":
@@ -23,7 +23,7 @@ class irc::config {
         ensure => present,
         source => "puppet:///modules/irc/irc-wrapper.sh",
     }
-	
+
     file { "/etc/systemd/system/irc.service":
         path => '/etc/systemd/system/irc.service',
         owner => 'root',
@@ -32,10 +32,10 @@ class irc::config {
         ensure => present,
         source => "puppet:///modules/irc/irc.service",
         notify => Exec["reload-systemd-irc"],
-    }   
+    }
 
     exec { "reload-systemd-irc":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable irc.service && /bin/systemctl start irc.service",
-    }   
+    }
 
 }

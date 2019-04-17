@@ -1,0 +1,6 @@
+.terraform
+terraform.tfstate*
+variables.tfvars
+*_config
+bootstrap-puppet.tgz
+network_seclists.tf

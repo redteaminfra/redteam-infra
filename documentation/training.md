@@ -50,21 +50,19 @@ Adjust as needed depending on what you want to modify. You always use the uid of
 
 ### SSH Stanza
 
-When infrastructure is provisioned, an SSH Stanza will be produced that relies on you having a key in this repository. 
+When infrastructure is provisioned, an SSH Stanza will be produced that relies on you having a key in this repository.
 
-SSH usage is the core of how we do our work on the Red Team. 
+SSH usage is the core of how we do our work on the Red Team.
 
 More on this later . . .
 
 ## ARCHITECTURE
 
-Dual hosted in Amazon Web Services (AWS) and Internally 
+Dual hosted in Oracle Cloud and Amazon Web Services (AWS)
 
-Designed to be repeatable, modular, dynamic, auditable and secure. 
+Designed to be repeatable, modular, dynamic, auditable and secure.
 
 Key technologies used for the deployment
-
-- Vagrant - Deployment
 
 - Puppet - Provisioning
 
@@ -80,7 +78,7 @@ Logging
 
 Proxies
 
-- Allow operational safe C2 channels 
+- Allow operational safe C2 channels
 
 Homebase
 
@@ -92,14 +90,14 @@ Port scanning machine.
 
 ### VPC
 
-A VPC, Virtual Private Cloud, is a logically isolated section of AWS Cloud hosting. The network is completely controlled by us and allows us to use private IP spaces inside of our AWS instances. 
+A VPC, Virtual Private Cloud, is a logically isolated section of AWS Cloud hosting. The network is completely controlled by us and allows us to use private IP spaces inside of our AWS instances.
 
-Public-facing subnets can be issued to a VPC to allow for external usage of instances. 
+Public-facing subnets can be issued to a VPC to allow for external usage of instances.
 
-A VPC will be defined for each engagement that will prevent cross-contamination between parallel and past engagements to minimize data exposed inside of AWS at a given time. It also provides us the ability to keep the same architecture across each operation. 
+A VPC will be defined for each engagement that will prevent cross-contamination between parallel and past engagements to minimize data exposed inside of AWS at a given time. It also provides us the ability to keep the same architecture across each operation.
 
 Each VPC will contain the internal IP space of 192.168.0.0/16, which we use 192.168.1.0/24.
-An internal network topology is setup inside each VPC inside the infra.redteam domain. Furthermore, each VPC will be prefixed with an engagement name such as BOX-OPERATION.infra.redteam. 
+An internal network topology is setup inside each VPC inside the infra.redteam domain. Furthermore, each VPC will be prefixed with an engagement name such as BOX-OPERATION.infra.redteam.
 
 Important Note: infra.redteam is internal routing inside the VPC in /etc/hosts
 
@@ -109,7 +107,7 @@ Homebase-[Op Name].infra.redteam
 
 - 192.168.1.10
 - Kali machine with SSH open to victim.target
-- This machine is the only one we connect to from victim.target and is used to move between other machines within the VPC. 
+- This machine is the only one we connect to from victim.target and is used to move between other machines within the VPC.
 - IRC Server hosted on localhost
 - Cobalt Strike hosted on localhost
 
@@ -118,9 +116,9 @@ Homebase-[Op Name].infra.redteam
 Proxy Machines (proxy[01,02]-[Op Name].infra.redteam)
 
 - 192.168.1.11, 192.168.1.12
-- These machines receive C2 traffic from victim.target and are indictable by blue. The proxies serve two functions, forward and reverse. 
+- These machines receive C2 traffic from victim.target and are indictable by blue. The proxies serve two functions, forward and reverse.
 - They reverse proxy incoming connections from victim.target (http/https traffic) to homebase or other C2 servers as need arises.
-- The forward proxy forwards attack traffic from homebase or other attack machines back to victim.target 
+- The forward proxy forwards attack traffic from homebase or other attack machines back to victim.target
 
 ### Natlas
 
@@ -176,7 +174,7 @@ Cobalt Strike is listening on localhost to prevent OPSEC mistakes (We do not wan
 
 ### VNC
 
-VNC is available on Homebase which will grant you local access to 
+VNC is available on Homebase which will grant you local access to
 
 - Cobalt Strike
 
@@ -202,9 +200,9 @@ password is your username
 
 ## OPSEC
 
-In order to maintain operational security, the only inbound connection to our infra is the SSH connection through homebase. 
+In order to maintain operational security, the only inbound connection to our infra is the SSH connection through homebase.
 
-The proxies will be used for C2 traffic and will be burned by a member of blue. We can always spin up new proxy machines. If we lose homebase, we lost. 
+The proxies will be used for C2 traffic and will be burned by a member of blue. We can always spin up new proxy machines. If we lose homebase, we lost.
 
 There are rules in place to help prevent OPSEC failures from homebase, not allowing victim.target Ips as outbound in the firewall, but there could be edge cases. Run commands with care and ensure you tunnel through the proxy machines.
 
@@ -212,9 +210,9 @@ Remembering what you did and where you did it is key for continued OPSEC.
 
 ## Workflow
 
-As an operator you can attack from homebase through a proxy machine or from a proxy machine directly. Remember, homebase CANNOT touch victim.target directly. 
+As an operator you can attack from homebase through a proxy machine or from a proxy machine directly. Remember, homebase CANNOT touch victim.target directly.
 
-Example: Running nmap against a victim from AWS will require tunneling through the proxy into a victim machine. 
+Example: Running nmap against a victim from AWS will require tunneling through the proxy into a victim machine.
 
 Proxychains confiurations live in ~/proxy01 & ~/proxy02 after initialization of your user account per VPC
 
@@ -228,7 +226,7 @@ All commands ran from homebase need to be prefaced with `proxychains` or run on 
 
 Proxies are in ~/proxy01 and ~/proxy02
 
-You must be in the proxy folder to use that machine as a proxy. 
+You must be in the proxy folder to use that machine as a proxy.
 
 Use ‘proxychains’ for every command you want to run
 

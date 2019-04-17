@@ -16,7 +16,7 @@ class tinyproxy {
   # we do this because we change the config after the package is
   # installed, which starts the service
   exec {'tinyproxyreload':
-      command => '/bin/systemctl reload tinyproxy.service',
+      command => '/bin/systemctl restart tinyproxy.service',
       path => ['/bin/', '/usr/bin'],
       refreshonly => true,
   }
