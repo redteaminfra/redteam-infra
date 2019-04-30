@@ -1,5 +1,5 @@
-Michael Leibowitz <michael.leibowitz@intel.com>
+Michael Leibowitz
 
-Topher Timzen <topher.timzen@intel.com>
+Topher Timzen
 
-Adam Luvshis <adam.m.luvshis@intel.com>
+Adam Luvshis
