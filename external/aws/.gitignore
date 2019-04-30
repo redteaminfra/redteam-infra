@@ -1,2 +1,5 @@
+variables.tfvars
+.terraform
+terraform.tfstate
+*_config
 venv/
-vpc-*.json
