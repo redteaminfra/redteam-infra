@@ -6,7 +6,7 @@ sphere of hacking.
 The basic idea is that each enagement has its own VPC that
 encapsulates all data for that engagement.  This keeps things from
 being cross-contaminated between parallel and past engagements and
-minimizes that data we have exposed in AWS at any one time.  It also
+minimizes that data we have exposed in a cloud provider at any one time.  It also
 helps keep our system architecture sane and auditable.
 
 Each operation, as noted above will have a VPC.  This also enables us
@@ -102,7 +102,7 @@ Additionally follow the directions in `Setup Rules for VPC`
 
 ## Repo Setup
 
-Because terraform makes a local folder to house all information about state, we need a copy of this repository for every VPC we need in AWS.
+Because terraform makes a local folder to house all information about state, we need a copy of this repository for every infra we deploy.
 
 1. git clone https://github.com/redteaminfra/redteam-infra <OPNAME>
 1. Make a new repo in RedTeamInfra called <OPNAME>
@@ -127,7 +127,7 @@ You will need to configure a few select things in order to spin up homebase
 1. Create a git submodule from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh) that contains a valid users.json. The git submodule should be owned by you and placed in `host-share/sshkeys`. You should have at least one user with an `infra` tag. See above instructions for SSH Setup (in /external/README.md) for more detail on how to do this.
 1. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. Also, put your licence in `/global/host-share/.cobaltstrike.licence`
 1. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that your organization owns. These are to prevent OPSEC mistakes from homebase.
-1. Add auth for AWS SMS to `puppet/modules/monitoring/files/authFile.yaml`
+1. Add auth for AWS SMS to `puppet/modules/monitoring/files/authFile.yaml` if using AWS SMS for alerting
 1. Add OUTBOUND company traffic IPs to `puppet/modules/monitoring/files/C2Compromised.yaml`
 1. Add public keys to `external/sketch/provision.sh` inside the `authorized_keys` blob for users you want to access the redirector instances.
 
