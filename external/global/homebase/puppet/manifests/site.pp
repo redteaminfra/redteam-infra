@@ -20,9 +20,6 @@ node "default" {
 
     class { 'logstash':
      logstash_group => "adm",
-      settings => {
-        'http.host' => 'elk.infra.redteam',
-      }
     }
 
     logstash::configfile { 'inputs':
