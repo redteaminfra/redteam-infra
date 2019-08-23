@@ -99,6 +99,18 @@
 	"egress" : []
     },
     {
+	"name" : "eight_thousands_from_anywhere",
+	"display_name" : "8000-8080 from Anywhere",
+	"ingress" : [
+	    {
+		"protocol" : "tcp",
+		"source" : "0.0.0.0/0",
+		"ports" : "8000-8080"
+	    }
+	],
+	"egress" : []
+    },
+    {
 	"name" : "ssh_from_company",
 	"display_name" : "SSH from company",
 	"ingress" : [
