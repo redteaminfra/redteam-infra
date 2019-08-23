@@ -15,7 +15,7 @@ class OCITemplate
       max = input
     end
     if input.is_a? String
-      md = /(\d)+\s*-\s*(\d+)/.match(input)
+      md = /(\d+)\s*-\s*(\d+)/.match(input)
       min = md[1]
       max = md[2]
     end
