@@ -46,7 +46,10 @@ resource "oci_core_subnet" "proxy" {
 
   security_list_ids = [
     "${oci_core_security_list.vcn_all.id}",
-    "${oci_core_security_list.all_egress_list.id}"
+    "${oci_core_security_list.all_egress_list.id}",
+    "${oci_core_security_list.https_from_anywhere.id}",
+    "${oci_core_security_list.http_from_anywhere.id}",
+    "${oci_core_security_list.ssh_2222_from_anywhere.id}"
   ]
 
   route_table_id  = "${oci_core_route_table.igw.id}"
