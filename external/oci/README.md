@@ -47,3 +47,15 @@ From there you can run
 1. `make`
 1. `terraform init`
 1. `terraform apply -var-file=variables.tfvars`
+
+# Making Changes
+
+## Proxy Inbound Network Rules
+
+We define one Network Security Group (NSG) for both proxies and
+`network_security_group.tf` becomes the source for the rules governing
+the NSG. The NSG is attached to the proxy1 and proxy2 VNIC.
+
+Terraform will cycle the VNIC when doing this attachment, so if you
+are applying this change to a running infra, it will cause the proxies
+to have new public IP

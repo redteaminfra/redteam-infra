@@ -51,30 +51,6 @@
 	"ingress" : []
     },
     {
-	"name" : "https_from_anywhere",
-	"display_name" : "HTTPS from Anywhere",
-	"ingress" : [
-	    {
-		"protocol" : "tcp",
-		"source" : "0.0.0.0/0",
-		"ports" : 443
-	    }
-	],
-	"egress" : []
-    },
-    {
-	"name" : "http_from_anywhere",
-	"display_name" : "HTTP from Anywhere",
-	"ingress" : [
-	    {
-		"protocol" : "tcp",
-		"source" : "0.0.0.0/0",
-		"ports" : 80
-	    }
-	],
-	"egress" : []
-    },
-    {
 	"name" : "ssh_from_anywhere",
 	"display_name" : "SSH from Anywhere",
 	"ingress" : [
@@ -82,30 +58,6 @@
 		"protocol" : "tcp",
 		"source" : "0.0.0.0/0",
 		"ports" : 22
-	    }
-	],
-	"egress" : []
-    },
-    {
-	"name" : "ssh_2222_from_anywhere",
-	"display_name" : "SSH(2222) from Anywhere",
-	"ingress" : [
-	    {
-		"protocol" : "tcp",
-		"source" : "0.0.0.0/0",
-		"ports" : 2222
-	    }
-	],
-	"egress" : []
-    },
-    {
-	"name" : "eight_thousands_from_anywhere",
-	"display_name" : "8000-8080 from Anywhere",
-	"ingress" : [
-	    {
-		"protocol" : "tcp",
-		"source" : "0.0.0.0/0",
-		"ports" : "8000-8080"
 	    }
 	],
 	"egress" : []

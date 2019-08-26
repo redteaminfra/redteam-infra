@@ -17,6 +17,9 @@ resource "oci_core_instance" "proxy2" {
     private_ip = "${cidrhost(var.proxy_cidr, 12)}"
     assign_public_ip = false
     skip_source_dest_check = "true"
+    nsg_ids = [
+      "${oci_core_network_security_group.proxies.id}"
+    ]
   }
 
   metadata {
