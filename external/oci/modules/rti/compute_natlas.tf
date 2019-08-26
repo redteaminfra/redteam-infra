@@ -84,7 +84,7 @@ resource "null_resource" "natlas_provisioner" {
   provisioner "remote-exec" {
     inline = [
       "sudo bash -e /tmp/host-share/setup.sh",
-      "sudo bash -c 'iptables -F INPUT; iptables -F FORWARD; iptables -F OUTPUT; iptables -F InstanceServices; iptables -L'",
+      "sudo bash -e /tmp/host-share/oci_iptables_fix.sh",
     ]
   }
 }
