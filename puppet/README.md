@@ -68,7 +68,11 @@ up in a branch on your machine prior to pushing to github.
 
 ## Backflips
 
-TODO
+This module sets up the infrastructure to use "ssh backflips" A
+backflip is where the victim ssh's back to the attacker with a remote
+port forward back to the victim's ssh port. This enables the attacker
+to ssh directly back into the victim to get a shell as well as set up
+a SOCKS5 proxy into the victim network.
 
 ## cobaltstrike
 
