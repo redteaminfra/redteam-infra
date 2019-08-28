@@ -79,7 +79,7 @@ onwards and our socks proxies are on ports 5000 onwards
 		[*] waiting one minute for tunnel to come up...
 		[+] tunnel running
 
-1. run `install_proxy.py`
+1. run `install_proxy.py` on the attack host
 
 	`install_proxy.py` will create a systemd service to initiate the ssh
 	connection to the victim and reverse port-forward a connection to
