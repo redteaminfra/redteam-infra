@@ -30,7 +30,7 @@ class modrewrite::config {
         group => 'root',
         mode => '644',
         ensure => present,
-        replace => 'no',
+        replace => 'yes',
         source => "puppet:///modules/modrewrite/.htaccess",
 	}
 }
