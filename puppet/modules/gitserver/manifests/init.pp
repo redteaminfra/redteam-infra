@@ -2,7 +2,7 @@ class gitserver {
 
     $gitdir = '/var/lib/git'
     $gitinfrarepo = "${gitdir}/infra"
-    $gitsshrepo = "${gitdir}/sshKeys"
+    $gitsshrepo = "${gitdir}/sshkeys"
 
     package { ['git']:
         ensure => 'installed',
