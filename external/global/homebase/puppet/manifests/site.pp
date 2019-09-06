@@ -1,5 +1,3 @@
-# DO NOT INCLUDE UNATTENDED UPGRADES
-# You do not want homebase to reboot during an operation due to upgrades
 node "default" {
     include 'hostsexternal'
     include 'gitserver'
@@ -14,7 +12,6 @@ node "default" {
     include 'etherpad'
     include 'yama'
     include 'mollyguard'
-    include 'cleanup'
 
     package { ['openjdk-8-jre-headless']:
         ensure => 'installed',
@@ -30,7 +27,10 @@ node "default" {
     }
 
     include 'logstashconfig'
-    class { 'golang':
-      version => '1.13',
-    }
+#    include 'cobaltstrike'
+
+class { 'golang':
+  version => '1.13',
+}
+
 }
