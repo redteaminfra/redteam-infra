@@ -27,10 +27,8 @@ node "default" {
     }
 
     include 'logstashconfig'
-#    include 'cobaltstrike'
 
    class { 'golang':
       version => '1.13',
     }
-
 }
