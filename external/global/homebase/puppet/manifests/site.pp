@@ -27,8 +27,7 @@ node "default" {
     }
 
     include 'logstashconfig'
-
-   class { 'golang':
+    class { 'golang':
       version => '1.13',
     }
 }
