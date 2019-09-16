@@ -36,9 +36,6 @@ fi
 ### Versions are hardcoded as a result of installation errors
 ### Versions came from https://forge.puppet.com/elastic and https://forge.puppet.com/puppetlabs
 
-# Install puppetlabs apt module
-puppet module install puppetlabs-apt --modulepath /etc/puppet/modules
-
 # Install logstash for everybody
 puppet module install elastic-logstash --version 5.1.0 --modulepath /etc/puppet/modules
 
@@ -67,6 +64,9 @@ if grep -q elk /etc/hostname; then
     #puppet module install elastic-kibana --modulepath /etc/puppet/modules
     puppet module install elastic-kibana  --version 5.1.0 --modulepath /etc/puppet/modules --force
 fi
+
+# Install puppetlabs apt module
+puppet module install puppetlabs-apt --modulepath /etc/puppet/modules
 
 ### fix base image provision
 regex="(ubuntu|ec2-user):x:.*"
