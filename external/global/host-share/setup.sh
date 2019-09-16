@@ -36,6 +36,9 @@ fi
 ### Versions are hardcoded as a result of installation errors
 ### Versions came from https://forge.puppet.com/elastic and https://forge.puppet.com/puppetlabs
 
+# Install puppetlabs apt module
+puppet module install puppetlabs-apt --modulepath /etc/puppet/modules
+
 # Install logstash for everybody
 puppet module install elastic-logstash --version 5.1.0 --modulepath /etc/puppet/modules
 
