@@ -12,6 +12,7 @@ node "default" {
   include 'proxytools'
   include 'backflips'
   include 'tinyproxy'
+  include 'cleanup'
 
   package { ['openjdk-8-jre-headless']:
       ensure => 'installed',

@@ -6,6 +6,7 @@ node "default" {
     include 'yama'
     include 'mollyguard'
   #  include 'monitoring'
+    include 'cleanup'
 
 # ELK Setup
 #  package { ['openjdk-8-jre-headless']:

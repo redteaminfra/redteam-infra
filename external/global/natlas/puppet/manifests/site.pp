@@ -7,6 +7,7 @@ node "default" {
     include 'unattendedupgrades'
     include 'yama'
     include 'mollyguard'
+    include 'cleanup'
 
     package { ['openjdk-8-jre-headless']:
         ensure => 'installed',
