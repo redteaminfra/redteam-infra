@@ -8,7 +8,7 @@ user.libwrap: nobody
 internal: 0.0.0.0 port=1080
 
 # The proxying network interface or address.
-external: ens3
+external: <%= `ip -br addr|cut -d' ' -f1|grep -v lo` %>
 
 # socks-rules determine what is proxied through the external interface.
 # The default of "none" permits anonymous access.
