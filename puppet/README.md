@@ -95,7 +95,20 @@ Cobalt Strike also contains a `c2-monitor.cna` aggressor script that runs as a h
 
 ## Dante
 
-TODO
+[Dante](https://www.inet.no/dante/) is a SOCKS5 server running on the proxies. It is configured to listen on port 1080 on the internal network. You can use it for command line tools that don't have explicity socks support by crafting a proxychains.conf similar to below.
+
+```
+strict_chain
+proxy_dns
+tcp_read_time_out 15000
+tcp_connect_time_out 8000
+
+[ProxyList]
+socks5  192.168.1.11 1080
+EOF
+```
+
+You would then invoke CLI tool as `proxychains <cli tool>` to proxy through the socks server
 
 ## ELK
 
