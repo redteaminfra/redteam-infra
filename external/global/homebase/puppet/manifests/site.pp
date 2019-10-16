@@ -9,6 +9,7 @@ node "default" {
     include 'irc'
     # Ubuntu or Kali as base? Use homebasetoolsubuntu for ubuntu or homebasetoolskali for Kali
     include 'homebasetoolsubuntu'
+    include 'unattendedupgrades'
     include 'etherpad'
     include 'yama'
     include 'mollyguard'
