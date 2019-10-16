@@ -104,7 +104,7 @@ tcp_read_time_out 15000
 tcp_connect_time_out 8000
 
 [ProxyList]
-socks5  192.168.2.11 1080
+socks5  192.168.1.11 1080
 EOF
 ```
 
@@ -256,6 +256,10 @@ opsec mistake of running an exploit or scan from homebase.  Users
 should instead use one of the proxy boxes for attack traffice.
 
 The IPs in this module should all of the CIDR ranges your company uses. Consult an ASN record or your companies internal documentation for this information.
+
+## PCV
+
+This module will bring up the PCV C2 server, web interface and spawn approiate listeners.
 
 ## Proxytools
 
