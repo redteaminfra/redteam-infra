@@ -39,6 +39,7 @@ op_name=""
 ## Setup Rules For OCI
 
 1. Put a list of IPs in `external/oci/seclists.json` in the `ssh_from_compnay` tag that your company uses for OUTBOUND traffic. This will be used for both SSH inbound and OPSEC rules
+1. Change the the shape of the `compute_homebase.tf` to be `BM.Standard2.52` if there are resource limits for BMs
 
 ## Spin up Instances
 
