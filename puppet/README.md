@@ -104,7 +104,7 @@ tcp_read_time_out 15000
 tcp_connect_time_out 8000
 
 [ProxyList]
-socks5  192.168.1.11 1080
+socks5  192.168.2.11 1080
 EOF
 ```
 
