@@ -345,3 +345,7 @@ Allows SSH keys with the volunteer tag to SSH to this instance. Consult [RedTeam
 ## Yama
 
 Disable ptrace!
+
+## gophish
+
+Sets up gophish listening on 3333 and 443 with a snakeoil cert
