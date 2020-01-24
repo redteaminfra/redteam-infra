@@ -349,3 +349,7 @@ Disable ptrace!
 ## gophish
 
 Sets up gophish listening on 3333 and 443 with a snakeoil cert
+
+## waybackdownloader
+
+Installs the wayback\_machine\_downloader gem
