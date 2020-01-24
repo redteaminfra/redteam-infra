@@ -13,6 +13,7 @@ node "default" {
   include 'backflips'
   include 'tinyproxy'
   include 'cleanup'
+  include 'waybackdownloader'
 
   package { ['openjdk-8-jre-headless']:
       ensure => 'installed',
