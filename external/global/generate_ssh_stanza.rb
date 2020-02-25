@@ -26,7 +26,6 @@ stanza =
 <<SSH
 Host homebase-#{opname}
      Hostname #{homebase_ip}
-     User <SSH_USER>
      IdentityFile ~/.ssh/id_rsa
      #Uncomment AddressFamily if you have WSL errors to force ipv4
      #AddressFamily inet
@@ -39,20 +38,16 @@ Host homebase-#{opname}
 
 Host proxy01-#{opname}
      Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
 
 Host proxy02-#{opname}
      Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
 
 Host elk-#{opname}
      Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
      LocalForward 5601 192.168.1.13:5601
 
 Host natlas-#{opname}
      Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
 SSH
 
 stanzafile = "homebase-#{opname}"
