@@ -37,6 +37,12 @@ fi
 ### Versions came from https://forge.puppet.com/elastic and https://forge.puppet.com/puppetlabs
 puppet module install puppetlabs-apt --version 4.3.0 --modulepath /etc/puppet/modules
 
+### Install golang on homebase
+if grep -q homebase /etc/hostname; then
+    puppet module install dp-golang --modulepath /etc/puppet/modules
+    puppet module install puppetlabs-postgresql --modulepath /etc/puppet/modules
+fi
+
 ### Install puppet tools for elk
 if grep -q elk /etc/hostname; then
     wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.15.deb -O /tmp/elasticsearch.deb
