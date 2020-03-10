@@ -32,17 +32,4 @@ node "default" {
     include 'logstashconfig'
 #    include 'cobaltstrike'
 
-    class { 'golang':
-      version => '1.13',
-    }
-
-    class { 'postgresql::server':
-    }
-
-    postgresql::server::db { 'pcv_dev':
-        user     => 'pcv_dev',
-        password => postgresql_password('pcv_dev', 'password123'),
-    }
-
-
 }
