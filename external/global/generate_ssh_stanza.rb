@@ -29,9 +29,12 @@ Host homebase-#{opname}
      IdentityFile ~/.ssh/id_rsa
      #Uncomment AddressFamily if you have WSL errors to force ipv4
      #AddressFamily inet
-     LocalForward 50050 127.0.0.1:50050
-     LocalForward 5000 192.168.2.14:5000
-     LocalForward 9001 127.0.0.1:9001
+     # Etherpad
+     #LocalForward 9001 127.0.0.1:9001
+     # Pcv-web
+     #LocalForward 3000 127.0.0.1:3000
+     # Pcv-server API
+     #LocalForward 9000 127.0.0.1:9000
      ##Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshkeys users.json
      #Your port number is (5900 + (UID - 6000) + 1)
      #LocalForward 5901 127.0.0.1:59xx
@@ -45,9 +48,6 @@ Host proxy02-#{opname}
 Host elk-#{opname}
      Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
      LocalForward 5601 192.168.1.13:5601
-
-Host natlas-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
 SSH
 
 stanzafile = "homebase-#{opname}"
