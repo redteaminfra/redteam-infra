@@ -9,7 +9,7 @@ class etherpad::config {
     }
 
     exec { "install_nodejs":
-        command => "/usr/bin/curl -sL https://deb.nodesource.com/setup_8.x | /bin/bash - && /usr/bin/apt install -y nodejs",
+        command => "/usr/bin/curl -sL https://deb.nodesource.com/setup_13.x  | /bin/bash - && /usr/bin/apt install -y nodejs",
         notify => Exec["clone_etherpad"],
      }
 
