@@ -26,7 +26,6 @@ stanza =
 <<SSH
 Host homebase-#{opname}
      Hostname #{homebase_ip}
-     IdentityFile ~/.ssh/id_rsa
      #Uncomment AddressFamily if you have WSL errors to force ipv4
      #AddressFamily inet
      # Etherpad
