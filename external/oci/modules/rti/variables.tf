@@ -49,13 +49,13 @@ variable "ssh_provisioning_public_key" {
 variable "ssh_provisioning_private_key" {
 }
 
-# UBUNTU_18_04_2018_12_10
+# Canonical-Ubuntu-18.04-2019.09.18-0 us-phoenix-1
 variable "ubuntu_image_id" {
-  default = "ocid1.image.oc1.phx.aaaaaaaahuvwlhrckaqyjgntvbjhlunzbv4zwsy6zvczknkstwa4tj3pzmuq"
+  default = "ocid1.image.oc1.phx.aaaaaaaajqblum4knqfeogw6c4o5ikldcaxiif2vh4scntgxh6zgpps4jmpq"
 }
 # set to ubuntu for now
 variable "kali_image_id" {
-  default = "ocid1.image.oc1.phx.aaaaaaaahuvwlhrckaqyjgntvbjhlunzbv4zwsy6zvczknkstwa4tj3pzmuq"
+  default = "ocid1.image.oc1.phx.aaaaaaaajqblum4knqfeogw6c4o5ikldcaxiif2vh4scntgxh6zgpps4jmpq"
 }
 
 variable "instance_user" {
