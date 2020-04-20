@@ -21,8 +21,8 @@ class OCITemplate
     end
     if min and max
       return "    #{protocol}_options {\n" +
-             "      \"min\" = #{min}\n" +
-             "      \"max\" = #{max}\n" +
+             "      min = #{min}\n" +
+             "      max = #{max}\n" +
              "    }"
     else
       return ""

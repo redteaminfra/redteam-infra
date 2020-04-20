@@ -1,58 +1,58 @@
 resource "oci_core_instance" "proxy1" {
-  depends_on          = [ "oci_core_instance.homebase" ]
-  availability_domain = "${data.null_data_source.target_ad.outputs.name}"
-  compartment_id      = "${var.compartment_id}"
+  depends_on          = [oci_core_instance.homebase]
+  availability_domain = data.null_data_source.target_ad.outputs.name
+  compartment_id      = var.compartment_id
   display_name        = "${var.proxy_name}1-${var.op_name}"
-  shape               = "${var.proxy_shape}"
+  shape               = var.proxy_shape
 
   source_details {
-    source_id = "${var.ubuntu_image_id}"
+    source_id   = var.ubuntu_image_id
     source_type = "image"
   }
 
   create_vnic_details {
-    subnet_id = "${oci_core_subnet.proxy.id}"
+    subnet_id      = oci_core_subnet.proxy.id
     hostname_label = "${var.proxy_name}1-${var.op_name}"
 
-    private_ip = "${cidrhost(var.proxy_cidr, 11)}"
-    assign_public_ip = false
+    private_ip             = cidrhost(var.proxy_cidr, 11)
+    assign_public_ip       = false
     skip_source_dest_check = "true"
     nsg_ids = [
       "${oci_core_network_security_group.proxies.id}"
     ]
   }
 
-  metadata {
+  metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
   }
 }
 
 data "oci_core_private_ips" "proxy1" {
-  ip_address = "${oci_core_instance.proxy1.private_ip}"
-  subnet_id = "${oci_core_subnet.proxy.id}"
+  ip_address = oci_core_instance.proxy1.private_ip
+  subnet_id  = oci_core_subnet.proxy.id
 }
 
 resource "oci_core_public_ip" "proxy1" {
-  compartment_id = "${var.compartment_id}"
-  lifetime = "EPHEMERAL"
+  compartment_id = var.compartment_id
+  lifetime       = "EPHEMERAL"
 
-  display_name = "Proxy1 public ip"
-  private_ip_id = "${lookup(data.oci_core_private_ips.proxy1.private_ips[0], "id")}"
+  display_name  = "Proxy1 public ip"
+  private_ip_id = lookup(data.oci_core_private_ips.proxy1.private_ips[0], "id")
 }
 
 resource "null_resource" "proxy1_provisioner" {
- depends_on = ["oci_core_instance.proxy1"]
+  depends_on = [oci_core_instance.proxy1]
 
- connection {
-   host = "${oci_core_instance.proxy1.private_ip}"
-   type = "ssh"
-   user = "${var.instance_user}"
-   private_key = "${file(var.ssh_provisioning_private_key)}"
-   timeout = "3m"
+  connection {
+    host        = oci_core_instance.proxy1.private_ip
+    type        = "ssh"
+    user        = var.instance_user
+    private_key = file(var.ssh_provisioning_private_key)
+    timeout     = "3m"
 
-   bastion_host = "${oci_core_public_ip.homebase.ip_address}"
-   bastion_user = "${var.homebase_user}"
- }
+    bastion_host = oci_core_public_ip.homebase.ip_address
+    bastion_user = var.homebase_user
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -61,17 +61,17 @@ resource "null_resource" "proxy1_provisioner" {
   }
 
   provisioner "file" {
-    source = "../global/host-share/"
+    source      = "../global/host-share/"
     destination = "/tmp/host-share/"
   }
 
   provisioner "file" {
-    source = "../../puppet",
+    source      = "../../puppet"
     destination = "/tmp/host-share/"
   }
 
   provisioner "file" {
-    source = "../global/proxies",
+    source      = "../global/proxies"
     destination = "/tmp/host-share/"
   }
 

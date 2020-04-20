@@ -53,6 +53,7 @@ variable "ssh_provisioning_private_key" {
 variable "ubuntu_image_id" {
   default = "ocid1.image.oc1.phx.aaaaaaaajqblum4knqfeogw6c4o5ikldcaxiif2vh4scntgxh6zgpps4jmpq"
 }
+
 # set to ubuntu for now
 variable "kali_image_id" {
   default = "ocid1.image.oc1.phx.aaaaaaaajqblum4knqfeogw6c4o5ikldcaxiif2vh4scntgxh6zgpps4jmpq"
@@ -76,3 +77,4 @@ variable "preserve_boot_volume" {
 variable "provisioners_dir" {
   default = "provisioners"
 }
+

@@ -1,42 +1,42 @@
 resource "oci_core_instance" "elk" {
-  depends_on          = [ "oci_core_instance.homebase" ]
-  availability_domain = "${data.null_data_source.target_ad.outputs.name}"
-  compartment_id      = "${var.compartment_id}"
+  depends_on          = [oci_core_instance.homebase]
+  availability_domain = data.null_data_source.target_ad.outputs.name
+  compartment_id      = var.compartment_id
   display_name        = "elk-${var.op_name}"
-  shape               = "${var.infra_shape}"
+  shape               = var.infra_shape
 
   source_details {
-    source_id = "${var.ubuntu_image_id}"
+    source_id   = var.ubuntu_image_id
     source_type = "image"
   }
 
   create_vnic_details {
-    subnet_id = "${oci_core_subnet.utility.id}"
+    subnet_id      = oci_core_subnet.utility.id
     hostname_label = "elk-${var.op_name}"
 
-    private_ip = "${cidrhost(var.utility_cidr, 13)}"
+    private_ip = cidrhost(var.utility_cidr, 13)
   }
 
-  metadata {
+  metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
   }
 
-  preserve_boot_volume = "${var.preserve_boot_volume}"
+  preserve_boot_volume = var.preserve_boot_volume
 }
 
 resource "null_resource" "elk_provisioner" {
- depends_on = ["oci_core_instance.elk"]
+  depends_on = [oci_core_instance.elk]
 
- connection {
-   host = "${oci_core_instance.elk.private_ip}"
-   type = "ssh"
-   user = "${var.instance_user}"
-   private_key = "${file(var.ssh_provisioning_private_key)}"
-   timeout = "3m"
+  connection {
+    host        = oci_core_instance.elk.private_ip
+    type        = "ssh"
+    user        = var.instance_user
+    private_key = file(var.ssh_provisioning_private_key)
+    timeout     = "3m"
 
-   bastion_host = "${oci_core_public_ip.homebase.ip_address}"
-   bastion_user = "${var.homebase_user}"
- }
+    bastion_host = oci_core_public_ip.homebase.ip_address
+    bastion_user = var.homebase_user
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -45,17 +45,17 @@ resource "null_resource" "elk_provisioner" {
   }
 
   provisioner "file" {
-    source = "../global/host-share/"
+    source      = "../global/host-share/"
     destination = "/tmp/host-share/"
   }
 
   provisioner "file" {
-    source = "../../puppet",
+    source      = "../../puppet"
     destination = "/tmp/host-share/"
   }
 
   provisioner "file" {
-    source = "../global/elkServer",
+    source      = "../global/elkServer"
     destination = "/tmp/host-share/"
   }
 
