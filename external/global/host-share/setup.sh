@@ -11,8 +11,8 @@ unattended-upgrade
 
 ### user setup
 ### Do this early in the setup process so you can get into the box to debug install errors
-apt-get -qq -y install python-minimal
-bash -c "cd /tmp/host-share/sshkeys/ && python ./user_tool.py apply -j users.json -t core"
+apt-get -qq -y install python2.7-minimal
+bash -c "cd /tmp/host-share/sshkeys/ && python2.7 ./user_tool.py apply -j users.json -t core"
 
 ### Install java
 apt -y -qq install -f
