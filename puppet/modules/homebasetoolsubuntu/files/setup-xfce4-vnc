@@ -26,45 +26,6 @@ EOF
     chmod 600 ~/.vnc/passwd
 fi
 
-sudo cp -R /opt/cobaltstrike $HOME
-sudo chown -R $(whoami):$(whoami) $HOME/cobaltstrike
-sudo cp -v /root/.cobaltstrike.license $HOME
-sudo chown $(whoami):$(whoami) $HOME/.cobaltstrike.license
-
-# avoid pounding CS servers
-
-sleep 0.$[ ( $RANDOM % 100 )]s # lousy toctou prevention
-
-while [ -f /tmp/update_lock ]; do
-    echo "."
-    sleep 5s
-done
-
-touch /tmp/update_lock
-timeout --foreground 5m bash -c "cd ~/cobaltstrike/ && ./update.sh"
-rm /tmp/update_lock
-
-# Fix for Issue 28
-sed -i 's/-jar/-Xmx4096m -Xms4096m -jar/g' $HOME/cobaltstrike/cobaltstrike
-
-if [ ! -d ~/Desktop ] ; then
-    mkdir ~/Desktop
-fi
-
-if [ ! -f ~/Desktop/cobalt.desktop ]; then
-    cat <<EOF > ~/Desktop/cobalt.desktop
-[Desktop Entry]
-
-Type=Application
-Version=1.0
-Name=cobalt strike
-Icon=cobalt-strike.png
-Exec=bash -c "cd $HOME/cobaltstrike && ./cobaltstrike"
-EOF
-    chmod 755 ~/Desktop/cobalt.desktop
-fi
-
-
 VNCNUMBER=$(($(id -u) - 6000 + 1))
 PIDFILE="$HOME/.vnc/$(hostname):$VNCNUMBER.pid"
 if [[ -e $PIDFILE && -e /proc/$(cat $PIDFILE) ]]; then
