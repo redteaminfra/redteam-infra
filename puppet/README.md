@@ -74,6 +74,10 @@ port forward back to the victim's ssh port. This enables the attacker
 to ssh directly back into the victim to get a shell as well as set up
 a SOCKS5 proxy into the victim network.
 
+## Cleanup
+
+Uses `tidy` to eliminate large stashes of logs such as those found in /var/cache/puppet/report.
+
 ## cobaltstrike
 
 1. Add a teamserver password in the `PASSWORD` field in `modules/cobaltstrike/files/teamserver.sh`
