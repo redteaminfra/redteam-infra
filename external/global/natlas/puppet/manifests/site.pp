@@ -8,6 +8,7 @@ node "default" {
     include 'yama'
     include 'mollyguard'
     include 'cleanup'
+    include 'cloudagent'
 
     package { ['openjdk-8-jre-headless']:
         ensure => 'installed',

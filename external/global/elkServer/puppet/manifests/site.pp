@@ -7,6 +7,7 @@ node "default" {
     include 'mollyguard'
   #  include 'monitoring'
     include 'cleanup'
+    include 'cloudagent'
 
 # ELK Setup
 #  package { ['openjdk-8-jre-headless']:

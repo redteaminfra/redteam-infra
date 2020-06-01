@@ -14,6 +14,7 @@ node "default" {
   include 'tinyproxy'
   include 'cleanup'
   include 'waybackdownloader'
+  include 'cloudagent'
 
   package { ['openjdk-8-jre-headless']:
       ensure => 'installed',
