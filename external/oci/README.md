@@ -34,9 +34,6 @@ ssh_provisioning_private_key=""
 ssh_provisioning_public_key=""
 
 op_name=""
-
-# Adjust this to false for prod operation infrastructure
-preserve_boot_volume = "false"
 ```
 
 ## Setup Rules For OCI

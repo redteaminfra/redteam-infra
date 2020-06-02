@@ -33,7 +33,4 @@ module "op" {
   proxy_name  = var.proxy_name
 
   provisioners_dir = var.provisioners_dir
-
-  preserve_boot_volume = var.preserve_boot_volume
 }
-
