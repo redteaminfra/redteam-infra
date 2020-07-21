@@ -12,14 +12,20 @@ Rediculous bash script that:
 * makes 'user' passwordless sudoer
 * enables ufw firewall
 * installs unattended-upgrades
+* installs nginx
+* adds a hostname to the sketch box
 
-This script is ran on the zero-trust reflector proxies to configure them. 
+This script is ran on the zero-trust reflector proxies to configure them.
 
 You will need to add a SSH public key to this script.
 
+```
+./provision.sh <hostname>
+```
+
 ## install_proxy.py
 
-Sets up a simpleproxy redirector and associated systemd service file. 
+Sets up a simpleproxy redirector and associated systemd service file.
 
 ```
 usage: install_proxy.py <IP> <LPORT> <RPORT>
@@ -31,18 +37,42 @@ usage: install_proxy.py <IP> <LPORT> <RPORT>
         must be run as root
 ```
 
-# How to Play
+### How to Play with Install_proxy.py
 
 1. On trusted host:
   1. cat provision.sh | base64 -w0 | xclip -i
 1. On untrusted host (zero-trust reflector):
-  1. echo '\<xpaste\>' | base64 -d | bash
+  1. echo '\<xpaste\>' | base64 -d | bash <hostname>
 1. On trusted host:
   1. cat install_proxy.py | base64 -w0 | xclip -i
 1. On untrusted host (zero-trust reflector):
   1. echo '\<xpaste\>' | base64 -d | sudo python - \<IP of a proxy\> 443 443
   1. echo '\<xpaste\>' | base64 -d | sudo python - \<IP of a proxy\> 80 80
 
+## install_ProxyProtocol.sh
+
+Sets up nginx with proxy protocol to pass remote IP information to red team hosted infra
+
+```
+usage: ./install_Proxy_Protocol.sh <next hop IP> <edge/middle>
+Example: ./provision.sh 192.168.1.10 edge
+
+  <Next Hop IP> is the next hop. e.g.; middle-sketch or prox01-engagement
+  <edge/middle> is where the sketch is in the double hop
+
+  Must be run as root
+```
+
+### How to Play with install_ProxyProtocol.py
+
+1. On trusted host:
+  1. cat provision.sh | base64 -w0 | xclip -i 
+1. On untrusted host (zero-trust reflector):
+  1. echo '\<xpaste\>' | base64 -d | bash <hostname>
+1. On trusted host:
+  1. cat install_ProxyProtocol.sh | base64 -w0 | xclip -i
+1. On untrusted host (zero-trust reflector):
+  1. echo '\<xpaste\>' | base64 -d | sudo bash <next hop ip> <edge/middle>
 
 # Ideal Stanza
 
@@ -60,4 +90,4 @@ Host sketch2
 
 This is best used in cases where you are okay with leaking the IP of sketch 1 from a trusted infra ran proxy, but want to keep the IP of sketch 2 safe.
 
-Whend deploying a double reflector you will want to perform the `How to Play` steps twice for each reflector. For `install_proxy.py` you would point the appropriate IP addresses to reflector through with the above reflector setting.
+Whend deploying a double reflector you will want to perform the `How to Play` steps twice for each reflector. For `install_proxy.py` and `install_ProxyProtocol.sh` you would point the appropriate IP addresses to reflector through with the above reflector setting.
