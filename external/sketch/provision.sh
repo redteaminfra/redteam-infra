@@ -24,7 +24,7 @@ EOF
 sysctl -p
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update && apt-get -y install tmux ufw nginx
+apt-get update && apt-get -y install screen tmux ufw nginx simpleproxy
 
 useradd -p '*' -m -s '/bin/bash' -k /etc/skel  user
 mkdir ~user/.ssh
