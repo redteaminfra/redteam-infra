@@ -252,6 +252,10 @@ There are two modules, one for the server and one for the agent in `natlasserver
 
 Bootstraps the installation of `nmap 7.60` becuase at the time our instances did not automatically install it.
 
+## Open Resty
+
+Installs Open Resty to proxies so we can use nginx with Proxy Protocol, as well as all of the extendable features Open Resty provides
+
 ## OPSEC
 
 Homebase has a set of iptables rules to prevent new outbound

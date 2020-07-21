@@ -4,7 +4,6 @@ node "default" {
   include 'ssh'
   include 'dante'
   include 'volunteerssh'
-  include 'modrewrite'
   include 'unattendedupgrades'
   include 'yama'
   include 'nmap'
@@ -15,6 +14,7 @@ node "default" {
   include 'cleanup'
   include 'waybackdownloader'
   include 'cloudagent'
+  include 'openresty'
 
   package { ['openjdk-8-jre-headless']:
       ensure => 'installed',
