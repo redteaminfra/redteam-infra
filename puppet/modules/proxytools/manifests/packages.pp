@@ -5,6 +5,7 @@ class proxytools::packages {
                  'zile',
                  'emacs',
                  'nmap',
-                 'nikto' ]
+                 'nikto',
+                 'xclip']
     package { $packages: ensure => "installed" }
 }
