@@ -66,7 +66,7 @@ Example: ./provision.sh 192.168.1.10 edge
 ### How to Play with install_ProxyProtocol.py
 
 1. On trusted host:
-  1. cat provision.sh | base64 -w0 | xclip -i 
+  1. cat provision.sh | base64 -w0 | xclip -i
 1. On untrusted host (zero-trust reflector):
   1. echo '\<xpaste\>' | base64 -d | bash <hostname>
 1. On trusted host:
@@ -79,12 +79,14 @@ Example: ./provision.sh 192.168.1.10 edge
 You should be connecting to the sketchy zero-trust instances in disconnected infra. In the case where you are using a double reflector such as `target <-> sketch 2 <-> sketch 1 <-> proxy##` you could perform the following in an SSH Stanza
 
 ```
-Host sketch1
-    Proxycommand ssh proxy##-redteam nc -q0 <IP of sketch 2> %p
+Host middle-sketch-ENGAGEMENT
+    Hostname <IP of Middle Sketch>
+    Proxycommand ssh proxy##-ENGAGEMENT nc -q0 %h %p
     IdentityFile ~/.ssh/sketchyKey
 
-Host sketch2
-    Proxycommand ssh sketch2 nc -q0 <IP of sketch 1> %p
+Host edge-sketch##-ENGAGEMENT
+    Hostname <IP an of edge sketch>
+    Proxycommand ssh middle-sketch-ENGAGEMENT nc -q0 %h %p
     IdentityFile ~/.ssh/sketchyKey
 ```
 
