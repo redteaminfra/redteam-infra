@@ -55,3 +55,5 @@ ufw allow http
 ufw allow https
 ufw --force enable
 apt-get -y install unattended-upgrades
+
+useradd -s /bin/bash -d /home/sketchssh -m sketchssh
