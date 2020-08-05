@@ -6,6 +6,7 @@ class proxytools::packages {
                  'emacs',
                  'nmap',
                  'nikto',
-                 'xclip']
+                 'xclip',
+                 'autossh']
     package { $packages: ensure => "installed" }
 }
