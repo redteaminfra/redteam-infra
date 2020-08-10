@@ -57,3 +57,5 @@ ufw --force enable
 apt-get -y install unattended-upgrades
 
 useradd -s /bin/bash -d /home/sketchssh -m sketchssh
+usermod -p '*' sketchssh
+usermod -U sketchssh
