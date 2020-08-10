@@ -24,7 +24,7 @@ def usage():
         "\tKEY is the path to the key for the proxy to connect into sketch\n")
     sys.stderr.write("\tMIDDLE the IP address of a middle sketch\n")
     sys.stderr.write("\tEDGE is the IP address of an edge sketch\n")
-    sys.stderr.write("\tUser is the user we connect through on sketch. If provisioned with RTI, use `sshsketch` as the user.\n")
+    sys.stderr.write("\tUser is the user we connect through on sketch. If provisioned with RTI, use `sketchssh` as the user.\n")
 
 def run(cmd):
     proc = subprocess.Popen(cmd, shell=True)
