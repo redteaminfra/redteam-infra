@@ -18,13 +18,11 @@ WantedBy=multi-user.target
 
 def usage():
     sys.stderr.write("install_proxy.py Proxyport Middle Edge User Key\n\n")
-    sys.stderr.write(
-        "\tPROXYPORT is the port for the SOCKS server to listen on\n")
-    sys.stderr.write(
-        "\tKEY is the path to the key for the proxy to connect into sketch\n")
+    sys.stderr.write("\tPROXYPORT is the port for the SOCKS server to listen on\n")
     sys.stderr.write("\tMIDDLE the IP address of a middle sketch\n")
     sys.stderr.write("\tEDGE is the IP address of an edge sketch\n")
     sys.stderr.write("\tUser is the user we connect through on sketch. If provisioned with RTI, use `sketchssh` as the user.\n")
+    sys.stderr.write("\tKEY is the path to the key for the proxy to connect into sketch\n")
 
 def run(cmd):
     proc = subprocess.Popen(cmd, shell=True)
@@ -71,10 +69,11 @@ def main():
         sys.exit(1)
 
     proxyport = int(sys.argv[1])
-    key = sys.argv[2]
-    middleIP = sys.argv[3]
-    edgeIP = sys.argv[4]
-    user = sys.argv[5]
+    middleIP = sys.argv[2]
+    edgeIP = sys.argv[3]
+    user = sys.argv[4]
+  	key = sys.argv[5]
+
 
     print(sys.argv)
 
