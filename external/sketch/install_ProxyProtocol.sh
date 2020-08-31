@@ -18,14 +18,15 @@ then
     usage
 fi
 
-if [[ $2 != "edge" ]] && [[ $2 != "middle" ]];
+NEXTHOP=$1
+NODE=$2
+
+if [[ $NODE != "edge" ]] && [[ $NODE != "middle" ]];
 then
     usage
 fi
 
-NEXTHOP=$1
-
-if [[ $2 == "edge" ]];
+if [[ $NODE == "edge" ]];
 then
 cat <<EOF >> /etc/nginx/nginx.conf
 stream {
@@ -43,7 +44,7 @@ stream {
 EOF
 fi
 
-if [[ $2 == "middle" ]];
+if [[ $NODE == "middle" ]];
 then
 cat <<EOF >> /etc/nginx/nginx.conf
 stream {
