@@ -1,0 +1,3 @@
+[submodule "external/global/host-share/sshkeys"]
+	path = external/global/host-share/sshkeys
+	url = ssh://git@bitbucket.oci.oraclecorp.com:7999/ff0000/ssh.git

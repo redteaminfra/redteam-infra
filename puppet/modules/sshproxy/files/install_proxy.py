@@ -5,24 +5,50 @@ import os
 import subprocess
 import socket
 
-TEMPLATE = """[Unit]
+
+SSH = """
+ServerAliveInterval 30
+ServerAliveCountMax 3
+Compression yes
+Host %(middleName)s
+    Hostname %(middleIP)s
+    IdentityFile %(key)s
+    User %(user)s
+Host %(edgeName)s
+    Hostname %(edgeIP)s
+    DynamicForward 0.0.0.0:%(proxyport)d    
+    ProxyJump %(middleName)s
+    IdentityFile %(key)s
+    User %(user)s
+    RequestTTY no
+"""
+
+SYSTEMD = """[Unit]
 Description=ssh forward socks proxy for %(proxyport)d through %(middle)s -> %(edge)s
 After=network.target auditd.service
 
 [Service]
-ExecStart=/usr/bin/autossh -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -D 0.0.0.0:%(proxyport)d -i %(key)s %(user)s@%(middle)s -o "ProxyCommand nc -q0 %(edge)s 22"
+Environment="AUTOSSH_GATETIME=0"
+ExecStart=/usr/bin/autossh -M0 -F %(sshconfig)s -N %(edgeName)s
 
 [Install]
 WantedBy=multi-user.target
 """
 
+
 def usage():
     sys.stderr.write("install_proxy.py Proxyport Middle Edge User Key\n\n")
-    sys.stderr.write("\tPROXYPORT is the port for the SOCKS server to listen on\n")
-    sys.stderr.write("\tMIDDLE the IP address of a middle sketch\n")
-    sys.stderr.write("\tEDGE is the IP address of an edge sketch\n")
-    sys.stderr.write("\tUser is the user we connect through on sketch. If provisioned with RTI, use `sketchssh` as the user.\n")
-    sys.stderr.write("\tKEY is the path to the key for the proxy to connect into sketch\n")
+    sys.stderr.write(
+        "\tPROXYPORT is the port for the SOCKS server to listen on\n")
+    sys.stderr.write("\tMIDDLE-Name the name to give a middle sketch\n")
+    sys.stderr.write("\tMIDDLE-IP is the address IP of a middle sketch\n")
+    sys.stderr.write("\Edge-Name the name to give a middle sketch\n")
+    sys.stderr.write("\tEDGE-IP is the IP address of an edge sketch\n")
+    sys.stderr.write(
+        "\tUser is the user we connect through on sketch. If provisioned with RTI, use `sketchssh` as the user.\n")
+    sys.stderr.write(
+        "\tKEY is the path to the key for the proxy to connect into sketch\n")
+
 
 def run(cmd):
     proc = subprocess.Popen(cmd, shell=True)
@@ -30,6 +56,7 @@ def run(cmd):
     if proc.returncode != 0:
         return False
     return True
+
 
 def check_port(proxyport):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,25 +66,54 @@ def check_port(proxyport):
     else:
         return False
 
-def install_service_file(proxyport, key, middle, edge, user):
-    path = "/etc/systemd/system/sshproxy-%d.service" % (proxyport)
-    contents = TEMPLATE % {
+
+def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP, user):
+
+    ssh_path = "/opt/sshproxy/config-%d" % (proxyport)
+    ssh_contents = SSH % {
+        'middleName': middleName,
+        'middleIP': middleIP,
+        'edgeName': edgeName,
+        'edgeIP': edgeIP,
         'proxyport': proxyport,
-        'middle': middle,
-        'edge': edge,
         'key': key,
         'user': user
     }
-    print("contents:\n",  contents)
-    with open(path, "w") as f:
-        f.write(contents)
+    print("ssh config contents:\n",  ssh_contents)
+
+    with open(ssh_path, "w") as f:
+        f.write(ssh_contents)
+
+    service_path = "/etc/systemd/system/sshproxy-%d.service" % (proxyport)
+    systemd_contents = SYSTEMD % {
+        'sshconfig': ssh_path,
+        'proxyport': proxyport,
+        'middle': middleIP,
+        'edge': edgeIP,
+        'key': key,
+        'user': user
+    }
+    print("systemd contents:\n",  systemd_contents)
+
+    with open(service_path, "w") as f:
+        f.write(systemd_contents)
+
     run("systemctl daemon-reload")
+    start_and_enable(service_path)
+    accept_keys(ssh_path, edgeName)
+
 
 def start_and_enable(service_path):
     path = os.path.basename(service_path)
     if not run("systemctl start %s" % path):
         sys.exit(1)
     run("systemctl enable %s" % path)
+
+
+def accept_keys(ssh_path, edgeName):
+    print("[*] Run this command to accept the SSH keys and bootstrap the ssh tunnel\n")
+    print("ssh -F %s %s", % ssh_path, edgeName)
+
 
 def main():
     if len(sys.argv) < 5:
@@ -69,19 +125,18 @@ def main():
         sys.exit(1)
 
     proxyport = int(sys.argv[1])
-    middleIP = sys.argv[2]
-    edgeIP = sys.argv[3]
-    user = sys.argv[4]
-  	key = sys.argv[5]
-
+    middleName = sys.argv[2]
+    middleIP = sys.argv[3]
+    edgeName = sys.argv[4]
+    edgeIP = sys.argv[5]
+    user = sys.argv[6]
+    key = sys.argv[7]
 
     print(sys.argv)
 
     if not os.path.exists(key):
         sys.stderr.write("cannot access key %s" % key)
         sys.exit(1)
-
-    service_path = "/etc/systemd/system/sshproxy-%d.service" % (proxyport)
 
     if check_port(proxyport):
         sys.stderr.write("look like port %d is already used\n" % proxyport)
@@ -91,8 +146,9 @@ def main():
         sys.stderr.write("cannot access key %s" % key)
         sys.exit(1)
 
-    install_service_file(proxyport, key, middleIP, edgeIP, user)
-    start_and_enable(service_path)
+    install_service_files(proxyport, key, middleName,
+                          middleIP, edgeName, edgeIP, user)
+
 
 if __name__ == "__main__":
     main()
