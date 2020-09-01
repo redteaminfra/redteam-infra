@@ -84,7 +84,7 @@ Host middle-sketch-ENGAGEMENT
     Proxycommand ssh proxy##-ENGAGEMENT nc -q0 %h %p
     IdentityFile ~/.ssh/sketchyKey
 
-Host edge-sketch##-ENGAGEMENT
+Host edge##-sketch-ENGAGEMENT
     Hostname <IP an of edge sketch>
     ProxyJump middle-sketch-ENGAGEMENT
     IdentityFile ~/.ssh/sketchyKey
@@ -93,4 +93,4 @@ Host edge-sketch##-ENGAGEMENT
 
 This is best used in cases where you are okay with leaking the IP of sketch 1 from a trusted infra ran proxy, but want to keep the IP of sketch 2 safe.
 
-Whend deploying a double reflector you will want to perform the `How to Play` steps twice for each reflector. For `install_proxy.py` and `install_ProxyProtocol.sh` you would point the appropriate IP addresses to reflector through with the above reflector setting.
+When deploying a double reflector you will want to perform the `How to Play` steps twice for each reflector. For `install_proxy.py` and `install_ProxyProtocol.sh` you would point the appropriate IP addresses to reflector through with the above reflector setting.
