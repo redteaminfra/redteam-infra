@@ -37,13 +37,14 @@ WantedBy=multi-user.target
 
 
 def usage():
-    sys.stderr.write("install_proxy.py Proxyport Middle Edge User Key\n\n")
+    sys.stderr.write(
+        "install_proxy.py Proxyport MiddleName MiddleIP EdgeName EdgeIP User Key\n\n")
     sys.stderr.write(
         "\tPROXYPORT is the port for the SOCKS server to listen on\n")
-    sys.stderr.write("\tMIDDLE-Name the name to give a middle sketch\n")
-    sys.stderr.write("\tMIDDLE-IP is the address IP of a middle sketch\n")
-    sys.stderr.write("\Edge-Name the name to give a middle sketch\n")
-    sys.stderr.write("\tEDGE-IP is the IP address of an edge sketch\n")
+    sys.stderr.write("\MiddleName the name to give a middle sketch\n")
+    sys.stderr.write("\MiddleIP is the address IP of a middle sketch\n")
+    sys.stderr.write("\EdgeName the name to give a middle sketch\n")
+    sys.stderr.write("\EdgeIP is the IP address of an edge sketch\n")
     sys.stderr.write(
         "\tUser is the user we connect through on sketch. If provisioned with RTI, use `sketchssh` as the user.\n")
     sys.stderr.write(
