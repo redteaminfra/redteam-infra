@@ -83,12 +83,13 @@ Host middle-sketch-ENGAGEMENT
     Hostname <IP of Middle Sketch>
     Proxycommand ssh proxy##-ENGAGEMENT nc -q0 %h %p
     IdentityFile ~/.ssh/sketchyKey
+    User user
 
 Host edge##-sketch-ENGAGEMENT
     Hostname <IP an of edge sketch>
     ProxyJump middle-sketch-ENGAGEMENT
     IdentityFile ~/.ssh/sketchyKey
-    RequestTTY no
+    User user
 ```
 
 This is best used in cases where you are okay with leaking the IP of sketch 1 from a trusted infra ran proxy, but want to keep the IP of sketch 2 safe.
