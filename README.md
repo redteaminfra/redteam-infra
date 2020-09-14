@@ -2,7 +2,7 @@
 
 # What
 
-This project houses reference deployment recipies that can be used to build Red Team Infrastructure. As such, there are no security guarantees or promises. Use at your own risk.
+This project houses reference deployment recipes that can be used to build Red Team Infrastructure. As such, there are no security guarantees or promises. Use at your own risk.
 
 This infrastructure was discussed at CanSecWest 2019 and the slides can be found [here](https://speakerdeck.com/tophertimzen/attack-infrastructure-for-the-modern-red-team)
 
