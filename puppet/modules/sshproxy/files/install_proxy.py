@@ -91,8 +91,7 @@ def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP
         'proxyport': proxyport,
         'middle': middleIP,
         'edge': edgeIP,
-        'key': key,
-        'user': user
+        'edgeName': edgeName
     }
     print("systemd contents:\n",  systemd_contents)
 
@@ -101,7 +100,7 @@ def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP
 
     run("systemctl daemon-reload")
     start_and_enable(service_path)
-    accept_keys(ssh_path, edgeName)
+    accept_keys(ssh_path, edgeName, proxyport)
 
 
 def start_and_enable(service_path):
@@ -112,8 +111,9 @@ def start_and_enable(service_path):
 
 
 def accept_keys(ssh_path, edgeName):
-    print("[*] Run this command to accept the SSH keys and bootstrap the ssh tunnel\n")
-    print("ssh -F %s %s", % ssh_path, edgeName)
+    print("[*] Run these commands to accept the SSH keys and bootstrap the ssh tunnel\n")
+    print("sudo ssh -F %s %s\n" % (ssh_path, edgeName))
+    print("sudo systemctl restart sshproxy-%d.service" % proxyport)
 
 
 def main():
