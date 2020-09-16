@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -110,7 +110,7 @@ def start_and_enable(service_path):
     run("systemctl enable %s" % path)
 
 
-def accept_keys(ssh_path, edgeName):
+def accept_keys(ssh_path, edgeName, proxyport):
     print("[*] Run these commands to accept the SSH keys and bootstrap the ssh tunnel\n")
     print("sudo ssh -F %s %s\n" % (ssh_path, edgeName))
     print("sudo systemctl restart sshproxy-%d.service" % proxyport)

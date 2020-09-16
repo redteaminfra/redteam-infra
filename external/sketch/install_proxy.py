@@ -20,9 +20,9 @@ def checksock(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     result = sock.connect_ex(('127.0.0.1', port))
     if result == 0:
-        print "[+] port %d is listening and accepted connection" % port
+        print("[+] port %d is listening and accepted connection" % port)
     else:
-        print "[-] could not connect to port %d" % port
+        print("[-] could not connect to port %d" % port)
         sys.exit(1)
 
 

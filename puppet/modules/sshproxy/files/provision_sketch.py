@@ -1,15 +1,10 @@
-# /usr/bin/env python
+# /usr/bin/env python3
 
 import os
 import pwd
 import grp
-import sys
 import stat
 import base64
-import subprocess
-import time
-import StringIO
-import gzip
 from string import ascii_lowercase
 
 PUBKEY = "PUBLIC_KEY_PLACEHOLDER"
@@ -25,7 +20,8 @@ if not os.path.exists(DOTSSH):
     os.chmod(DOTSSH, stat.S_IRWXU)
 
 with open(os.path.expanduser("/home/sketchssh/.ssh/authorized_keys"), "a") as f:
-    f.write(base64.b64decode(PUBKEY))
+    key = base64.b64decode(PUBKEY)
+    f.write(key.decode("ascii"))
     uid = pwd.getpwnam("sketchssh").pw_uid
     gid = grp.getgrnam("sketchssh").gr_gid
     os.chown(path, uid, gid)
@@ -34,4 +30,4 @@ with open(os.path.expanduser("/home/sketchssh/.ssh/authorized_keys"), "a") as f:
             os.chown(os.path.join(dirpath, dname), uid, gid)
         for fname in filenames:
             os.chown(os.path.join(dirpath, fname), uid, gid)
-    print "[+] wrote to /home/sketchssh/.ssh/authorized_keys"
+    print("[+] wrote to /home/sketchssh/.ssh/authorized_keys")
