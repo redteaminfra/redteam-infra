@@ -81,7 +81,7 @@ You should be connecting to the sketchy zero-trust instances in disconnected inf
 ```
 Host middle-sketch-ENGAGEMENT
     Hostname <IP of Middle Sketch>
-    Proxycommand ssh proxy##-ENGAGEMENT nc -q0 %h %p
+    ProxyJump proxy##-ENGAGEMENT
     IdentityFile ~/.ssh/sketchyKey
     User user
 

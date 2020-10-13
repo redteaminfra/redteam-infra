@@ -26,26 +26,25 @@ stanza =
 <<SSH
 Host homebase-#{opname}
      Hostname #{homebase_ip}
-     #Uncomment AddressFamily if you have WSL errors to force ipv4
-     #AddressFamily inet
+     # Uncomment AddressFamily if you have WSL errors to force ipv4
+     ## AddressFamily inet
      # Etherpad
-     #LocalForward 9001 127.0.0.1:9001
-     # Pcv-web
-     #LocalForward 3000 127.0.0.1:3000
-     # Pcv-server API
-     #LocalForward 9000 127.0.0.1:9000
-     ##Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshkeys users.json
-     #Your port number is (5900 + (UID - 6000) + 1)
-     #LocalForward 5901 127.0.0.1:59xx
+     ## LocalForward 9001 127.0.0.1:9001
+     # Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshkeys users.json
+     ## Your port number is (5900 + (UID - 6000) + 1)
+     ## LocalForward 5901 127.0.0.1:59xx
 
 Host proxy01-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
+    Hostname proxy01-#{opname}.infra.redteam
+    ProxyJump homebase-#{opname}
 
 Host proxy02-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
+    Hostname proxy02-#{opname}.infra.redteam
+    ProxyJump homebase-#{opname}
 
 Host elk-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
+     Hostname elk-#{opname}.infra.redteam
+     ProxyJump homebase-#{opname}
      LocalForward 5601 192.168.1.13:5601
 SSH
 

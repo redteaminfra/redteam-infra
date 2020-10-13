@@ -48,12 +48,6 @@ Each VPC uses the same internal IP space of 192.168.0.0/16. Within that, we use 
    192.168.2.13   proxy-3.op-example.infra.redteam
    ```
 
-   This way, one can ssh into the VPC with the following snippet in .ssh/config:
-   ```
-   Host *.op-example.infra.redteam
-      ProxyCommand tsocks ssh op-example.infra.redteam nc -q0 %h 22
-   ```
-
   For testing purposes use t2.medium as machine type ($0.0464 per
   Hour) currently.  However, for operations, please use m4.4xlarge as
   machine type ($0.8 per Hour) currenlty.
