@@ -31,5 +31,6 @@ class natlasagent::config {
 
     exec { "natlas-agent":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable natlas-agent.service && /bin/systemctl start natlas-agent.service",
+        refreshonly => true,
     }
 }

@@ -36,6 +36,7 @@ class irc::config {
 
     exec { "reload-systemd-irc":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable irc.service && /bin/systemctl start irc.service",
+        refreshonly => true,
     }
 
 }

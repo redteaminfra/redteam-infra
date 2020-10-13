@@ -31,5 +31,6 @@ class etherpad::config {
 
     exec { "reload-systemd-etherpad":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable etherpad.service && /bin/systemctl start etherpad.service",
+        refreshonly => true,
     }
 }

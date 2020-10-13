@@ -20,5 +20,6 @@ class logstashconfig::config {
   exec { "ensure_${service_file}_exist":
     command => "bash -c 'test -f ${service_file} && sed -i -e \"s/^Group=logstash/Group=adm/\" ${service_file}' && systemctl daemon-reload && systemctl restart logstash ;true",
     path    =>  ["/usr/bin","/usr/sbin", "/bin"],
+    refreshonly => true,
   }
 }

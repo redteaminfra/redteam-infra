@@ -18,10 +18,12 @@ class modrewrite::config {
     exec { "enable_a2enmod":
         command => "/usr/sbin/a2enmod rewrite proxy proxy_http",
         notify => Exec['systemctl-apache2'],
+        refreshonly => true,
     }
 
     exec { "systemctl-apache2":
 	  command => "/bin/systemctl enable apache2 && /bin/systemctl restart apache2",
+      refreshonly => true,
 	}
 
     file { "/var/www/html/.htaccess":

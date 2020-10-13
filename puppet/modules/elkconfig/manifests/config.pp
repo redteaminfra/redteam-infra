@@ -11,5 +11,6 @@ class elkconfig::config {
 
     exec { "reload-elasticsearch":
         command => "/bin/systemctl restart elasticsearch",
+        refreshonly => true,
     }
 }

@@ -79,6 +79,7 @@ class monitoring::config {
 
   exec { "reload_elastalert":
     command => "/bin/systemctl daemon-reload && /bin/systemctl enable elastalert.service && /bin/systemctl start elastalert.service",
+    refreshonly => true,
   }
 
 }
