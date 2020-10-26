@@ -16,6 +16,7 @@ node "default" {
     include 'mollyguard'
     include 'cleanup'
     include 'cloudagent'
+    include 'sketchopsec'
 
     package { ['openjdk-8-jre-headless']:
         ensure => 'installed',

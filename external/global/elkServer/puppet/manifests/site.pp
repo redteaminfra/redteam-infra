@@ -8,6 +8,7 @@ node "default" {
   #  include 'monitoring'
     include 'cleanup'
     include 'cloudagent'
+    include 'sketchopsec'
 
 # ELK Setup
 #  package { ['openjdk-8-jre-headless']:

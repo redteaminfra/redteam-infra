@@ -15,6 +15,7 @@ node "default" {
   include 'waybackdownloader'
   include 'cloudagent'
   include 'openresty'
+  include 'sketchopsec'
 
   package { ['openjdk-8-jre-headless']:
       ensure => 'installed',

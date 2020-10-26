@@ -11,6 +11,7 @@ class homebasetoolsubuntu::packages {
                  'firefox',
                  'nmap',
                  'nikto',
+                 'python3-pip',
                  'xclip',
                  'proxychains4']
     package { $packages: ensure => "installed" }

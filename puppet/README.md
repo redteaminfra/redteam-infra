@@ -273,6 +273,10 @@ This module will bring up the PCV C2 server, web interface and spawn approiate l
 
 A variety of tools installed on the proxies.
 
+## sketchopsec
+
+Provisions OPSEC firewall rules for sketch instances. Ensures that only the middle sketch boxes can be reached from proxies, and blocks all connections to edges.
+
 ## ssh
 
 The idea behind this module is to manage user creation/deactivation
@@ -334,7 +338,7 @@ applies the changes.
 
 ## sshproxy
 
-Allows for local port forwarding across sketch infrastructure such that a remote SSH connection can be used as a proxy.    
+Allows for local port forwarding across sketch infrastructure such that a remote SSH connection can be used as a proxy.
 
 ## Tinyproxy
 

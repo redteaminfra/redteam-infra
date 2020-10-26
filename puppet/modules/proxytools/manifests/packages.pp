@@ -7,6 +7,7 @@ class proxytools::packages {
                  'nmap',
                  'nikto',
                  'xclip',
+                 'python3-pip',
                  'autossh']
     package { $packages: ensure => "installed" }
 }
