@@ -12,7 +12,7 @@ resource "oci_core_instance" "proxy01" {
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.proxy.id
-    hostname_label = "${var.proxy_name}1-${var.op_name}"
+    hostname_label = "${var.proxy_name}01-${var.op_name}"
 
     private_ip             = cidrhost(var.proxy_cidr, 11)
     assign_public_ip       = false
