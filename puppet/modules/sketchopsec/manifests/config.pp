@@ -6,7 +6,7 @@ class sketchopsec::config {
         mode => '755',
         ensure => 'directory',
     }
-    
+
     file { "/opt/sketch/sketch-setup.py":
         path => "/opt/sketch/sketch-setup.py",
         owner => 'root',
@@ -39,15 +39,17 @@ class sketchopsec::config {
     exec { "opsec-sketch-requirements":
         command => "/usr/bin/pip3 install -r /opt/sketch/requirements.txt",
         require => File["/opt/sketch/requirements.txt"],
-        refreshonly => true,
+        unless => "/usr/bin/pip3 show python-iptables",
     }
 
     exec { "opsec-sketch-python":
         command => "/usr/bin/python3 /opt/sketch/sketch-setup.py",
         require => Exec["opsec-sketch-requirements"],
-        notify => Exec["save-iptables"],
+        subscribe => [
+            File['/opt/sketch/sketch.json'],
+        ],
         refreshonly => true,
-        unless => "/usr/bin/pip3 show python-iptables",
+        notify => Exec["save-iptables"],
     }
 
     exec { "save-iptables":
