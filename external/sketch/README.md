@@ -22,6 +22,12 @@ You will need to add a SSH public key to this script.
 ```
 ./provision.sh <hostname>
 ```
+### How to Play with provision.sh
+
+1. On trusted host:
+  1. cat provision.sh | base64 -w0 | xclip -i
+1. On untrusted host (zero-trust reflector):
+  1. echo '\<xpaste\>' | base64 -d | bash <hostname>
 
 ## install_proxy.py
 
@@ -39,10 +45,6 @@ usage: install_proxy.py <IP> <LPORT> <RPORT>
 
 ### How to Play with Install_proxy.py
 
-1. On trusted host:
-  1. cat provision.sh | base64 -w0 | xclip -i
-1. On untrusted host (zero-trust reflector):
-  1. echo '\<xpaste\>' | base64 -d | bash <hostname>
 1. On trusted host:
   1. cat install_proxy.py | base64 -w0 | xclip -i
 1. On untrusted host (zero-trust reflector):
@@ -63,12 +65,8 @@ Example: ./provision.sh 192.168.1.10 edge
   Must be run as root
 ```
 
-### How to Play with install_ProxyProtocol.py
+### How to Play with install_ProxyProtocol.sh
 
-1. On trusted host:
-  1. cat provision.sh | base64 -w0 | xclip -i
-1. On untrusted host (zero-trust reflector):
-  1. echo '\<xpaste\>' | base64 -d | bash <hostname>
 1. On trusted host:
   1. cat install_ProxyProtocol.sh | base64 -w0 | xclip -i
 1. On untrusted host (zero-trust reflector):
