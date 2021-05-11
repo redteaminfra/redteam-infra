@@ -8,6 +8,7 @@ node "default" {
   include 'yama'
   include 'nmap'
   include 'mollyguard'
+  include 'basetools'
   include 'proxytools'
   #include 'tinyproxy'
   include 'sshproxy'
