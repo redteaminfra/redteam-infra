@@ -78,3 +78,6 @@ variable "provisioners_dir" {
   default = "provisioners"
 }
 
+variable "homebase_image_size_gbs" {
+  default = "512"
+}
