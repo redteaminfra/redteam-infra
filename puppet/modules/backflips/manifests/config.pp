@@ -2,14 +2,23 @@ class backflips::config {
 
     $backflip_dirs = [ "/opt/backflips",
                        "/opt/backflips/etc",
-                       "/opt/backflips/etc/ssh",
                        "/opt/backflips/keys" ]
 
     file { $backflip_dirs:
         owner => 'root',
-        group => 'root',
+        group => 'flip',
         mode => '755',
         ensure => 'directory',
+        require => [ Group['flip'], User['flip'] ],
+    }
+
+    file { "/opt/backflips/etc/ssh":
+        path => "/opt/backflips/etc/ssh",
+        owner => 'flip',
+        group => 'flip',
+        mode => '755',
+        ensure => 'directory',
+        require => Group['flip'],
     }
 
     file { "/opt/backflips/implant.py":
@@ -70,6 +79,7 @@ class backflips::config {
         command => "/usr/bin/ssh-keygen -f /opt/backflips/etc/ssh/ssh_host_rsa_key -N '' -t rsa",
         creates => ["/opt/backflips/etc/ssh/ssh_host_rsa_key",
                     "/opt/backflips/etc/ssh/ssh_host_rsa_key.pub"],
+        user => 'flip',
         require => File["/opt/backflips/etc/ssh"],
     }
 
@@ -77,6 +87,7 @@ class backflips::config {
         command => "/usr/bin/ssh-keygen -f /opt/backflips/etc/ssh/ssh_host_ed25519_key -N '' -t ed25519",
         creates => ["/opt/backflips/etc/ssh/ssh_host_ed25519_key",
                     "/opt/backflips/etc/ssh/ssh_host_ed25519_key.pub"],
+        user => 'flip',
         require => File["/opt/backflips/etc/ssh"],
     }
 
