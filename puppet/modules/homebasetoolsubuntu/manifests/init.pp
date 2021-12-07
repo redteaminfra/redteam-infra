@@ -16,4 +16,12 @@ class homebasetoolsubuntu {
       ensure => present,
       source => "puppet:///modules/homebasetoolsubuntu/dot_xscreensaver"
     }
+
+    file { "/usr/local/bin/hashit":
+      path => '/usr/local/bin/hashit',
+      owner => 'root',
+      mode => '755',
+      ensure => present,
+      source => "puppet:///modules/homebasetoolsubuntu/hashit"
+    }
 }

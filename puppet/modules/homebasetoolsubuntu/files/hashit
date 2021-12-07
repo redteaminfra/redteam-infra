@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import subprocess
+import datetime
+import hashlib
+
+def usage():
+    sys.stderr.write(f"usage: {sys.argv[0]} <file>\n")
+    sys.stderr.write("\n")
+    sys.stderr.write("\t <file>: filename to hash\n")
+    sys.stderr.write("\n")
+    sys.exit(1)
+
+
+def hashit(algo, data):
+    m = hashlib.new(algo)
+    m.update(data)
+    return m.hexdigest()
+
+def getIoC(filename):
+    contents = None
+    with open(filename, 'rb') as f:
+        contents = f.read()
+    algos = ['md5', 'sha1', 'sha256']
+    ioc = {}
+    for algo in algos:
+        digest = hashit(algo, contents)
+        ioc[algo] = digest
+    return ioc
+
+def printIoC(filename, prefix):
+    ioc = getIoC(filename)
+    for items in ioc.items():
+        print(f"[+] {prefix} {items[0]}: '{items[1]}'")
+
+
+def main():
+    if (len(sys.argv) < 2):
+        usage()
+    ioc_file = sys.argv[1]
+    if not os.path.exists(ioc_file):
+        usage()
+    print(f"hashit @ {datetime.datetime.now().isoformat()}")
+    print(f"[*] input: '{ioc_file}'")
+    printIoC(ioc_file, ioc_file)
+    print("Have a nice day!")
+
+if __name__ == "__main__":
+    main()
+
+#
+# Editor modelines  -  https://www.wireshark.org/tools/modelines.html
+#
+# Local variables:
+# c-basic-offset: 4
+# indent-tabs-mode: nil
+# End:
+#
+# vi: set shiftwidth=4 expandtab:
+# :indentSize=4:noTabs=true:
+#
