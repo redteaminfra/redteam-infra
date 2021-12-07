@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -10,7 +10,7 @@ Description=ssh backflip to %(port)d
 After=network.target auditd.service
 
 [Service]
-ExecStart=/usr/bin/autossh -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -D :%(proxyport)d -i %(key)s -p%(port)d %(user)s@localhost
+ExecStart=/usr/bin/autossh -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -R 3004:192.168.0.10:3004 -D :%(proxyport)d -i %(key)s -p%(port)d %(user)s@localhost
 
 [Install]
 WantedBy=multi-user.target
@@ -45,7 +45,7 @@ def install_service_file(user, path, port, proxyport, key):
         'key' : key,
         'user' : user
     }
-    print "contents:\n",  contents
+    print("contents:\n",  contents)
     with open(path, "w") as f:
         f.write(contents)
     run("systemctl daemon-reload")
