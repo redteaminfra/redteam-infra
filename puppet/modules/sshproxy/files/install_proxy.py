@@ -16,7 +16,7 @@ Host %(middleName)s
     User %(user)s
 Host %(edgeName)s
     Hostname %(edgeIP)s
-    DynamicForward 0.0.0.0:%(proxyport)d    
+    DynamicForward 0.0.0.0:%(proxyport)d
     ProxyJump %(middleName)s
     IdentityFile %(key)s
     User %(user)s
@@ -30,6 +30,8 @@ After=network.target auditd.service
 [Service]
 Environment="AUTOSSH_GATETIME=0"
 ExecStart=/usr/bin/autossh -M0 -F %(sshconfig)s -N %(edgeName)s
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -67,7 +69,6 @@ def check_port(proxyport):
     else:
         return False
 
-
 def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP, user):
 
     ssh_path = "/opt/sshproxy/config-%d" % (proxyport)
@@ -102,19 +103,15 @@ def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP
     start_and_enable(service_path)
     accept_keys(ssh_path, edgeName, proxyport)
 
-
 def start_and_enable(service_path):
     path = os.path.basename(service_path)
-    if not run("systemctl start %s" % path):
-        sys.exit(1)
+    run("systemctl start %s" % path)
     run("systemctl enable %s" % path)
-
 
 def accept_keys(ssh_path, edgeName, proxyport):
     print("[*] Run these commands to accept the SSH keys and bootstrap the ssh tunnel\n")
     print("sudo ssh -F %s %s\n" % (ssh_path, edgeName))
     print("sudo systemctl restart sshproxy-%d.service" % proxyport)
-
 
 def main():
     if len(sys.argv) < 5:
