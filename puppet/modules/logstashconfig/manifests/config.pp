@@ -68,14 +68,12 @@ class logstashconfig::config {
 
   exec {'logstashreload':
       command => '/bin/systemctl daemon-reload',
-      path => ['/bin/', '/usr/bin'],
       refreshonly => true,
       notify => Exec['logstashrestart'],
   }
 
   exec {'logstashrestart':
       command => '/bin/systemctl restart logstash',
-      path => ['/bin/', '/usr/bin'],
       refreshonly => true,
   }
 
