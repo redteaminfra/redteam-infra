@@ -39,7 +39,7 @@ class logstashconfig::config {
     ensure => present,
     source => "puppet:///modules/logstashconfig/$input",
     require => Package['logstash'],
-    notify => Exec['logstashreload'],
+    notify => Exec['logstashrestart'],
     }
 
 # /etc/logstash/logstash.yml
@@ -51,7 +51,7 @@ class logstashconfig::config {
       ensure => present,
       source => "puppet:///modules/logstashconfig/logstash.yml",
       require => Package['logstash'],
-      notify => Exec['logstashreload'],
+      notify => Exec['logstashrestart'],
   }
 
 # /etc/systemd/system/logstash.service
@@ -67,6 +67,13 @@ class logstashconfig::config {
   }
 
   exec {'logstashreload':
+      command => '/bin/systemctl daemon-reload',
+      path => ['/bin/', '/usr/bin'],
+      refreshonly => true,
+      notify => Exec['logstashrestart'],
+  }
+
+  exec {'logstashrestart':
       command => '/bin/systemctl restart logstash',
       path => ['/bin/', '/usr/bin'],
       refreshonly => true,
