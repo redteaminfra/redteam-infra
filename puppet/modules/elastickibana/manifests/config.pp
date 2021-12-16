@@ -13,7 +13,8 @@ class elastickibana::config {
   }
 
   exec { "elastic-sysctl":
-    command => "/sbin/sysctl -q --system"
+    command => "/sbin/sysctl -q --system",
+    refreshonly => true,
   }
 
 # docker compose management
