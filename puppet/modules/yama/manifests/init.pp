@@ -11,7 +11,8 @@ class yama {
   }
 
   exec { "sysctl":
-    command => "/sbin/sysctl -q --system"
+    command => "/sbin/sysctl -q --system",
+    refreshonly => true,
   }
 
 }
