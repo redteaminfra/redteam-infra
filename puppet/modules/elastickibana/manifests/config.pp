@@ -2,16 +2,18 @@ class elastickibana::config {
 
 # set mx_map_count
 
-  exec { "set_max_map_count":
-      command => "/sbin/sysctl -w vm.max_map_count=262144",
-      unless => "/bin/grep -q max_map_count /etc/sysctl.conf",
+  file { "/etc/sysctl.d/98-max-map-count.conf":
+    path => "/etc/sysctl.d/98-max-map-count.conf",
+    owner => 'root',
+    group => 'root',
+    mode => '644',
+    ensure => present,
+    source => "puppet:///modules/elastickibana/98-max-map-count.conf",
+    notify => Exec["elastic-sysctl"],
   }
 
-# make mx_map_count persistent
-
-  exec { "persist_max_map_count":
-      command => "/bin/bash -c 'echo \"vm.max_map_count=262144\" | /usr/bin/tee /etc/sysctl.conf'",
-      unless => "/bin/grep -q max_map_count /etc/sysctl.conf",
+  exec { "elastic-sysctl":
+    command => "/sbin/sysctl -q --system"
   }
 
 # docker compose management
