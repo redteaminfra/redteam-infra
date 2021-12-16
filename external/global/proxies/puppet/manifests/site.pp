@@ -17,20 +17,9 @@ node "default" {
   include 'cloudagent'
   include 'openresty'
   include 'sketchopsec'
-
-  package { ['openjdk-8-jre-headless']:
-      ensure => 'installed',
-      notify => Class['logstash']
-  }
-
-  class { 'logstash':
-      logstash_group => 'adm'
-  }
-
-  logstash::configfile { 'inputs':
-    source => "puppet:///modules/elk/proxy.conf",
-  }
-
   include 'logstashconfig'
 
+
+  package { ['openjdk-8-jre-headless']:
+  }
 }

@@ -18,21 +18,10 @@ node "default" {
     include 'cleanup'
     include 'cloudagent'
     include 'sketchopsec'
+    include 'logstashconfig'
 
     package { ['openjdk-8-jre-headless']:
-        ensure => 'installed',
-        notify => Class['logstash']
     }
-
-    class { 'logstash':
-     logstash_group => "adm",
-    }
-
-    logstash::configfile { 'inputs':
-      source => "puppet:///modules/elk/ls.conf",
-    }
-
-    include 'logstashconfig'
 
     class { 'golang':
       version => '1.13',
@@ -43,5 +32,4 @@ node "default" {
     class { 'docker::compose':
     }
 
-    include 'gophish'
 }

@@ -11,12 +11,18 @@ unattended-upgrade
 
 ### user setup
 ### Do this early in the setup process so you can get into the box to debug install errors
-apt-get -qq -y install python2.7-minimal
+apt-get -qq -y install python2.7-minimal curl
 bash -c "cd /tmp/host-share/sshkeys/ && python2.7 ./user_tool.py apply -j users.json -t core"
 
 ### Install java
 apt -y -qq install -f
 apt -y -qq install openjdk-8-jre-headless
+
+### Setup GPG Key for logstash
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+apt-get install apt-transport-https
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+apt-get update
 
 ### Install puppet
 if ! grep -q Kali /etc/os-release; then
@@ -33,39 +39,19 @@ if [ ! -d /etc/puppet/modules ]; then
 fi
 
 ### Install puppet modules
-### Versions are hardcoded as a result of installation errors
-### Versions came from https://forge.puppet.com/elastic and https://forge.puppet.com/puppetlabs
 
-# Install logstash for everybody
-puppet module install elastic-logstash --version 5.1.0 --modulepath /etc/puppet/modules
-
-if grep -q homebase /etc/hostname; then
-    puppet module install dp-golang --modulepath /etc/puppet/modules
-    puppet module install puppetlabs-postgresql --modulepath /etc/puppet/modules
-fi
-
-### Install golang on homebase
+#### Install golang and docker on homebase
 if grep -q homebase /etc/hostname; then
     puppet module install dp-golang --modulepath /etc/puppet/modules
     puppet module install puppetlabs-docker --modulepath /etc/puppet/modules
 fi
 
-### Install puppet tools for elk
+#### Install docker on elk
 if grep -q elk /etc/hostname; then
-    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.15.deb -O /tmp/elasticsearch.deb
-    dpkg -i /tmp/elasticsearch.deb
-    apt -y install -f
-    ### Super gross fix to get us to 5.4.3 of elastic-elasticsearch
-    ### Cannot install older version first
-    ### Causes dependancy problems
-    ### TODO: Fix this
-    #puppet module install elastic-elasticsearch  --modulepath /etc/puppet/modules
-    puppet module install elastic-elasticsearch --version 5.4.3 --modulepath /etc/puppet/modules --force
-    #puppet module install elastic-kibana --modulepath /etc/puppet/modules
-    puppet module install elastic-kibana  --version 5.1.0 --modulepath /etc/puppet/modules --force
+    puppet module install puppetlabs-docker --modulepath /etc/puppet/modules
 fi
 
-# Install puppetlabs apt module
+##### Install puppetlabs apt module
 puppet module install puppetlabs-apt --modulepath /etc/puppet/modules
 
 ### fix base image provision

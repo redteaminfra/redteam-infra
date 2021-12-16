@@ -1,5 +1,9 @@
 class logstashconfig::config {
 
+
+# /etc/default/logstash
+# This ensures that `hostname` and `server` are configured for our logstash filter
+
   exec { "add_hostname_for_logstash":
     command => "/bin/bash -c 'echo hostname=$(hostname)' >> /etc/default/logstash",
     onlyif => "/usr/bin/test -f /etc/default/logstash",
@@ -13,13 +17,59 @@ class logstashconfig::config {
     refreshonly => true,
   }
 
-  # this is so gross b/c the service file is actually created by a
-  # puppetforge module and on kali, the service is wrong.  This
-  # fixes an issue for both new and existing homebases.
-  $service_file = "/etc/systemd/system/logstash.service"
-  exec { "ensure_${service_file}_exist":
-    command => "bash -c 'test -f ${service_file} && sed -i -e \"s/^Group=logstash/Group=adm/\" ${service_file}' && systemctl daemon-reload && systemctl restart logstash ;true",
-    path    =>  ["/usr/bin","/usr/sbin", "/bin"],
-    refreshonly => true,
+# etc/logstash/conf.d/inputs
+
+  if $hostname =~ /^homebase/ {
+    $input = "homebase.conf"
   }
+  elsif $hostname =~ /^proxy/ {
+    $input = "proxy.conf"
+  }
+  elsif $hostname =~ /^elk/ {
+    $input = "elk.conf"
+  }
+  else {
+    $input = "somethingiswrong.conf"
+ }
+
+  file {'/etc/logstash/conf.d/inputs':
+    path => '/etc/logstash/conf.d/inputs',
+    owner => 'root',
+    mode => '644',
+    ensure => present,
+    source => "puppet:///modules/logstashconfig/$input",
+    require => Package['logstash'],
+    notify => Exec['logstashreload'],
+    }
+
+# /etc/logstash/logstash.yml
+
+  file { '/etc/logstash/logstash.yml':
+      path => '/etc/logstash/logstash.yml',
+      owner => 'root',
+      mode => '644',
+      ensure => present,
+      source => "puppet:///modules/logstashconfig/logstash.yml",
+      require => Package['logstash'],
+      notify => Exec['logstashreload'],
+  }
+
+# /etc/systemd/system/logstash.service
+
+  file { '/etc/systemd/system/logstash.service':
+      path => '/etc/systemd/system/logstash.service',
+      owner => 'root',
+      mode => '644',
+      ensure => present,
+      source => "puppet:///modules/logstashconfig/logstash.service",
+      require => Package['logstash'],
+      notify => Exec['logstashreload'],
+  }
+
+  exec {'logstashreload':
+      command => '/bin/systemctl restart logstash',
+      path => ['/bin/', '/usr/bin'],
+      refreshonly => true,
+  }
+
 }

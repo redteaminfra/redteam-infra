@@ -114,17 +114,9 @@ EOF
 
 You would then invoke CLI tool as `proxychains <cli tool>` to proxy through the socks server
 
-## ELK
+## Elastickibana
 
-Contains files that tell instances which files to pipe through logstash.
-
-`ls.conf` is currently used for elk, natlas and homebase
-
-`proxy.conf` is currently used for the proxies.
-
-Consult any `site.pp` for information on how to apply these.
-
-This module relies on `logstash`
+Installs Elasticsearch and Kibana on the ELK instance with a docker-compose file.
 
 ## Etherpad
 
@@ -198,7 +190,7 @@ in the shell provisioner stage and then utilized in the site manifests.
 ELK server will have Kibana and Elastic while all other machines in the VPC
 ship logs to it with logstash.
 
-This module relies on `elk`
+Contains files that tell instances which files to pipe through logstash.
 
 ## Loot
 
