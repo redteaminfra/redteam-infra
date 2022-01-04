@@ -24,7 +24,7 @@ node "default" {
     }
 
     class { 'golang':
-      version => '1.13',
+      version => '1.17',
     }
 
     include 'docker'
