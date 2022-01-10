@@ -24,4 +24,12 @@ class homebasetoolsubuntu {
       ensure => present,
       source => "puppet:///modules/homebasetoolsubuntu/hashit"
     }
+
+    file { '/usr/local/bin/implant_cryptor':
+        path => '/usr/local/bin/implant_cryptor',
+        owner => 'root',
+        mode => '755',
+        ensure => present,
+        source => "puppet:///modules/homebasetoolsubuntu/implant_cryptor.py",
+    }
 }
