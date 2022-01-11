@@ -18,7 +18,7 @@ class backflips::config {
         group => 'flip',
         mode => '755',
         ensure => 'directory',
-        require => Group['flip'],
+        require => File["/opt/backflips/etc"],
     }
 
     file { "/opt/backflips/implant.py":
@@ -28,6 +28,7 @@ class backflips::config {
         mode => '644',
         ensure => present,
         source => "puppet:///modules/backflips/backflips/implant.py",
+        require => File["/opt/backflips"],
     }
 
     file { "/opt/backflips/install_implant.py":
@@ -37,6 +38,7 @@ class backflips::config {
         mode => '644',
         ensure => present,
         source => "puppet:///modules/backflips/backflips/install_implant.py",
+        require => File["/opt/backflips"],
     }
 
     file { "/opt/backflips/README.md":
@@ -46,6 +48,7 @@ class backflips::config {
         mode => '644',
         ensure => present,
         source => "puppet:///modules/backflips/backflips/README.md",
+        require => File["/opt/backflips"],
     }
 
     file { "/opt/backflips/install_proxy.py":
@@ -55,6 +58,7 @@ class backflips::config {
         mode => '755',
         ensure => present,
         source => "puppet:///modules/backflips/backflips/install_proxy.py",
+        require => File["/opt/backflips"],
     }
 
     file { "/opt/backflips/make_backflip.py":
@@ -64,6 +68,7 @@ class backflips::config {
         mode => '755',
         ensure => present,
         source => "puppet:///modules/backflips/backflips/make_backflip.py",
+        require => File["/opt/backflips"],
     }
 
     file { "/opt/backflips/etc/ssh/sshd_config":
@@ -72,7 +77,8 @@ class backflips::config {
         group => 'root',
         mode => '644',
         ensure => present,
-        source => "puppet:///modules/backflips/sshd_config"
+        source => "puppet:///modules/backflips/sshd_config",
+        require => File["/opt/backflips/etc/ssh"],
     }
 
     exec { "rsa_keygen_rsa":
