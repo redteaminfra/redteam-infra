@@ -2,7 +2,8 @@ class backflips::config {
 
     $backflip_dirs = [ "/opt/backflips",
                        "/opt/backflips/etc",
-                       "/opt/backflips/keys" ]
+                       "/opt/backflips/keys",
+                       "/opt/backflips/osx-ssh-backflip" ]
 
     file { $backflip_dirs:
         owner => 'root',
@@ -69,6 +70,46 @@ class backflips::config {
         ensure => present,
         source => "puppet:///modules/backflips/backflips/make_backflip.py",
         require => File["/opt/backflips"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/backflipdeploy.py":
+        path => "/opt/backflips/osx-ssh-backflip/backflipdeploy.py",
+        owner => 'root',
+        group => 'root',
+        mode => '755',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/backflipdeploy.py",
+        require => File["/opt/backflips/osx-ssh-backflip"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/cleanup.sh":
+        path => "/opt/backflips/osx-ssh-backflip/cleanup.sh",
+        owner => 'root',
+        group => 'root',
+        mode => '644',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/cleanup.sh",
+        require => File["/opt/backflips/osx-ssh-backflip"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/loadssh_template.sh":
+        path => "/opt/backflips/osx-ssh-backflip/loadssh_template.sh",
+        owner => 'root',
+        group => 'root',
+        mode => '755',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/loadssh_template.sh",
+        require => File["/opt/backflips/osx-ssh-backflip"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/README.md":
+        path => "/opt/backflips/osx-ssh-backflip/README.md",
+        owner => 'root',
+        group => 'root',
+        mode => '644',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/README.md",
+        require => File["/opt/backflips/osx-ssh-backflip"],
     }
 
     file { "/opt/backflips/etc/ssh/sshd_config":
