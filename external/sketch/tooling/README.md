@@ -78,6 +78,9 @@ You can add N+1 proxies to the configuration.
 
 ## sketch-json-config.py
 
+**Note**: `sketch-json-config.py` requires the `Graphviz` package to be installed on the host OS in order to generate graphs 
+with the `-g` option.
+
 ```
 usage: sketchJSON [-h] -j SKETCHJSON [-s] [-n NAME] [-g] [-c] [-p PUPPET]
 

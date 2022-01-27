@@ -7,7 +7,15 @@ import tempfile
 import os
 import subprocess
 import difflib
-from jsonschema import validate, FormatChecker
+import shutil
+
+# jsonschema isn't in the default lib, try to import it. If it isn't there tell the user
+try:
+    from jsonschema import validate, FormatChecker
+except ImportError:
+    print('jsonschema module is not installed.')
+    print('pip3 install jsonschema')
+    sys.exit(1)
 
 schema = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -43,7 +51,7 @@ schema = {
 StanzaTemplate = """
 Host %(location)s-%(number)d-sketch-%(engagementName)s
     Hostname %(ip)s
-    ProxyJump ssh %(proxyName)s-%(engagementName)s
+    ProxyJump %(proxyName)s-%(engagementName)s
     IdentityFile ~/.ssh/sketchKey
     User root
 """
@@ -77,7 +85,7 @@ def parse_args():
         "-g",
         "--graph",
         action='store_true',
-        help="Make a png graph for confluence",
+        help="Make a png graph for confluence. Requires `dot`",
         dest='graph'
     )
     parser.add_argument(
@@ -143,6 +151,11 @@ def obj_to_dot(obj):
 
 
 def run_dot(dot, outputfilename):
+    # check to see if the `dot` command is in the users path
+    if shutil.which('dot') is None:
+        print("The dot command doesn't exit in your path. Do you have graphviz installed?")
+        sys.exit(1)
+
     with tempfile.TemporaryDirectory() as tmpdirname:
         dotfilename = os.path.join(tmpdirname, "dot.dot")
         pngfilename = outputfilename
