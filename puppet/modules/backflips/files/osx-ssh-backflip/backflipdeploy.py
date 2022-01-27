@@ -88,11 +88,12 @@ def main():
         "BACKFLIP_PUB_PLACEHOLDER":backkey.decode("utf-8"),
     })
     filename = str(uuid.uuid4())
+
     with open(KEYPATH+filename+'_cleanup.sh','w') as file2:
         file2.write(implant_clean)
     with open(KEYPATH+filename,'w') as file:
         file.write(implant)
-    print ("[+] The mac backflip is located @ %s" % file)
+    print (f"[+] The mac backflip is located @ {KEYPATH}{filename}")
 
 
 if __name__ == "__main__":
