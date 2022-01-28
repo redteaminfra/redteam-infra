@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import ipaddress
 import sys
 import os
 import subprocess
@@ -164,6 +164,14 @@ def main():
     key = Path(Path(args.key).expanduser().absolute())
 
     print(f'{sys.argv[0]} {proxyport} {middleName} {middleIP} {edgeName} {edgeIP} {user} {key}')
+
+    # validate addresses look like address
+    try:
+        ipaddress.ip_address(middleIP)
+        ipaddress.ip_address(edgeIP)
+    except ValueError as e:
+        print(e)
+        sys.exit(1)
 
     if not key.exists():
         sys.stderr.write("cannot access key %s" % key)
