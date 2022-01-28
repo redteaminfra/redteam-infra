@@ -4,6 +4,8 @@ import sys
 import os
 import subprocess
 import socket
+import argparse
+from pathlib import Path
 
 
 SSH = """
@@ -38,19 +40,47 @@ WantedBy=multi-user.target
 """
 
 
-def usage():
-    sys.stderr.write(
-        "install_proxy.py Proxyport MiddleName MiddleIP EdgeName EdgeIP User Key\n\n")
-    sys.stderr.write(
-        "\tPROXYPORT is the port for the SOCKS server to listen on\n")
-    sys.stderr.write("\MiddleName the name to give a middle sketch\n")
-    sys.stderr.write("\MiddleIP is the address IP of a middle sketch\n")
-    sys.stderr.write("\EdgeName the name to give a middle sketch\n")
-    sys.stderr.write("\EdgeIP is the IP address of an edge sketch\n")
-    sys.stderr.write(
-        "\tUser is the user we connect through on sketch. If provisioned with RTI, use `sketchssh` as the user.\n")
-    sys.stderr.write(
-        "\tKEY is the path to the key for the proxy to connect into sketch\n")
+def parse_args():
+    desc = 'This script is used to create forward SSH proxies through sketch infrastructure.'
+    parser = argparse.ArgumentParser(description=desc)
+
+    parser.add_argument(
+        dest="proxy_port",
+        type=int,
+        help="the port for the SOCKS server to listen on.",
+    )
+    parser.add_argument(
+        dest="middle_name",
+        type=str,
+        help="the name to give a middle sketch."
+    )
+    parser.add_argument(
+        dest="middle_ip",
+        type=str,
+        help="the address IP of a middle sketch."
+    )
+    parser.add_argument(
+        dest="edge_name",
+        type=str,
+        help="the name to give a middle sketch."
+    )
+    parser.add_argument(
+        dest="edge_ip",
+        type=str,
+        help="the IP address of an edge sketch."
+    )
+    parser.add_argument(
+        dest="user",
+        type=str,
+        help="the user we connect through on sketch. If provisioned with RTI, use \"sketchssh\" as the user."
+    )
+    parser.add_argument(
+        dest="key",
+        type=str,
+        help="the path to the key for the proxy to connect into sketch."
+    )
+
+    return parser.parse_args()
 
 
 def run(cmd):
@@ -68,6 +98,7 @@ def check_port(proxyport):
         return True
     else:
         return False
+
 
 def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP, user):
 
@@ -103,45 +134,50 @@ def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP
     start_and_enable(service_path)
     accept_keys(ssh_path, edgeName, proxyport)
 
+
 def start_and_enable(service_path):
     path = os.path.basename(service_path)
     run("systemctl start %s" % path)
     run("systemctl enable %s" % path)
+
 
 def accept_keys(ssh_path, edgeName, proxyport):
     print("[*] Run these commands to accept the SSH keys and bootstrap the ssh tunnel\n")
     print("sudo ssh -F %s %s\n" % (ssh_path, edgeName))
     print("sudo systemctl restart sshproxy-%d.service" % proxyport)
 
+
 def main():
-    if len(sys.argv) < 5:
-        usage()
-        sys.exit(1)
+
+    args = parse_args()
 
     if os.getuid() != 0:
         sys.stderr.write("run as root or with sudo\n")
         sys.exit(1)
 
-    proxyport = int(sys.argv[1])
-    middleName = sys.argv[2]
-    middleIP = sys.argv[3]
-    edgeName = sys.argv[4]
-    edgeIP = sys.argv[5]
-    user = sys.argv[6]
-    key = sys.argv[7]
+    proxyport = args.proxy_port
+    middleName = args.middle_name
+    middleIP = args.middle_ip
+    edgeName = args.edge_name
+    edgeIP = args.edge_ip
+    user = args.user
+    key = Path(Path(args.key).expanduser().absolute())
 
-    print(sys.argv)
+    print(f'{sys.argv[0]} {proxyport} {middleName} {middleIP} {edgeName} {edgeIP} {user} {key}')
 
-    if not os.path.exists(key):
+    if not key.exists():
         sys.stderr.write("cannot access key %s" % key)
         sys.exit(1)
+
+    with open(key) as fd:
+        if 'PRIVATE KEY' not in fd.readline():
+            check = input(f'{key} does not appear to be a private key. Continue (y/n)? ')
+            if check.lower()[0] != 'y':
+                sys.stderr.write('exiting, user aborted')
+                sys.exit(1)
 
     if check_port(proxyport):
         sys.stderr.write("look like port %d is already used\n" % proxyport)
-        sys.exit(1)
-
-    if not os.path.exists(key):
-        sys.stderr.write("cannot access key %s" % key)
         sys.exit(1)
 
     install_service_files(proxyport, key, middleName,
