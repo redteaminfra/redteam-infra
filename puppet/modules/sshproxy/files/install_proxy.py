@@ -174,7 +174,12 @@ def main():
         sys.exit(1)
 
     if not key.exists():
-        sys.stderr.write("cannot access key %s" % key)
+        sys.stderr.write(f'{key} does not exists.')
+        sys.exit(1)
+
+    # check if the user can actually read the file
+    if not os.access(key, os.R_OK):
+        sys.stderr.write("cannot access key %s." % key)
         sys.exit(1)
 
     with open(key) as fd:
