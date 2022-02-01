@@ -15,3 +15,7 @@ c2_fqdn/ip: The IP address or domain of the edge sketch node the backflip will c
 port: Port that forwards back to the victim (tcp/22). Use a range of 4000 and upwards. Track this on the `Table for tracking backflips` in an engagements infra.
 
 remote_port: The secondary edge port that the backflip SSH service is running on, which for RTI is 2222.
+
+## Clean Up
+To remove the backflip on the host mac
+`run python3 cleanup.py <payload name>`

