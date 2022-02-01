@@ -82,13 +82,13 @@ class backflips::config {
         require => File["/opt/backflips/osx-ssh-backflip"],
     }
 
-    file { "/opt/backflips/osx-ssh-backflip/cleanup.sh":
-        path => "/opt/backflips/osx-ssh-backflip/cleanup.sh",
+    file { "/opt/backflips/osx-ssh-backflip/cleanup.py":
+        path => "/opt/backflips/osx-ssh-backflip/cleanup.py",
         owner => 'root',
         group => 'root',
         mode => '644',
         ensure => present,
-        source => "puppet:///modules/backflips/osx-ssh-backflip/cleanup.sh",
+        source => "puppet:///modules/backflips/osx-ssh-backflip/cleanup.py",
         require => File["/opt/backflips/osx-ssh-backflip"],
     }
 
