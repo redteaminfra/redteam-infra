@@ -52,13 +52,13 @@ class backflips::config {
         require => File["/opt/backflips"],
     }
 
-    file { "/opt/backflips/install_proxy.py":
-        path => "/opt/backflips/install_proxy.py",
+    file { "/opt/backflips/install_autossh_backflip.py":
+        path => "/opt/backflips/install_autossh_backflip.py",
         owner => 'root',
         group => 'root',
         mode => '755',
         ensure => present,
-        source => "puppet:///modules/backflips/backflips/install_proxy.py",
+        source => "puppet:///modules/backflips/backflips/install_autossh_backflip.py",
         require => File["/opt/backflips"],
     }
 

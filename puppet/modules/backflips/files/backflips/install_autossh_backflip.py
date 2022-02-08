@@ -10,14 +10,14 @@ Description=ssh backflip to %(port)d
 After=network.target auditd.service
 
 [Service]
-ExecStart=/usr/bin/autossh -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -R 3004:192.168.0.10:3004 -D :%(proxyport)d -i %(key)s -p%(port)d %(user)s@localhost
+ExecStart=/usr/bin/autossh -M0 -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -R 3004:192.168.0.10:3004 -D :%(proxyport)d -i %(key)s -p%(port)d %(user)s@localhost
 
 [Install]
 WantedBy=multi-user.target
 """
 
 def usage():
-    sys.stderr.write("install_proxy.py PORT PROXYPORT KEY\n\n")
+    sys.stderr.write("install_autossh_backflip.py PORT PROXYPORT KEY\n\n")
     sys.stderr.write("\tPORT is port of backflip reverse listener\n")
     sys.stderr.write("\tPROXYPORT is the port for the SOCKS server to listen on\n")
     sys.stderr.write("\tKEY is the path to the key for the backflip\n")

@@ -21,7 +21,7 @@ are of the form `echo xxx|python`. The cut-n-paste command is
 generated from the scripts that are indirectly run. This is important
 for the operator to understand what these scripts do on target, but
 the the scripts the operator directly uses are `make_backflip.py` and
-`install_proxy.py`
+`install_autossh_backflip.py`
 
 ## Components Directly Run
 
@@ -29,7 +29,7 @@ the the scripts the operator directly uses are `make_backflip.py` and
 runs on the attack machine that gives the cut-n-paste command to
 run on victim
 
-### `install_proxy.py`
+### `install_autossh_backflip.py`
 runs on attack machine and installs and starts a socks proxy into victim network
 
 ## Components Indirectly Run
@@ -79,9 +79,9 @@ onwards and our socks proxies are on ports 5000 onwards
 		[*] waiting one minute for tunnel to come up...
 		[+] tunnel running
 
-1. run `install_proxy.py` on the attack host
+1. run `install_autossh_backflip.py` on the attack host
 
-	`install_proxy.py` will create a systemd service to initiate the ssh
+	`install_autossh_backflip.py` will create a systemd service to initiate the ssh
 	connection to the victim and reverse port-forward a connection to
 	their ssh daemon on the attack system. Additionally, it will setup a
 	SOCKS5 proxy listening on a port you specify. As above, it is
@@ -91,7 +91,7 @@ onwards and our socks proxies are on ports 5000 onwards
 	In this example, we setup a persistant ssh connection with reverse
 	forward as well as a socks proxy on port 5000:
 
-		sudo ./install_proxy.py 4000 5000 /opt/backflips/keys/ubuntu-10.0.0.1-10.50.0.1
+		sudo ./install_autossh_backflip.py 4000 5000 /opt/backflips/keys/ubuntu-10.0.0.1-10.50.0.1
 		contents:
 		[Unit]
 		Description=ssh backflip to 4000
