@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 
@@ -20,4 +20,4 @@ except OSError:
 line = ""
 for tag in tags:
     line += (" -t " + tag)
-print line
+print(line)
