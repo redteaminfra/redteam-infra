@@ -3,6 +3,8 @@ Description=etherpad service
 
 [Service]
 WorkingDirectory=/home/etherpad/etherpad
+Restart=on-failure
+RestartSec=3
 ExecStart=/home/etherpad/etherpad/bin/run.sh
 Type=simple
 User=etherpad
