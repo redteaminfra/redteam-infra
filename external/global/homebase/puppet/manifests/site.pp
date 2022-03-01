@@ -19,6 +19,7 @@ node "default" {
     include 'cloudagent'
     include 'sketchopsec'
     include 'logstashconfig'
+    include 'nfsserver'
 
     package { ['openjdk-8-jre-headless']:
     }

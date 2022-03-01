@@ -18,6 +18,7 @@ node "default" {
   include 'openresty'
   include 'sketchopsec'
   include 'logstashconfig'
+  include 'nfsclient'
 
 
   package { ['openjdk-8-jre-headless']:
