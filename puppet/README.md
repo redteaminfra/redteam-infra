@@ -361,3 +361,11 @@ Sets up gophish listening on 3333 and 443 with a snakeoil cert
 ## waybackdownloader
 
 Installs the wayback\_machine\_downloader gem
+
+## nfsserver
+
+Installs `nfs-kernel-server`. Configures an NFS share (`/dropbox` on homebase) available to the 192.168.2.0/24 subnet. Sets the user/group of the `/dropbox` folder to `nobody:redteam` and the permissions to `770`.
+
+## nfsclient
+
+Ensures `nfs-common` is installed. Configures `/etc/fstab` to connect to homebase and mounts `/dropbox` on client hosts (proxy servers by default). 
