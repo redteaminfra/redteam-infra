@@ -150,6 +150,10 @@ push to the repo and changes are automatically applied.
 Homebase runs a git-daemon that other machines can periodically pull
 from and apply in a similar way.
 
+## gophish
+
+Sets up gophish listening on 3333 and 443 with a snakeoil cert
+
 ## Homebase tools
 
 A small collection of packages that are useful for homebase operations.
@@ -239,6 +243,14 @@ You'll also need to add auth for AWS SMS if you go this route in `puppet/modules
 Natlas will spin up an [natlas instance](https://github.com/natlas/natlas) for port scanning. It includes an nmap-agent and an natlas systemd service.
 
 There are two modules, one for the server and one for the agent in `natlasserver` and `natlasagent`
+
+## nfsserver
+
+Installs `nfs-kernel-server`. Configures an NFS share (`/dropbox` on homebase) available to the 192.168.2.0/24 subnet. Sets the user/group of the `/dropbox` folder to `nobody:redteam` and the permissions to `770`.
+
+## nfsclient
+
+Ensures `nfs-common` is installed. Configures `/etc/fstab` to connect to homebase and mounts `/dropbox` on client hosts (proxy servers by default).
 
 ## Nmap
 
@@ -350,22 +362,10 @@ Manages a file that ought to keep unattended upgrades working and installs the p
 
 Allows SSH keys with the volunteer tag to SSH to this instance. Consult [RedTeam-ssh](https://github.com/redteaminfra/redteam-ssh) for more detail on tags.
 
-## Yama
-
-Disable ptrace!
-
-## gophish
-
-Sets up gophish listening on 3333 and 443 with a snakeoil cert
-
 ## waybackdownloader
 
 Installs the wayback\_machine\_downloader gem
 
-## nfsserver
+## Yama
 
-Installs `nfs-kernel-server`. Configures an NFS share (`/dropbox` on homebase) available to the 192.168.2.0/24 subnet. Sets the user/group of the `/dropbox` folder to `nobody:redteam` and the permissions to `770`.
-
-## nfsclient
-
-Ensures `nfs-common` is installed. Configures `/etc/fstab` to connect to homebase and mounts `/dropbox` on client hosts (proxy servers by default). 
+Disable ptrace!
