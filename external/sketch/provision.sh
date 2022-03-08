@@ -16,12 +16,11 @@ HOSTNAME=$1
 
 hostnamectl set-hostname $HOSTNAME
 
-cat <<EOF >> /etc/sysctl.conf
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
+# Disable IPV6 for reals
+cat << EOF >> /etc/default/grub.d/99-disable-ipv6.cfg
+GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
 EOF
-sysctl -p
+update-grub
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get -y install screen tmux ufw nginx simpleproxy python

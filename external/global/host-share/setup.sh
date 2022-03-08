@@ -70,13 +70,11 @@ Unattended-Upgrade::Origins-Pattern {
 EOF
 fi
 
-### disable ipv6
-cat <<EOF >> /etc/sysctl.conf
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
+### Disable IPV6 for reals
+cat << EOF >> /etc/default/grub.d/99-disable-ipv6.cfg
+GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
 EOF
-sysctl -p
+update-grub
 
 ### ssh fixes
 sed -i -e 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
