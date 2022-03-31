@@ -5,7 +5,7 @@ resource "oci_core_instance" "homebase" {
   shape               = var.infra_shape
 
   source_details {
-    source_id   = var.ubuntu_image_id
+    source_id   = var.ubuntu_image_id[var.region]
     source_type = "image"
     boot_volume_size_in_gbs = var.homebase_image_size_gbs
   }
@@ -20,6 +20,7 @@ resource "oci_core_instance" "homebase" {
 
   metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
+    user_data           = base64encode(file("../global/host-share/user_data.yaml"))
   }
 
   preserve_boot_volume = var.preserve_boot_volume

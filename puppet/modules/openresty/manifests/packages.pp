@@ -4,7 +4,7 @@ class openresty::packages {
         comment => 'Open_Resty_apt_Source',
         location => 'http://openresty.org/package/ubuntu',
         repos => 'main',
-        release => 'bionic',
+        release => 'focal',
         key => {
             server => 'pgp.mit.edu',
             source => 'https://openresty.org/package/pubkey.gpg',

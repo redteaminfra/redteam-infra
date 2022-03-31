@@ -14,6 +14,8 @@ locals {
 module "op" {
   source = "./modules/rti"
 
+  region = var.region
+
   instance_user = var.instance_user
   homebase_user = var.homebase_user
 

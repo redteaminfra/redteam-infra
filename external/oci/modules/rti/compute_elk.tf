@@ -6,7 +6,7 @@ resource "oci_core_instance" "elk" {
   shape               = var.infra_shape
 
   source_details {
-    source_id   = var.ubuntu_image_id
+    source_id   = var.ubuntu_image_id[var.region]
     source_type = "image"
   }
 
