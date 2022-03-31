@@ -20,7 +20,6 @@ resource "oci_core_instance" "homebase" {
 
   metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-    user_data           = base64encode(file("../global/host-share/user_data.yaml"))
   }
 
   preserve_boot_volume = var.preserve_boot_volume
