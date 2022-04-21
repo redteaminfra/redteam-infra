@@ -179,10 +179,8 @@ def main():
 
     with open(key) as fd:
         if 'PRIVATE KEY' not in fd.readline():
-            check = input(f'{key} does not appear to be a private key. Continue (y/n)? ')
-            if check.lower()[0] != 'y':
-                sys.stderr.write('exiting, user aborted')
-                sys.exit(1)
+            sys.stderr.write("exiting, file doesn't appear to be a private key.")
+            sys.exit(1)
 
     if check_port(proxyport):
         sys.stderr.write("look like port %d is already used\n" % proxyport)
