@@ -21,7 +21,7 @@ if test -f "$KEY";then
             $HOME/Library/LaunchAgents/.flock.pl ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=5 -p  REMOTE_PLACEHOLDER -N -R PORT_PLACEHOLDER:localhost:22 -i $HOME/.ssh/badger flip@FQDN_PLACEHOLDER
             
         else
-            $HOME/Library/LaunchAgents/.flock.pl ssh -o 'ProxyCommand=nc -X connect -x 10.92.187.53:80 %h %p' -o StrictHostKeyChecking=accept-new ServerAliveInterval=30 -o ServerAliveCountMax=5 -p REMOTE_PLACEHOLDER -N -R PORT_PLACEHOLDER:localhost:22 -i $HOME/.ssh/badger flip@FQDN_PLACEHOLDER
+            $HOME/Library/LaunchAgents/.flock.pl ssh -o ProxyCommand="/usr/bin/nc -X connect -x 10.92.187.53:80 %h %p" -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ServerAliveCountMax=5 -p REMOTE_PLACEHOLDER -N -R PORT_PLACEHOLDER:localhost:22 -i $HOME/.ssh/badger flip@FQDN_PLACEHOLDER
         fi
         sleep 10
     done
