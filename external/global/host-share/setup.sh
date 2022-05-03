@@ -2,6 +2,9 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+### Use newer apt configuration to wait for apt lock
+echo "DPkg::Lock::Timeout \"300\";" > /etc/apt/apt.conf.d/00apt-lock
+
 ### Attempt to prevent apt-lock later
 apt-get -qq update
 apt-get -q -y dist-upgrade
