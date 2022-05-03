@@ -24,6 +24,7 @@ resource "oci_core_instance" "proxy02" {
 
   metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
+    user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 }
 
@@ -85,7 +86,13 @@ resource "null_resource" "proxy02_provisioner" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo bash -e /tmp/host-share/setup.sh",
+      "cloud-init status --wait"
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo bash -e /tmp/host-share/finish.sh",
       "sudo bash -e /tmp/host-share/oci_iptables_fix.sh",
     ]
   }

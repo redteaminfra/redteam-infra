@@ -19,6 +19,7 @@ resource "oci_core_instance" "elk" {
 
   metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
+    user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   preserve_boot_volume = var.preserve_boot_volume
@@ -69,7 +70,13 @@ resource "null_resource" "elk_provisioner" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo bash -e /tmp/host-share/setup.sh",
+      "cloud-init status --wait"
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo bash -e /tmp/host-share/finish.sh",
       "sudo bash -e /tmp/host-share/oci_iptables_fix.sh",
     ]
   }
