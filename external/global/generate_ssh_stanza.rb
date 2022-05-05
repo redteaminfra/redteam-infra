@@ -30,6 +30,8 @@ Host homebase-#{opname}
      ## AddressFamily inet
      # Etherpad
      ## LocalForward 9001 127.0.0.1:9001
+     # Mythic
+     LocalForward 7443 127.0.0.1:7443
      # Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshkeys users.json
      ## Your port number is (5900 + (UID - 6000) + 1)
      ## LocalForward 5901 127.0.0.1:59xx

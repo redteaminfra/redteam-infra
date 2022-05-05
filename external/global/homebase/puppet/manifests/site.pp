@@ -20,6 +20,7 @@ node "default" {
     include 'sketchopsec'
     include 'logstashconfig'
     include 'nfsserver'
+    include 'mythic'
 
     package { ['openjdk-8-jre-headless']:
     }
