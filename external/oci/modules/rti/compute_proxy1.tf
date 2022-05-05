@@ -85,6 +85,12 @@ resource "null_resource" "proxy01_provisioner" {
   }
 
   provisioner "remote-exec" {
+      inline = [
+        "cloud-init status --wait"
+      ]
+    }
+
+  provisioner "remote-exec" {
     inline = [
       "sudo bash -e /tmp/host-share/finish.sh",
       "sudo bash -e /tmp/host-share/oci_iptables_fix.sh",
