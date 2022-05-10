@@ -71,7 +71,7 @@ def main():
     print(f"[+] encryption passphrase: '{passphrase}'")
     encrypt(passphrase, plantext_file, cipherext_file)
     decrypt_cmd = f'openssl enc -aes256 -d -pass pass:"{passphrase}" -md sha256 -in {cipherext_file}'
-    print(f"[*] decrypt and run with with: '{decrypt_cmd}' | bash")
+    print(f"[*] decrypt and run with with: {decrypt_cmd} > [ARBITRARY IOC NAME]")
     printIoC(cipherext_file, "encrypted")
     print("Have a nice day!")
 
