@@ -1,6 +1,6 @@
 class backflips::packages {
 
-    $packages = ['autossh']
+    $packages = ['wamerican']
 
     package { $packages: ensure => "installed"}
 }
