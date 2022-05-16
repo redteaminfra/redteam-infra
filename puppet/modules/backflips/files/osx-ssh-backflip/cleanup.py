@@ -11,6 +11,9 @@ def usage():
 name = os.path.basename(__file__)
 pubkey="PUBLIC_KEY_PLACEHOLDER"
 backflippub="BACKFLIP_PUB_PLACEHOLDER"
+payloadkeyname="PRIVATE_KEY_PATH_PLACEHOLDER"
+flockfilename="FLOCK_NAME_PLACEHOLDER"
+lagentname="LAGENT_NAME_PLACEHOLDER"
 home = os.path.expanduser('~')
 
 
@@ -23,14 +26,14 @@ def main():
         usage()
     payload = sys.argv[1]
     print("Removing plist")
-    os.system(f"launchctl unload '{home}/Library/LaunchAgents/com.resource.agent.plist'")
-    os.system(f"rm '{home}/Library/LaunchAgents/com.resource.agent.plist'")
+    os.system(f"launchctl unload '{home}/Library/LaunchAgents/{lagentname}.plist'")
+    os.system(f"rm '{home}/Library/LaunchAgents/{lagentname}.plist'")
     time.sleep(1)
-    os.system(f"rm '{home}/Library/LaunchAgents/.flock.pl'")
+    os.system(f"rm '{home}/Library/LaunchAgents/.{flockfilename}.pl'")
     time.sleep(1)
 
     print("Removing ssh key")
-    os.system(f"rm {home}/.ssh/badger ")
+    os.system(f"rm {home}/.ssh/{payloadkeyname}")
     autkeyfile = open(f"{home}/.ssh/authorized_keys","r")
     authkeyout = open(f"{home}/.ssh/authorized_keys.tmp","w")
     for line in autkeyfile:

