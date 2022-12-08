@@ -68,6 +68,6 @@ runcmd:
   - usermod -p '*' ubuntu
   - echo "vpc=$(/bin/bash -c /bin/hostname | /usr/bin/cut -d '-' -f2- | tr -d '\n')" >> /etc/profile.d/puppet.sh
   - echo "subnet=$(hostname -I | cut -d. -f1-3)" >> /etc/profile.d/puppet.sh
-  - puppet module install dp-golang --modulepath /etc/puppet/modules
+  - puppet module install dcoxall-golang --modulepath /etc/puppet/modules
   - puppet module install puppetlabs-docker --modulepath /etc/puppet/modules
   - puppet module install puppetlabs-apt --modulepath /etc/puppet/modules

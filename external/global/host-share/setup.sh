@@ -45,7 +45,7 @@ fi
 
 #### Install golang and docker on homebase
 if grep -q homebase /etc/hostname; then
-    puppet module install dp-golang --modulepath /etc/puppet/modules
+    puppet module install dcoxall-golang --modulepath /etc/puppet/modules
     puppet module install puppetlabs-docker --modulepath /etc/puppet/modules
 fi
 
