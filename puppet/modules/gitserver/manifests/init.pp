@@ -94,7 +94,7 @@ class gitserver {
     }
 
     exec { 'unpack':
-        command => "bash -c \"cd $(mktemp -d); tar xavf /tmp/host-share/bootstrap-puppet.tgz; git push ${gitinfrarepo} master\"",
+        command => "bash -c \"cd $(mktemp -d); tar --no-same-owner -xavf /tmp/host-share/bootstrap-puppet.tgz; git push ${gitinfrarepo} master\"",
         user => 'root',
         group => 'infra',
         path => ['/bin', '/usr/bin/'],
