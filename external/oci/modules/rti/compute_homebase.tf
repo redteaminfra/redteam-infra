@@ -23,6 +23,15 @@ resource "oci_core_instance" "homebase" {
     user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
+  agent_config {
+    are_all_plugins_disabled = false
+    is_monitoring_disabled   = true
+    plugins_config {
+      name          = "Compute Instance Monitoring"
+      desired_state = "DISABLED"
+    }
+  }
+
   preserve_boot_volume = var.preserve_boot_volume
 }
 
