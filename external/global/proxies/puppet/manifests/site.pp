@@ -13,7 +13,6 @@ node "default" {
   #include 'tinyproxy'
   include 'sshproxy'
   include 'cleanup'
-  # include 'waybackdownloader'
   include 'cloudagent'
   include 'openresty'
   include 'sketchopsec'

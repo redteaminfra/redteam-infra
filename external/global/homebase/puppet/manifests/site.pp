@@ -18,9 +18,6 @@ node "default" {
     include 'sketchopsec'
     include 'logstashconfig'
     include 'nfsserver'
-    # include 'irc'
-    # include 'etherpad'
-    # include 'mythic'
 
     package { ['openjdk-8-jre-headless']:
     }
