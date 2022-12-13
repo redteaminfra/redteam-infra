@@ -7,7 +7,7 @@ resource "oci_core_instance" "homebase" {
   source_details {
     source_id   = var.ubuntu_image_id[var.region]
     source_type = "image"
-    boot_volume_size_in_gbs = var.homebase_image_size_gbs
+    boot_volume_size_in_gbs = var.default_image_size_gbs
   }
 
   create_vnic_details {
