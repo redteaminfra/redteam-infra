@@ -5,7 +5,7 @@ resource "oci_core_instance" "homebase" {
   shape               = var.infra_shape
 
   source_details {
-    source_id   = var.ubuntu_image_id[var.region]
+    source_id   = data.oci_core_images.ubuntu-20-04.images.0.id
     source_type = "image"
     boot_volume_size_in_gbs = var.default_image_size_gbs
   }
