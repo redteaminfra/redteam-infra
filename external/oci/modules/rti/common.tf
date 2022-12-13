@@ -1,9 +1,4 @@
-data "oci_identity_availability_domains" "ads" {
+data "oci_identity_availability_domain" "ad" {
   compartment_id = var.compartment_id
-}
-
-data "null_data_source" "target_ad" {
-  inputs = {
-    name = "${lookup(data.oci_identity_availability_domains.ads.availability_domains[var.avail_dom], "name")}"
-  }
+  ad_number      = var.ad_number
 }

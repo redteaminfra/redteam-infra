@@ -2,7 +2,7 @@ resource "oci_core_subnet" "infra" {
   depends_on = [oci_core_vcn.infra_vcn]
 
   compartment_id      = var.compartment_id
-  availability_domain = data.null_data_source.target_ad.outputs.name
+  availability_domain = data.oci_identity_availability_domain.ad.name
   vcn_id              = oci_core_vcn.infra_vcn.id
 
   security_list_ids = [
@@ -22,7 +22,7 @@ resource "oci_core_subnet" "utility" {
   depends_on = [oci_core_vcn.infra_vcn]
 
   compartment_id      = var.compartment_id
-  availability_domain = data.null_data_source.target_ad.outputs.name
+  availability_domain = data.oci_identity_availability_domain.ad.name
   vcn_id              = oci_core_vcn.infra_vcn.id
 
   security_list_ids = [
@@ -41,7 +41,7 @@ resource "oci_core_subnet" "proxy" {
   depends_on = [oci_core_vcn.infra_vcn]
 
   compartment_id      = var.compartment_id
-  availability_domain = data.null_data_source.target_ad.outputs.name
+  availability_domain = data.oci_identity_availability_domain.ad.name
   vcn_id              = oci_core_vcn.infra_vcn.id
 
   security_list_ids = [

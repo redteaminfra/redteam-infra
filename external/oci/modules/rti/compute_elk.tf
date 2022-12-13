@@ -1,6 +1,6 @@
 resource "oci_core_instance" "elk" {
   depends_on          = [oci_core_instance.homebase]
-  availability_domain = data.null_data_source.target_ad.outputs.name
+  availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
   display_name        = "elk-${var.op_name}"
   shape               = var.infra_shape

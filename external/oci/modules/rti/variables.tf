@@ -6,8 +6,8 @@ variable "network_protocol" {
   }
 }
 
-variable "avail_dom" {
-  default = "0" //0 - AD1, 1 - AD2, 2 - AD3
+variable "ad_number" {
+  default = "1"
 }
 
 variable "region" {

@@ -20,7 +20,7 @@ module "op" {
   homebase_user = var.homebase_user
 
   op_name        = var.op_name
-  avail_dom      = var.avail_dom
+  ad_number     = var.ad_number
   compartment_id = var.compartment_id
 
   vcn_cidr_block = var.vcn_cidr_block
