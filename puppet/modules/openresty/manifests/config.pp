@@ -10,6 +10,14 @@ class openresty::config {
         notify => Exec['restyreload'],
     }
 
+    file { '/var/log/openresty':
+        ensure => 'directory',
+        owner  => 'root',
+        mode   => '0775',
+        require => Package['openresty'],
+        notify => Exec['restyreload'],
+    }
+
   exec {'restyreload':
       command => '/bin/systemctl restart openresty',
       path => ['/bin/', '/usr/bin'],
