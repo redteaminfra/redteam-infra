@@ -18,10 +18,19 @@ class openresty::config {
         notify => Exec['restyreload'],
     }
 
-  exec {'restyreload':
-      command => '/bin/systemctl restart openresty',
-      path => ['/bin/', '/usr/bin'],
-      refreshonly => true,
-  }
+    file { '/etc/logrotate.d/openresty':
+        path => '/etc/logrotate.d/openresty',
+        owner => 'root',
+        mode => '644',
+        ensure => present,
+        source => "puppet:///modules/openresty/openresty",
+        require => Package['openresty'],
+    }
+
+    exec {'restyreload':
+        command => '/bin/systemctl restart openresty',
+        path => ['/bin/', '/usr/bin'],
+        refreshonly => true,
+    }
 
 }

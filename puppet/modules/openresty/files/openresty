@@ -1,0 +1,8 @@
+/var/log/openresty/*.log {
+    daily
+    dateext
+    compress
+    dateyesterday
+    copytruncate
+    notifempty
+}
