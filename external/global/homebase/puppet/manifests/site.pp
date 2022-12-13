@@ -8,11 +8,9 @@ node "default" {
     include 'loot'
     include 'ssh'
     include 'volunteerssh'
-    include 'irc'
     include 'basetools'
     # Ubuntu or Kali as base? Use homebasetoolsubuntu for ubuntu or homebasetoolskali for Kali
     include 'homebasetoolsubuntu'
-    include 'etherpad'
     include 'yama'
     include 'mollyguard'
     include 'cleanup'
@@ -20,7 +18,9 @@ node "default" {
     include 'sketchopsec'
     include 'logstashconfig'
     include 'nfsserver'
-    include 'mythic'
+    # include 'irc'
+    # include 'etherpad'
+    # include 'mythic'
 
     package { ['openjdk-8-jre-headless']:
     }
