@@ -1,30 +1,30 @@
 resource "oci_core_instance" "homebase" {
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
-  display_name        = "homebase-${var.op_name}"
-  shape               = var.infra_shape
+  display_name        = "homebase-${var.operation_name}"
+  shape               = var.homebase_shape
 
   source_details {
-    source_id   = data.oci_core_images.ubuntu-20-04.images.0.id
-    source_type = "image"
-    boot_volume_size_in_gbs = var.default_image_size_gbs
+    source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
+    source_type             = "image"
+    boot_volume_size_in_gbs = var.boot_volume_size_in_gbs
   }
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.infra.id
-    hostname_label = "homebase-${var.op_name}"
+    hostname_label = "homebase-${var.operation_name}"
 
-    private_ip       = cidrhost(var.infra_subnet_cidr, 10)
-    assign_public_ip = false
+    private_ip       = cidrhost(var.subnet_cidr_blocks["infra"], 10)
+    assign_public_ip = true
   }
 
   metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-    user_data           = base64encode(file("../global/host-share/user_data.yml"))
+     user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {
-    are_all_plugins_disabled = false
+    are_all_plugins_disabled = true
     is_monitoring_disabled   = true
     plugins_config {
       name          = "Compute Instance Monitoring"
@@ -33,38 +33,23 @@ resource "oci_core_instance" "homebase" {
   }
 
   preserve_boot_volume = var.preserve_boot_volume
-}
 
-data "oci_core_private_ips" "homebase" {
-  ip_address = oci_core_instance.homebase.private_ip
-  subnet_id  = oci_core_subnet.infra.id
-}
-
-resource "oci_core_public_ip" "homebase" {
-  compartment_id = var.compartment_id
-  lifetime       = "EPHEMERAL"
-
-  display_name  = "Homebase public ip"
-  private_ip_id = lookup(data.oci_core_private_ips.homebase.private_ips[0], "id")
-}
-
-resource "null_resource" "homebase_provisioner" {
-  depends_on = [oci_core_instance.homebase]
-
-  connection {
-    host        = oci_core_public_ip.homebase.ip_address
-    type        = "ssh"
-    user        = var.homebase_user
-    private_key = file(var.ssh_provisioning_private_key)
-    timeout     = "3m"
+  # create ssh stanza
+  provisioner "local-exec" {
+    command = "${path.module}/templates/generate_ssh_stanza.rb --opname ${var.operation_name} --homebase_ip ${self.public_ip}"
   }
 
+  # bootstrap puppet
   provisioner "local-exec" {
     command = "bash -c \"cd $(git rev-parse --show-toplevel); tar -czf external/global/host-share/bootstrap-puppet.tgz .git\""
   }
 
-  provisioner "local-exec" {
-    command = "../global/generate_ssh_stanza.rb --opname ${var.op_name} --homebase_ip ${oci_core_public_ip.homebase.ip_address}"
+  connection {
+    host        = self.public_ip
+    type        = "ssh"
+    user        = var.image_username
+    private_key = file(var.ssh_provisioning_private_key)
+    timeout     = "3m"
   }
 
   provisioner "remote-exec" {

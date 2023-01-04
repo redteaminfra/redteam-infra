@@ -1,68 +1,53 @@
-resource "oci_core_instance" "proxy02" {
+resource "oci_core_instance" "proxy" {
   depends_on          = [oci_core_instance.homebase]
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
-  display_name        = "${var.proxy_name}02-${var.op_name}"
+  display_name        = "proxy${format("%02g", count.index + 1)}-${var.operation_name}"
   shape               = var.proxy_shape
+  count               = var.proxy_count
 
   source_details {
-    source_id   = data.oci_core_images.ubuntu-20-04.images.0.id
-    source_type = "image"
-    boot_volume_size_in_gbs = var.default_image_size_gbs
+    source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
+    source_type             = "image"
+    boot_volume_size_in_gbs = var.boot_volume_size_in_gbs
   }
 
   create_vnic_details {
-    subnet_id      = oci_core_subnet.proxy.id
-    hostname_label = "${var.proxy_name}02-${var.op_name}"
+    subnet_id = oci_core_subnet.proxy.id
+    #    hostname_label = self.display_name #"proxy${format("%02g", count.index + 1)}-${var.operation_name}"
+    #    display_name   = "proxy${format("%02g", count.index + 1)}-${var.operation_name}"
 
-    private_ip             = cidrhost(var.proxy_cidr, 12)
-    assign_public_ip       = false
-    skip_source_dest_check = "true"
-    nsg_ids = [
-      "${oci_core_network_security_group.proxies.id}"
+    private_ip             = cidrhost(var.subnet_cidr_blocks["proxy"], count.index + 10)
+    assign_public_ip       = true
+    skip_source_dest_check = true
+    nsg_ids                = [
+      oci_core_network_security_group.proxies.id
     ]
   }
 
   metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-    user_data           = base64encode(file("../global/host-share/user_data.yml"))
+        user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {
-    are_all_plugins_disabled = false
+    are_all_plugins_disabled = true
     is_monitoring_disabled   = true
     plugins_config {
       name          = "Compute Instance Monitoring"
       desired_state = "DISABLED"
     }
   }
-}
-
-data "oci_core_private_ips" "proxy02" {
-  ip_address = oci_core_instance.proxy02.private_ip
-  subnet_id  = oci_core_subnet.proxy.id
-}
-
-resource "oci_core_public_ip" "proxy02" {
-  compartment_id = var.compartment_id
-  lifetime       = "EPHEMERAL"
-
-  display_name  = "Proxy02 public ip"
-  private_ip_id = lookup(data.oci_core_private_ips.proxy02.private_ips[0], "id")
-}
-
-resource "null_resource" "proxy02_provisioner" {
-  depends_on = [oci_core_instance.proxy02]
 
   connection {
-    host        = oci_core_instance.proxy02.private_ip
+    host        = self.private_ip
     type        = "ssh"
-    user        = var.instance_user
+    user        = var.image_username
     private_key = file(var.ssh_provisioning_private_key)
     timeout     = "3m"
 
-    bastion_host = oci_core_public_ip.homebase.ip_address
-    bastion_user = var.homebase_user
+    bastion_host = oci_core_instance.homebase.public_ip
+    bastion_user = var.image_username
   }
 
   provisioner "remote-exec" {
@@ -89,16 +74,16 @@ resource "null_resource" "proxy02_provisioner" {
   provisioner "remote-exec" {
     inline = [
       "mkdir -p /tmp/host-share/puppet/manifests",
-      "ln -s /tmp/host-share/proxies/puppet/manifests/site.pp /tmp/host-share/puppet/manifests/site.pp",
+      "ln -s /tmp/host-share/proxies/puppet//manifests/site.pp /tmp/host-share/puppet/manifests/site.pp",
       "if [ ! -L /etc/infra/site ]; then sudo mkdir -p /etc/infra && sudo ln -s external/global/proxies/puppet/manifests/site.pp /etc/infra/site; fi",
     ]
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "cloud-init status --wait"
-    ]
-  }
+      inline = [
+        "cloud-init status --wait"
+      ]
+    }
 
   provisioner "remote-exec" {
     inline = [

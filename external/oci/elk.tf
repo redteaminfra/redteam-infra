@@ -2,29 +2,30 @@ resource "oci_core_instance" "elk" {
   depends_on          = [oci_core_instance.homebase]
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
-  display_name        = "elk-${var.op_name}"
-  shape               = var.infra_shape
+  display_name        = "elk-${var.operation_name}"
+  shape               = var.elk_shape
 
   source_details {
-    source_id   = data.oci_core_images.ubuntu-20-04.images.0.id
-    source_type = "image"
-    boot_volume_size_in_gbs = var.default_image_size_gbs
+    source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
+    source_type             = "image"
+    boot_volume_size_in_gbs = var.boot_volume_size_in_gbs
   }
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.utility.id
-    hostname_label = "elk-${var.op_name}"
+    hostname_label = "elk-${var.operation_name}"
 
-    private_ip = cidrhost(var.utility_cidr, 13)
+    private_ip       = cidrhost(var.subnet_cidr_blocks["utility"], 13)
+    assign_public_ip = false
   }
 
   metadata = {
     ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-    user_data           = base64encode(file("../global/host-share/user_data.yml"))
+    #    user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {
-    are_all_plugins_disabled = false
+    are_all_plugins_disabled = true
     is_monitoring_disabled   = true
     plugins_config {
       name          = "Compute Instance Monitoring"
@@ -33,20 +34,16 @@ resource "oci_core_instance" "elk" {
   }
 
   preserve_boot_volume = var.preserve_boot_volume
-}
-
-resource "null_resource" "elk_provisioner" {
-  depends_on = [oci_core_instance.elk]
 
   connection {
-    host        = oci_core_instance.elk.private_ip
+    host        = self.private_ip
     type        = "ssh"
-    user        = var.instance_user
+    user        = var.image_username
     private_key = file(var.ssh_provisioning_private_key)
     timeout     = "3m"
 
-    bastion_host = oci_core_public_ip.homebase.ip_address
-    bastion_user = var.homebase_user
+    bastion_host = oci_core_instance.homebase.public_ip
+    bastion_user = var.image_username
   }
 
   provisioner "remote-exec" {

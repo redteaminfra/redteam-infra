@@ -71,3 +71,4 @@ runcmd:
   - puppet module install dcoxall-golang --modulepath /etc/puppet/modules
   - puppet module install puppetlabs-docker --modulepath /etc/puppet/modules
   - puppet module install puppetlabs-apt --modulepath /etc/puppet/modules
+  - bash -c "cd /tmp/host-share/puppet && time puppet apply --modulepath=/etc/puppet/modules:/tmp/host-share/puppet/modules/ --verbose --debug manifests/site.pp"
