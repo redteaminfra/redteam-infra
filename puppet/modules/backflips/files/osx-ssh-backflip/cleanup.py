@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 import base64
 import os
 import sys

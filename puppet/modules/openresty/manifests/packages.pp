@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 class openresty::packages {
 
     apt::source { 'open_resty':

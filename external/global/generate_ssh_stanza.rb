@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# Copyright (c) 2022, Oracle and/or its affiliates.
 
 require 'optparse'
 

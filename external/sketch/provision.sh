@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 
 if [ $(whoami) != "root" ]; then
     echo "you must be root"

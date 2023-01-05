@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 class sketchopsec::config {
 
     file { "/opt/sketch":

@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 # Provider initialization (tenancy, api user, key, region, etc.)
 tenancy_ocid     = ""
 user_ocid        = ""

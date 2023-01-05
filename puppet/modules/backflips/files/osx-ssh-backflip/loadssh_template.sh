@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 UMASK=002
 umask $UMASK
 NAME=$(basename "$0")

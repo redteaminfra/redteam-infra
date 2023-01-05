@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 node "default" {
     include 'hostsexternal'
     include 'gitpuppet'

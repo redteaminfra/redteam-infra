@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 class yama {
 
   file { "/etc/sysctl.d/99-kill-ptrace.conf":

@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2022, Oracle and/or its affiliates.
 
 PATTERN="REJECT.*reject-with icmp-host-prohibited"
 OFFENDING_LINE=$(iptables -L INPUT --line-numbers| grep -E "${PATTERN}")

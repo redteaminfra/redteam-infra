@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 
 if [[ "$EUID" -eq 0 ]]; then
   echo -e "Sorry, you cannot run this as root \n"

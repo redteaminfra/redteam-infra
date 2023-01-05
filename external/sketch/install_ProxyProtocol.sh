@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2022, Oracle and/or its affiliates.
 
 usage () {
     echo "./install_Proxy_Protocol.sh <next hop IP> <edge/middle>"

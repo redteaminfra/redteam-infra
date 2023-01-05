@@ -1,4 +1,5 @@
 #!/bin/bash -x -e
+# Copyright (c) 2022, Oracle and/or its affiliates.
 
 export DEBIAN_FRONTEND=noninteractive
 

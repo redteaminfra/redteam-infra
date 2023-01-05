@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 
 DIR=$(mktemp -d)
 VPC=$(hostname | /usr/bin/cut -d '-' -f2- | tr -d '\n')

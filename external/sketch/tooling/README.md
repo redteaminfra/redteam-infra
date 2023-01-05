@@ -158,3 +158,5 @@ git push homebase-<ENGAGEMENT>:/var/lib/git/infra -f
 Have a nice day!
 RED TEAM!
 ```
+
+Copyright (c) 2022, Oracle and/or its affiliates.

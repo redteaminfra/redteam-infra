@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 # DO NOT INCLUDE UNATTENDED UPGRADES
 # You do not want homebase to reboot during an operation due to upgrades
 node "default" {

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 
 import os
 

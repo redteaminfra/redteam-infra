@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 # Define network resources for Red Team Infrastructure
 
 # Virtual Cloud Network (VCN)

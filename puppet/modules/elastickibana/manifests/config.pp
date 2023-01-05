@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 class elastickibana::config {
 
 # set mx_map_count

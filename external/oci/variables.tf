@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 variable "tenancy_ocid" {}
 variable "user_ocid" {}
 variable "compartment_id" {}

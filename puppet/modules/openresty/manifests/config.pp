@@ -1,3 +1,5 @@
+# Copyright (c) 2022, Oracle and/or its affiliates.
+
 class openresty::config {
 
     file { '/usr/local/openresty/nginx/conf/nginx.conf':
