@@ -1,5 +1,5 @@
 #/usr/bin/env python
-# Copyright (c) 2022, Oracle and/or its affiliates.
+# Copyright (c) 2023, Oracle and/or its affiliates.
 
 import os
 import sys

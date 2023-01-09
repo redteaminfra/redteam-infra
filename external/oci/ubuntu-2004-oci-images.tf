@@ -1,4 +1,4 @@
-# Copyright (c) 2022, Oracle and/or its affiliates.
+# Copyright (c) 2023, Oracle and/or its affiliates.
 
 # get latest Ubuntu Linux 20.04 image
 data "oci_core_images" "ubuntu-20-04" {
