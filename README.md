@@ -20,7 +20,7 @@ See `puppet/README.md` for information on puppet modules
 
 ## Rebasing Op repos
 
-### Perquisite
+### Prerequisite
 
 1. Add original repo as remote
 
@@ -32,7 +32,7 @@ git remote add infra git@github.com:redteam-infra/redteam-infra
 
 This can probably be abbreviated, this is what I do.
 
-1. Observe curent state
+1. Observe current state
 
     ```
     $ git show -s --pretty=short infra/master
@@ -47,13 +47,13 @@ This can probably be abbreviated, this is what I do.
 
     ```
 
-1. Find the common ancestor
+2. Find the common ancestor
 
     ```
     $ git merge-base master infra/master
     ```
 
-1. Checkout your "feature" branch
+3. Checkout your "feature" branch
 
     This is counter-intuitive, but master is you feature branch.  We'll make a branch and then, since it will be branched from HEAD, will be our feature branch
 
@@ -61,27 +61,27 @@ This can probably be abbreviated, this is what I do.
     git checkout -b feature
     ```
 
-1. Switch back to master and reset back to common ancenstor
+4. Switch back to master and reset back to common ancenstor
 
     ```
     git checkout master
     git reset --hard <commit given in merge-base>
     ```
 
-1. Pull infra master
+5. Pull infra master
 
     ```
     git pull infra master
     ```
 
-1. checkout and rebase feature
+6. checkout and rebase feature
 
     ```
     git checkout feature
     git rebase master
     ```
 
-1. merge feature to master
+7. merge feature to master
 
     ```
     git checkout master
@@ -89,7 +89,7 @@ This can probably be abbreviated, this is what I do.
     git branch -d feature
     ```
 
-1. Push for victory
+8. Push for victory
 
     ```
     git push --force origin master

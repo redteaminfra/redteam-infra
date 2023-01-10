@@ -2,7 +2,7 @@
 
 ## How to start
 
-The first thing you'll need to do is setup IAM in AWS and generate an EC2 keypair.
+The first thing you'll need to do is set up IAM in AWS and generate an EC2 keypair.
 
 To do so, from IAM in AWS make a user and add that user to the group "redteam".
 
@@ -24,7 +24,7 @@ export AWS_SECRET_ACCESS_KEY="SECRET"
 ```
 From there run `source ~/.aws/awssetup.sh` before doing any deployments.
 
-You also need to setup your AWS credentials in `~/.aws/credentials`
+You also need to set up your AWS credentials in `~/.aws/credentials`
 
 ```
 [default]
@@ -41,7 +41,7 @@ Also set `~/.aws/config` to your zone such as
 region=us-west-2
 ```
 
-You will also need to setup a `variables.tfvars` file
+You will also need to set up a `variables.tfvars` file
 
 ```
 key_name = "<Location of your key ie ~/.ssh/deploy. Note; this cannot be a password protected key>"
@@ -54,10 +54,10 @@ aws_key_name = "<Name you will give your key in AWS>"
 Because terraform makes a local folder to house all information about state, we need a copy of this repository for every VPC we need in AWS.
 
 1. git clone https://github.com/redteaminfra/redteam-infra <OPNAME>
-1. Make a new repo in RedTeamInfra called <OPNAME>
-1. git remote rm origin
-1. git remote add origin git@github.com:redteaminfra/<OPNAME>
-1. git push origin master
+2. Make a new repo in RedTeamInfra called <OPNAME>
+3. git remote rm origin
+4. git remote add origin git@github.com:redteaminfra/<OPNAME>
+5. git push origin master
 
 Once the repo is forked and cloned, you may need to make some additional modifications to the puppet modules depending on your use cases. View the README in the puppet repo for additional documentation.
 
@@ -66,8 +66,8 @@ Once the repo is forked and cloned, you may need to make some additional modific
 In order to start an OP VPC you will need to
 
 1. fork repo to https://github/Intel/redteam-infra/
-1. change homebase to m4.4xlarge
-1. change ELK to t2.large
+2. change homebase to m4.4xlarge
+3. change ELK to t2.large
 
 ## Setup Rules for VPC
 
@@ -76,12 +76,12 @@ In order to start an OP VPC you will need to
 ## Make a new VPC
 
 1. terraform init
-1. terraform apply -auto-approve -var-file=variables.tfvars
+2. terraform apply -auto-approve -var-file=variables.tfvars
 
 ## Destroy a VPC
 
 1. `virtualenv -p python3 venv`
-1. `. venv/bin/activate`
-1. `pip3 install -r requirements.txt`
-1. `./backup_ebs.py -i <VPC-########> -d <description>`
-1. `./del_vpc.py -i <VPC-########>`
+2. `. venv/bin/activate`
+3. `pip3 install -r requirements.txt`
+4. `./backup_ebs.py -i <VPC-########> -d <description>`
+5. `./del_vpc.py -i <VPC-########>`

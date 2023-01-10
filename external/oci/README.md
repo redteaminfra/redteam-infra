@@ -2,7 +2,7 @@
 
 ## How to start
 
-The first thing you'll need to do is setup an Oracle Cloud account, generate a key pair, and make a compartment in your tenancy.
+The first thing you'll need to do is set up an Oracle Cloud account, generate a key pair, and make a compartment in your tenancy.
 
 You will need to add information regarding your tenancy to `~/.oci/config` such as
 
