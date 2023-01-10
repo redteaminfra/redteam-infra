@@ -8,9 +8,9 @@ Must be able to be built the same way in multiple places and on multiple platfor
 
 * Modularity
 
-Must provide a way of breaking down infrastructure tasks so that we can rapidly change our infrastrucutre to match requirements of operations without breaking things at the same time.
+Must provide a way of breaking down infrastructure tasks so that we can rapidly change our infrastructure to match requirements of operations without breaking things at the same time.
 
-* Dyanmic
+* Dynamic
 
 Must provide mechanism  for changes to be deployed across a network of machines at once, so that changes in config rapidly deploy to the infrastructure.
 
@@ -33,43 +33,43 @@ As with everything, there is more than one way to do it.  If you don't know what
 Note!  The workflow below only works on the master branch
 
 1. terraform apply
-1. hack; hack; hack
-1. ```git add; git commit```
-1. ```git push homebase-xxx:/var/lib/git/infra```
-1. ????
-1. ```git push origin master```
-1. Profit!!
+2. hack; hack; hack
+3. ```git add; git commit```
+4. ```git push homebase-xxx:/var/lib/git/infra```
+5. ????
+6. ```git push origin master```
+7. Profit!!
 
 ## Hard Mode
 
 This lets you play with changes in master on homebase, then pretty it
-up in a branch on your machine prior to pushing to github.
+up in a branch on your machine prior to pushing to GitHub.
 
 1. terraform apply
-1. ssh into homebase
-1. ```git clone /var/lib/git/infra```
-1. ```cd infra```
-1. ```BASELINE=$(git rev-parse HEAD)```
-1. hack; hack; hack
-1. ```git add; git commit```
-1. ```git push```
-1. ```git format-patch $BASELINE```
-1. ```scp 'homebase-xxx:infra/*patch' .```
-1. ```git checkout -b topic```
-1. ```git am < *.patch```
-1. rebase; rebase; rebase
-1. ```git checkout master```
-1. ```git merge topic```
-1. ```git push origin master```
-1. ????
-1. Profit!
+2. ssh into homebase
+3. ```git clone /var/lib/git/infra```
+4. ```cd infra```
+5. ```BASELINE=$(git rev-parse HEAD)```
+6. hack; hack; hack
+7. ```git add; git commit```
+8. ```git push```
+9. ```git format-patch $BASELINE```
+10. ```scp 'homebase-xxx:infra/*patch' .```
+11. ```git checkout -b topic```
+12. ```git am < *.patch```
+13. rebase; rebase; rebase
+14. ```git checkout master```
+15. ```git merge topic```
+16. ```git push origin master```
+17. ????
+18. Profit!
 
 # Puppet Modules for Infra
 
-## Backflips
+## Back-flips
 
-This module sets up the infrastructure to use "ssh backflips" A
-backflip is where the victim ssh's back to the attacker with a remote
+This module sets up the infrastructure to use "ssh back-flips" A
+back-flip is where the victim will ssh back to the attacker with a remote
 port forward back to the victim's ssh port. This enables the attacker
 to ssh directly back into the victim to get a shell as well as set up
 a SOCKS5 proxy into the victim network.
@@ -81,25 +81,25 @@ Uses `tidy` to eliminate large stashes of logs such as those found in /var/cache
 ## cobaltstrike
 
 1. Add a teamserver password in the `PASSWORD` field in `modules/cobaltstrike/files/teamserver.sh`
-1. Change the Malleable C2 Profile you want to use in `modules/cobaltstrike/files/teamserver.sh`. Profiles are located in `/opt/malleable/`
-1. When connecting to Cobalt Strike on AWS you can connect with an SSH LocalForward from the ssh-config output. `ssh -f -N vm-vpc'
+2. Change the Malleable C2 Profile you want to use in `modules/cobaltstrike/files/teamserver.sh`. Profiles are located in `/opt/malleable/`
+3. When connecting to Cobalt Strike on AWS you can connect with an SSH LocalForward from the ssh-config output. `ssh -f -N vm-vpc'
 
 Our infra supports both "staged" and "stageless" beacons. To do either of the following:
 
 1. Create a listener by setting the "Host" field to one of your external proxy IP addresses. Note: This restricts us to only being able to use one proxy for our teamserver due to Mudge not supporting n+1 currently. We will do this to support staged beaconing.
-1. Stageless: Simply create a stageless executable. Ignore the proxy settings.
-1. Staged: Simply create an artifact beacon
+2. Stageless: Simply create a stageless executable. Ignore the proxy settings.
+3. Staged: Simply create an artifact beacon
 
 If you want to only use staged beacons to support N+1 proxies. This method will NOT support staged beacons/
 
 1. Create a listener by setting the "host" field to the team server IP address and add the proxy IPs as the external beacons.
-1. Create a stageless beacon with a Proxy of one of the AWS IPS. For example `http://AWS-IP:80` in the stageless beacon configuration.
+2. Create a stageless beacon with a Proxy of one of the AWS IPS. For example `http://AWS-IP:80` in the stageless beacon configuration.
 
-Cobalt Strike also contains a `c2-monitor.cna` aggressor script that runs as a headless script to provide the ELK instance with beacon information useful for alerting. This script will keep track of cobalt strike beacons and will alert an operator when they timeout or don't phone back within a certain threshold. It will also keep track of beacon state if the team server is restarted.
+Cobalt Strike also contains a `c2-monitor.cna` aggressor script that runs as a headless script to provide the ELK instance with beacon information useful for alerting. This script will keep track of cobalt strike beacons and will alert an operator when they time out or don't phone back within a certain threshold. It will also keep track of beacon state if the team server is restarted.
 
 ## Dante
 
-[Dante](https://www.inet.no/dante/) is a SOCKS5 server running on the proxies. It is configured to listen on port 1080 on the internal network. You can use it for command line tools that don't have explicity socks support by crafting a proxychains.conf similar to below.
+[Dante](https://www.inet.no/dante/) is a SOCKS5 server running on the proxies. It is configured to listen on port 1080 on the internal network. You can use it for command line tools that don't have explicitly socks support by crafting a proxychains.conf similar to below.
 
 ```
 strict_chain
@@ -172,7 +172,7 @@ A small collection of packages that are useful for homebase operations.
   127.0.0.1 asciinema.org
   ```
 
-  * asciinema is blackholed to prevent accidental asciinema upload mistakes
+  * asciinema is black-holed to prevent accidental asciinema upload mistakes
 
 ## Hostsexternal, internal and hb
 
@@ -185,7 +185,7 @@ IRC default listens on port 6667. A sed command is used to ensure s.bind() is on
 
 ## Logstashconfig
 
-Applied to all instances so they know how to ship logs to the ELK instance.
+Applied to all instances, so they know how to ship logs to the ELK instance.
 
 Logging is being done with an elastic stack running on elk-vpc. This is
 provisioned in two ways. Because we aren't using puppet librarian we needed
@@ -198,14 +198,14 @@ Contains files that tell instances which files to pipe through logstash.
 
 ## Loot
 
-Creates `/loot` to store loot. We need a more secure way to handle loot and it is a change inbound.
+Creates `/loot` to store loot. We need a more secure way to handle loot, and it is a change inbound.
 
 ## Mod Rewrite
 
 This module is used on the proxies to perform a mod_rewrite on apache to redirect CobaltStrike C2 traffic back to homebase.
 This module requires a Malleable C2 profile and a redirection URL for invalid C2 URI's.
 
-Currently this module only supports the amazon C2 profile. Work is in progress to automate the C2 modrewriter.
+Currently, this module only supports the amazon C2 profile. Work is in progress to automate the C2 modrewriter.
 
 ## Mollyguard
 
@@ -217,7 +217,7 @@ This module will create rules to alert on within the ELK instance using elastale
 
 `C2Dead.yaml` will alert an operator when a beacon exceeds a threshold as defined in the cobaltstrike file `c2-monitor.cna`.
 
-`C2Compromised.yaml` will alert an operator when a proxy server (hosting your domain / first entry point to C2) is hit by your organizations IP space without a successful htaccess redirect. This is a pretty sure sign that your blue team has hunted you down and you need to be ready to move proxies or get a game plan going!
+`C2Compromised.yaml` will alert an operator when a proxy server (hosting your domain / first entry point to C2) is hit by your organizations IP space without a successful htaccess redirect. This is a pretty sure sign that your blue team has hunted you down, and you need to be ready to move proxies or get a game plan going!
 
 To configure C2Compromised to alert on IPs hitting you, reference your external OUTBOUND IPs as defined from the README in `external`.
 
@@ -240,7 +240,7 @@ You'll also need to add auth for AWS SMS if you go this route in `puppet/modules
 
 ## Natlas
 
-Natlas will spin up an [natlas instance](https://github.com/natlas/natlas) for port scanning. It includes an nmap-agent and an natlas systemd service.
+Natlas will spin up a [natlas instance](https://github.com/natlas/natlas) for port scanning. It includes a nmap-agent and a natlas systemd service.
 
 There are two modules, one for the server and one for the agent in `natlasserver` and `natlasagent`
 
@@ -254,24 +254,24 @@ Ensures `nfs-common` is installed. Configures `/etc/fstab` to connect to homebas
 
 ## Nmap
 
-Bootstraps the installation of `nmap 7.60` becuase at the time our instances did not automatically install it.
+Bootstraps the installation of `nmap 7.60` because at the time our instances did not automatically install it.
 
 ## Open Resty
 
-Installs Open Resty to proxies so we can use nginx with Proxy Protocol, as well as all of the extendable features Open Resty provides
+Installs Open Resty to proxies, so we can use nginx with Proxy Protocol, as well as all the extendable features Open Resty provides
 
 ## OPSEC
 
 Homebase has a set of iptables rules to prevent new outbound
 connections to <victim.target> DMZ IP space.  This is designed to prevent an
 opsec mistake of running an exploit or scan from homebase.  Users
-should instead use one of the proxy boxes for attack traffice.
+should instead use one of the proxy boxes for attack traffic.
 
-The IPs in this module should all of the CIDR ranges your company uses. Consult an ASN record or your companies internal documentation for this information.
+The IPs in this module should be all the CIDR ranges your company uses. Consult an ASN record or your companies internal documentation for this information.
 
 ## PCV
 
-This module will bring up the PCV C2 server, web interface and spawn approiate listeners.
+This module will bring up the PCV C2 server, web interface and spawn appropriate listeners.
 
 ## Proxytools
 
@@ -285,7 +285,7 @@ Provisions OPSEC firewall rules for sketch instances. Ensures that only the midd
 
 The idea behind this module is to manage user creation/deactivation
 cleanly and repeatably. The ssh keys and user identities are stored in
-an internal github project.  This basically means that we have a VM on
+an internal GitHub project.  This basically means that we have a VM on
 an internal resource that pushes to homebase every time something is pushed to the
 ssh keys repo on github.com/redteaminfra/redteam-ssh
 

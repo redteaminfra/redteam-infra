@@ -1,6 +1,6 @@
 # AWS
 
-This document will serve as a stepping stone to setup and deploy redteam-infra inside of AWS in a detailed manner.
+This document will serve as a stepping stone to set up and deploy redteam-infra inside of AWS in a detailed manner.
 
 [How to start](https://github.com/redteaminfra/redteam-infra/tree/master/external/aws#how-to-start) currently solves as a beginning reference, but it is by no means complete or detailed enough to get running quickly.
 
@@ -12,7 +12,7 @@ This document will serve as a stepping stone to setup and deploy redteam-infra i
 
 ## Keypairs
 
-The first thing you'll need to do is setup IAM in AWS and generate an EC2 keypair.
+The first thing you'll need to do is set up IAM in AWS and generate an EC2 keypair.
 
 Our infra works in US-WEST so set your region to that!
 
@@ -34,7 +34,7 @@ export AWS_KEYPATH="~/.aws/PRIVATEKEY.pem"
 ```
 From there run `source ~/.aws/awssetup.sh` before doing any deployments.
 
-You also need to setup your AWS credentials in `~/.aws/credentials`
+You also need to set up your AWS credentials in `~/.aws/credentials`
 
 ```
 [default]
@@ -58,10 +58,10 @@ We'll just use the open source implementation for this walkthrough, but you'll w
 Ideally you'd do the following
 
 1. git clone https://github.com/redteaminfra/redteam-infra <OPNAME>
-1. Make a new repo in RedTeamInfra called <OPNAME>
-1. git remote rm origin
-1. git remote add origin git@github.com:redteaminfra/<OPNAME>
-1. git push origin master
+2. Make a new repo in RedTeamInfra called <OPNAME>
+3. git remote rm origin
+4. git remote add origin git@github.com:redteaminfra/<OPNAME>
+5. git push origin master
 
 For now, we will just `git clone https://github.com/redteaminfra/redteam-infra redteam-infra-demo`
 
@@ -82,7 +82,7 @@ Resolving deltas: 100% (71/71), done.
 
 The infra repo makes use of submodules for SSH from [redteam-ssh](https://github.com/redteaminfra/redteam-ssh).
 
-We need to setup a submodule to handle SSH access and add some keys to `users.json`
+We need to set up a submodule to handle SSH access and add some keys to `users.json`
 
 Assuming this is the first time setting this up, let's go do that.
 
@@ -144,7 +144,7 @@ We now need to make this a submodule for our infra repo
 
 You'll want to push and apply those changes as well.
 
-Now you have a ssh key repo setup for your team! Next time you clone off of or fork your master infra repo you can just run
+Now you have an ssh key repo setup for your team! Next time you clone off of or fork your master infra repo you can just run
 
 
 ```
@@ -162,7 +162,7 @@ You will need to configure a few select things in order to spin up homebase
 
 We've already done the above!
 
-2. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. and uncomment out `#include cobaltstrike` in the homebase site.pp. You will also want to throw your license `touch external/global/host-share/.cobaltstrike.licence`
+1. If using cobalt strike, plop a tarball into the puppet module in `puppet/modules/cobaltstrike/files/cobaltstrike.tgz`. and uncomment out `#include cobaltstrike` in the homebase site.pp. You will also want to throw your license `touch external/global/host-share/.cobaltstrike.licence`
 
 Let's just get a trial for cobalt strike for this demo and put a fake licence fill into that file location. If you are not using cobalt strike just remove the `cobaltstrike` module from the homebase `site.pp` in `external/aws/op/homebase/puppet/manifests/site.pp`.
 
@@ -180,7 +180,7 @@ We also want to just touch the license so terraform succeeds
 
 For this you will need to consult your organization. Exercise up to the reader! For this demo, we will assume our organization uses an OUTBOUND proxy via 10.10.10.10/32
 
-4. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that your organization owns. These are to prevent OPSEC mistakes from homebase.
+1. Fill out the CIDRs in `puppet/modules/opsec/files/99-opsec` that your organization owns. These are to prevent OPSEC mistakes from homebase.
 
 For this you will need to consult your organization. Exercise up to the reader! For this demo, we will assume our organization uses the following IPs as their public IP space
 
@@ -192,13 +192,13 @@ CIDRS="10.10.10.10/32
 10.10.9.0/24"
 ```
 
-5. Add auth for AWS SMS to `puppet/modules/monitoring/files/authFile.yaml`
+1. Add auth for AWS SMS to `puppet/modules/monitoring/files/authFile.yaml`
 
 We will skip this step for now
 
 1. Add OUTBOUND company traffic IPs to `puppet/modules/monitoring/files/C2Compromised.yaml`
 
-We will skip the following, but you'd use the IPs from step 3 into the above file so it looks like the [following](https://github.com/redteaminfra/redteam-infra/tree/master/puppet#monitoring)
+We will skip the following, but you'd use the IPs from step 3 into the above file, so it looks like the [following](https://github.com/redteaminfra/redteam-infra/tree/master/puppet#monitoring)
 
 1. Add public keys to `external/sketch/provision.sh` inside the `authorized_keys` blob for users you want to access the redirector instances.
 
@@ -210,10 +210,10 @@ AAAAB3NzaC1yc2EAAAADAQABAAACAQDtTFoNSwWK+zvTUvFlz1P/CeHIP0IK32Yp9tHok3Z1HL6a1YM5
 EOF
 ```
 
-We'll skip this for now as we use sketch on zero trust proxies. Consult the [README](https://github.com/redteaminfra/redteam-infra/blob/master/external/sketch/README.md) for now
+We'll skip this for now as we use Sketch on zero trust proxies. Consult the [README](https://github.com/redteaminfra/redteam-infra/blob/master/external/sketch/README.md) for now
 
 
-You will also need to setup a `variables.tfvars` file in external/aws/veriables.tfvars
+You will also need to set up a `variables.tfvars` file in external/aws/variables.tfvars
 
 ```
 key_name = "<Location of your key ie ~/.ssh/deploy. Note; this cannot be a password protected key>"
@@ -262,4 +262,4 @@ Host natlas-demo
 
 ## Hack the Planet
 
-SSH to `homebase-demo` and run `setup-xfc4-vnc` to get everything setup for the enviornment! Now you are good to go in AWS!
+SSH to `homebase-demo` and run `setup-xfc4-vnc` to get everything setup for the environment! Now you are good to go in AWS!

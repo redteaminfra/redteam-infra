@@ -30,21 +30,21 @@ The repo is public https://github.com/redteaminfra/redteam-ssh
 ### New User
 
 1. ssh-keygen –b 4096
-1. Git clone https://github.com/redteaminfra/redteam-ssh
-1. Cd sshkeys
-1. user_tool.py -j users.json add -u '<YOUR USERNAME>' -n '<YOUR NAME>' -k <PATH OF PUBLIC KEY> -t volunteer
-1. Git add users.json
-1. Git commit –m “Adding <YOUR NAME>”
-1. Git push origin master
+2. Git clone https://github.com/redteaminfra/redteam-ssh
+3. Cd sshkeys
+4. user_tool.py -j users.json add -u '<YOUR USERNAME>' -n '<YOUR NAME>' -k <PATH OF PUBLIC KEY> -t volunteer
+5. Git add users.json
+6. Git commit –m “Adding <YOUR NAME>”
+7. Git push origin master
 
 ### Forgotten Key / Adjustments to Keys
 
 Did you forget your ssh keypair or lose your private key? Read the users.json file to find the UID associated with your username.
 
 1. `ssh-keygen –b 4096`
-1. Git clone https://github.com/redteaminfra/redteam-ssh
-1. Cd sshkeys
-1. user_tool.py mod -j <json_file> --uid <uid> [-n <name>] [-u <username>] [-k <PATH OF PUBLIC KEY>] -t volunteer
+2. Git clone https://github.com/redteaminfra/redteam-ssh
+3. Cd sshkeys
+4. user_tool.py mod -j <json_file> --uid <uid> [-n <name>] [-u <username>] [-k <PATH OF PUBLIC KEY>] -t volunteer
 
 Adjust as needed depending on what you want to modify. You always use the uid of your user.
 
@@ -242,4 +242,4 @@ Irssi
 
 ### First connect
 
-Anytime you connec to a new homebase you must run `setup-xfce4-vnc`
+Anytime you connect to a new homebase you must run `setup-xfce4-vnc`
