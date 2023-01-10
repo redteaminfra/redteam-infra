@@ -1,6 +1,10 @@
 #!/bin/bash -x -e
+# Copyright (c) 2023, Oracle and/or its affiliates.
 
 export DEBIAN_FRONTEND=noninteractive
+
+### Use newer apt configuration to wait for apt lock
+echo "DPkg::Lock::Timeout \"300\";" > /etc/apt/apt.conf.d/00apt-lock
 
 ### Attempt to prevent apt-lock later
 apt-get -qq update
@@ -11,12 +15,18 @@ unattended-upgrade
 
 ### user setup
 ### Do this early in the setup process so you can get into the box to debug install errors
-apt-get -qq -y install python-minimal
-bash -c "cd /tmp/host-share/sshkeys/ && python ./user_tool.py apply -j users.json -t core -t infra"
+apt-get -qq -y install python2.7-minimal curl
+bash -c "cd /tmp/host-share/sshkeys/ && chmod +x *.py && python3 ./user_tool.py apply -j users.json -t core"
 
 ### Install java
 apt -y -qq install -f
 apt -y -qq install openjdk-8-jre-headless
+
+### Setup GPG Key for logstash
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+apt-get install apt-transport-https
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" > /etc/apt/sources.list.d/elastic-6.x.list
+apt-get update
 
 ### Install puppet
 if ! grep -q Kali /etc/os-release; then
@@ -33,26 +43,20 @@ if [ ! -d /etc/puppet/modules ]; then
 fi
 
 ### Install puppet modules
-### Versions are hardcoded as a result of installation errors
-### Versions came from https://forge.puppet.com/elastic and https://forge.puppet.com/puppetlabs
-puppet module install puppetlabs-apt --version 4.3.0 --modulepath /etc/puppet/modules
 
-### Install puppet tools for elk
-if grep -q elk /etc/hostname; then
-    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.15.deb -O /tmp/elasticsearch.deb
-    dpkg -i /tmp/elasticsearch.deb
-    apt -y install -f
-    ### Super gross fix to get us to 5.4.3 of elastic-elasticsearch
-    ### Cannot install older version first
-    ### Causes dependancy problems
-    ### TODO: Fix this
-    #puppet module install elastic-elasticsearch  --modulepath /etc/puppet/modules
-    puppet module install elastic-elasticsearch --version 5.4.3 --modulepath /etc/puppet/modules --force
-    #puppet module install elastic-kibana --modulepath /etc/puppet/modules
-    puppet module install elastic-kibana  --version 5.1.0 --modulepath /etc/puppet/modules --force
+#### Install golang and docker on homebase
+if grep -q homebase /etc/hostname; then
+    puppet module install dcoxall-golang --modulepath /etc/puppet/modules
+    puppet module install puppetlabs-docker --modulepath /etc/puppet/modules
 fi
 
-puppet module install elastic-logstash --version 5.1.0 --modulepath /etc/puppet/modules
+#### Install docker on elk
+if grep -q elk /etc/hostname; then
+    puppet module install puppetlabs-docker --modulepath /etc/puppet/modules
+fi
+
+##### Install puppetlabs apt module
+puppet module install puppetlabs-apt --modulepath /etc/puppet/modules
 
 ### fix base image provision
 regex="(ubuntu|ec2-user):x:.*"
@@ -70,13 +74,11 @@ Unattended-Upgrade::Origins-Pattern {
 EOF
 fi
 
-### disable ipv6
-cat <<EOF >> /etc/sysctl.conf
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
+### Disable IPV6 for reals
+cat << EOF >> /etc/default/grub.d/99-disable-ipv6.cfg
+GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
 EOF
-sysctl -p
+update-grub
 
 ### ssh fixes
 sed -i -e 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config

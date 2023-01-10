@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class cobaltstrike::config {
 
     file { "/opt/cobaltstrike.tgz":
@@ -120,6 +122,7 @@ class cobaltstrike::config {
     exec { "reload-systemd-cobalt":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable cobaltstrike.service && /bin/systemctl start cobaltstrike.service",
         require => File["/etc/systemd/system/cobaltstrike.service"],
+        refreshonly => true,
     }
 
     exec { "extract_artifact":
@@ -155,6 +158,7 @@ class cobaltstrike::config {
     exec { "reload-systemd-ircbot":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable ircbot.service && /bin/systemctl start ircbot.service",
         require => File["/etc/systemd/system/ircbot.service"],
+        refreshonly => true,
     }
 
     file { "/etc/systemd/system/c2monitor.service":
@@ -170,5 +174,6 @@ class cobaltstrike::config {
     exec { "reload-systemd-c2monitor":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable c2monitor.service && /bin/systemctl start c2monitor.service",
         require => File["/etc/systemd/system/c2monitor.service"],
+        refreshonly => true,
     }
 }

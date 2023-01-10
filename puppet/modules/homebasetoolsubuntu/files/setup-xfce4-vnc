@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 
 if [[ "$EUID" -eq 0 ]]; then
   echo -e "Sorry, you cannot run this as root \n"
@@ -26,44 +28,9 @@ EOF
     chmod 600 ~/.vnc/passwd
 fi
 
-sudo cp -R /opt/cobaltstrike $HOME
-sudo chown -R $(whoami):$(whoami) $HOME/cobaltstrike
-sudo cp -v /root/.cobaltstrike.license $HOME
-sudo chown $(whoami):$(whoami) $HOME/.cobaltstrike.license
-
-# avoid pounding CS servers
-
-sleep 0.$[ ( $RANDOM % 100 )]s # lousy toctou prevention
-
-while [ -f /tmp/update_lock ]; do
-    echo "."
-    sleep 5s
-done
-
-touch /tmp/update_lock
-timeout --foreground 5m bash -c "cd ~/cobaltstrike/ && ./update.sh"
-rm /tmp/update_lock
-
-# Fix for Issue 28
-sed -i 's/-jar/-Xmx4096m -Xms4096m -jar/g' $HOME/cobaltstrike/cobaltstrike
-
-if [ ! -d ~/Desktop ] ; then
-    mkdir ~/Desktop
-fi
-
-if [ ! -f ~/Desktop/cobalt.desktop ]; then
-    cat <<EOF > ~/Desktop/cobalt.desktop
-[Desktop Entry]
-
-Type=Application
-Version=1.0
-Name=cobalt strike
-Icon=cobalt-strike.png
-Exec=bash -c "cd $HOME/cobaltstrike && ./cobaltstrike"
-EOF
-    chmod 755 ~/Desktop/cobalt.desktop
-fi
-
+# disable your screensaver
+cp /usr/local/lib/dot_screensaver ~/.xscreensaver
+chown $(whoami):$(whoami) ~/.xscreensaver
 
 VNCNUMBER=$(($(id -u) - 6000 + 1))
 PIDFILE="$HOME/.vnc/$(hostname):$VNCNUMBER.pid"
@@ -88,7 +55,7 @@ tcp_read_time_out 15000
 tcp_connect_time_out 8000
 
 [ProxyList]
-socks5  192.168.1.11 1080
+socks5  192.168.2.11 1080
 EOF
 fi
 
@@ -101,6 +68,6 @@ tcp_read_time_out 15000
 tcp_connect_time_out 8000
 
 [ProxyList]
-socks5  192.168.1.12 1080
+socks5  192.168.2.12 1080
 EOF
 fi

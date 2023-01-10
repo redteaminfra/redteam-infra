@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class yama {
 
   file { "/etc/sysctl.d/99-kill-ptrace.conf":
@@ -11,7 +13,8 @@ class yama {
   }
 
   exec { "sysctl":
-    command => "/sbin/sysctl -q --system"
+    command => "/sbin/sysctl -q --system",
+    refreshonly => true,
   }
 
 }

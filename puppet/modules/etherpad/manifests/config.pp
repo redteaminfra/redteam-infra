@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class etherpad::config {
 
     user { 'etherpad':
@@ -9,7 +11,7 @@ class etherpad::config {
     }
 
     exec { "install_nodejs":
-        command => "/usr/bin/curl -sL https://deb.nodesource.com/setup_8.x | /bin/bash - && /usr/bin/apt install -y nodejs",
+        command => "/usr/bin/curl -sL https://deb.nodesource.com/setup_13.x  | /bin/bash - && /usr/bin/apt install -y nodejs",
         notify => Exec["clone_etherpad"],
      }
 
@@ -31,5 +33,6 @@ class etherpad::config {
 
     exec { "reload-systemd-etherpad":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable etherpad.service && /bin/systemctl start etherpad.service",
+        refreshonly => true,
     }
 }

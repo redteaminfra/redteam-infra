@@ -238,7 +238,7 @@ Host homebase-demo
      LocalForward 50050 127.0.0.1:50050
      LocalForward 5000 192.168.1.14:80
      LocalForward 9001 127.0.0.1:9001
-     ##Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshKeys users.json
+     ##Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshkeys users.json
      #Your port number is (5900 + (UID - 6000) + 1)
      #LocalForward 5901 127.0.0.1:59xx
 

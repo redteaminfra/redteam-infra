@@ -68,7 +68,15 @@ up in a branch on your machine prior to pushing to github.
 
 ## Backflips
 
-TODO
+This module sets up the infrastructure to use "ssh backflips" A
+backflip is where the victim ssh's back to the attacker with a remote
+port forward back to the victim's ssh port. This enables the attacker
+to ssh directly back into the victim to get a shell as well as set up
+a SOCKS5 proxy into the victim network.
+
+## Cleanup
+
+Uses `tidy` to eliminate large stashes of logs such as those found in /var/cache/puppet/report.
 
 ## cobaltstrike
 
@@ -91,19 +99,24 @@ Cobalt Strike also contains a `c2-monitor.cna` aggressor script that runs as a h
 
 ## Dante
 
-TODO
+[Dante](https://www.inet.no/dante/) is a SOCKS5 server running on the proxies. It is configured to listen on port 1080 on the internal network. You can use it for command line tools that don't have explicity socks support by crafting a proxychains.conf similar to below.
 
-## ELK
+```
+strict_chain
+proxy_dns
+tcp_read_time_out 15000
+tcp_connect_time_out 8000
 
-Contains files that tell instances which files to pipe through logstash.
+[ProxyList]
+socks5  192.168.2.11 1080
+EOF
+```
 
-`ls.conf` is currently used for elk, natlas and homebase
+You would then invoke CLI tool as `proxychains <cli tool>` to proxy through the socks server
 
-`proxy.conf` is currently used for the proxies.
+## Elastickibana
 
-Consult any `site.pp` for information on how to apply these.
-
-This module relies on `logstash`
+Installs Elasticsearch and Kibana on the ELK instance with a docker-compose file.
 
 ## Etherpad
 
@@ -136,6 +149,10 @@ push to the repo and changes are automatically applied.
 
 Homebase runs a git-daemon that other machines can periodically pull
 from and apply in a similar way.
+
+## gophish
+
+Sets up gophish listening on 3333 and 443 with a snakeoil cert
 
 ## Homebase tools
 
@@ -177,7 +194,7 @@ in the shell provisioner stage and then utilized in the site manifests.
 ELK server will have Kibana and Elastic while all other machines in the VPC
 ship logs to it with logstash.
 
-This module relies on `elk`
+Contains files that tell instances which files to pipe through logstash.
 
 ## Loot
 
@@ -227,9 +244,21 @@ Natlas will spin up an [natlas instance](https://github.com/natlas/natlas) for p
 
 There are two modules, one for the server and one for the agent in `natlasserver` and `natlasagent`
 
+## nfsserver
+
+Installs `nfs-kernel-server`. Configures an NFS share (`/dropbox` on homebase) available to the 192.168.2.0/24 subnet. Sets the user/group of the `/dropbox` folder to `nobody:redteam` and the permissions to `770`.
+
+## nfsclient
+
+Ensures `nfs-common` is installed. Configures `/etc/fstab` to connect to homebase and mounts `/dropbox` on client hosts (proxy servers by default).
+
 ## Nmap
 
 Bootstraps the installation of `nmap 7.60` becuase at the time our instances did not automatically install it.
+
+## Open Resty
+
+Installs Open Resty to proxies so we can use nginx with Proxy Protocol, as well as all of the extendable features Open Resty provides
 
 ## OPSEC
 
@@ -240,9 +269,17 @@ should instead use one of the proxy boxes for attack traffice.
 
 The IPs in this module should all of the CIDR ranges your company uses. Consult an ASN record or your companies internal documentation for this information.
 
+## PCV
+
+This module will bring up the PCV C2 server, web interface and spawn approiate listeners.
+
 ## Proxytools
 
 A variety of tools installed on the proxies.
+
+## sketchopsec
+
+Provisions OPSEC firewall rules for sketch instances. Ensures that only the middle sketch boxes can be reached from proxies, and blocks all connections to edges.
 
 ## ssh
 
@@ -303,6 +340,10 @@ applies the changes.
 * User changing keys
 * User changing name
 
+## sshproxy
+
+Allows for local port forwarding across sketch infrastructure such that a remote SSH connection can be used as a proxy.
+
 ## Tinyproxy
 
 Installs [tinyproxy](https://tinyproxy.github.io/) on the proxies.  This is a very simple http proxy that allows 192.168.0.0/16 to use it.  All ports are available for CONNECT, so you can effectively use this as an arbitrary tcp proxy.  Using depends on application, but in general, environment variables will do for most tools:
@@ -320,6 +361,10 @@ Manages a file that ought to keep unattended upgrades working and installs the p
 ## Volunteer SSH
 
 Allows SSH keys with the volunteer tag to SSH to this instance. Consult [RedTeam-ssh](https://github.com/redteaminfra/redteam-ssh) for more detail on tags.
+
+## waybackdownloader
+
+Installs the wayback\_machine\_downloader gem
 
 ## Yama
 

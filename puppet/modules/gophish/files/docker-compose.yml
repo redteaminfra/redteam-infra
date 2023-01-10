@@ -1,0 +1,16 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
+version: '2'
+services:
+  gophish:
+    image: gophish/gophish
+    ports:
+      - "3333:3333"
+      - "443:8443"
+    volumes:
+     - /opt/gophish/keys:/opt/gophish/keys
+     - /opt/gophish/database:/opt/gophish/database
+     - /opt/gophish/static/endpoint:/opt/gophish/static/endpoint
+     - /opt/gophish/logs:/opt/gophish/logs
+     - /opt/gophish/config.json:/opt/gophish/config.json
+    restart: always

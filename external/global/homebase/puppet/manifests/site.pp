@@ -1,3 +1,7 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
+# DO NOT INCLUDE UNATTENDED UPGRADES
+# You do not want homebase to reboot during an operation due to upgrades
 node "default" {
     include 'hostsexternal'
     include 'gitserver'
@@ -6,27 +10,27 @@ node "default" {
     include 'loot'
     include 'ssh'
     include 'volunteerssh'
-    include 'irc'
+    include 'basetools'
     # Ubuntu or Kali as base? Use homebasetoolsubuntu for ubuntu or homebasetoolskali for Kali
     include 'homebasetoolsubuntu'
-    include 'etherpad'
     include 'yama'
     include 'mollyguard'
+    include 'cleanup'
+    include 'cloudagent'
+    include 'sketchopsec'
+    include 'logstashconfig'
+    include 'nfsserver'
 
     package { ['openjdk-8-jre-headless']:
-        ensure => 'installed',
-        notify => Class['logstash']
     }
 
-    class { 'logstash':
-     logstash_group => "adm",
+    class { 'golang':
+      version => '1.17',
     }
 
-    logstash::configfile { 'inputs':
-      source => "puppet:///modules/elk/ls.conf",
-    }
+    include 'docker'
 
-    include 'logstashconfig'
-#    include 'cobaltstrike'
+    class { 'docker::compose':
+    }
 
 }

@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class irc::config {
 
     exec { 'clone_irc':
@@ -36,6 +38,7 @@ class irc::config {
 
     exec { "reload-systemd-irc":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable irc.service && /bin/systemctl start irc.service",
+        refreshonly => true,
     }
 
 }

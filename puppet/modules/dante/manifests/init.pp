@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class dante {
     package { ['dante-server']:
         ensure => 'installed',
@@ -9,7 +11,7 @@ class dante {
         owner => 'root',
         mode => '644',
         ensure => present,
-        source => 'puppet:///modules/dante/danted.conf',
+        content => template('dante/danted.conf.erb'),
         require => Package['dante-server']
     }
 

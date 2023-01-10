@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class natlasserver::config {
 
     exec { 'download-natlas-server':
@@ -49,6 +51,7 @@ class natlasserver::config {
 
     exec { "reload-systemd":
         command => "/bin/systemctl daemon-reload && /bin/systemctl enable natlas.service && /bin/systemctl start natlas.service",
+        refreshonly => true,
     }
 
     file { "/etc/nginx/sites-available/natlas":
@@ -72,6 +75,7 @@ class natlasserver::config {
 
     exec { "nginx-start":
         command => "/bin/systemctl reload nginx.service && /bin/systemctl enable nginx.service && /bin/systemctl start nginx.service",
+        refreshonly => true,
     }
 
 }

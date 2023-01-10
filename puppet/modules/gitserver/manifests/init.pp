@@ -1,8 +1,10 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class gitserver {
 
     $gitdir = '/var/lib/git'
     $gitinfrarepo = "${gitdir}/infra"
-    $gitsshrepo = "${gitdir}/sshKeys"
+    $gitsshrepo = "${gitdir}/sshkeys"
 
     package { ['git']:
         ensure => 'installed',
@@ -94,7 +96,7 @@ class gitserver {
     }
 
     exec { 'unpack':
-        command => "bash -c \"cd $(mktemp -d); tar xavf /tmp/host-share/bootstrap-puppet.tgz; git push ${gitinfrarepo} master\"",
+        command => "bash -c \"cd $(mktemp -d); tar --no-same-owner -xavf /tmp/host-share/bootstrap-puppet.tgz; git push ${gitinfrarepo} master\"",
         user => 'root',
         group => 'infra',
         path => ['/bin', '/usr/bin/'],

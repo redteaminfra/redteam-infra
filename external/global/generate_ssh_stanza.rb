@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# Copyright (c) 2023, Oracle and/or its affiliates.
 
 require 'optparse'
 
@@ -26,33 +27,28 @@ stanza =
 <<SSH
 Host homebase-#{opname}
      Hostname #{homebase_ip}
-     User <SSH_USER>
-     IdentityFile ~/.ssh/id_rsa
-     #Uncomment AddressFamily if you have WSL errors to force ipv4
-     #AddressFamily inet
-     LocalForward 50050 127.0.0.1:50050
-     LocalForward 5000 192.168.2.14:5000
-     LocalForward 9001 127.0.0.1:9001
-     ##Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshKeys users.json
-     #Your port number is (5900 + (UID - 6000) + 1)
-     #LocalForward 5901 127.0.0.1:59xx
+     # Uncomment AddressFamily if you have WSL errors to force ipv4
+     ## AddressFamily inet
+     # Etherpad
+     ## LocalForward 9001 127.0.0.1:9001
+     # Mythic
+     LocalForward 7443 127.0.0.1:7443
+     # Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshkeys users.json
+     ## Your port number is (5900 + (UID - 6000) + 1)
+     ## LocalForward 5901 127.0.0.1:59xx
 
 Host proxy01-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
+    Hostname proxy01-#{opname}.infra.redteam
+    ProxyJump homebase-#{opname}
 
 Host proxy02-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
+    Hostname proxy02-#{opname}.infra.redteam
+    ProxyJump homebase-#{opname}
 
 Host elk-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
+     Hostname elk-#{opname}.infra.redteam
+     ProxyJump homebase-#{opname}
      LocalForward 5601 192.168.1.13:5601
-
-Host natlas-#{opname}
-     Proxycommand ssh homebase-#{opname} nc -q0 %h.infra.redteam %p
-     User <SSH_USER>
 SSH
 
 stanzafile = "homebase-#{opname}"

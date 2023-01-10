@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 node "default" {
     include 'hostsexternal'
     include 'gitpuppet'
@@ -5,46 +7,18 @@ node "default" {
     include 'unattendedupgrades'
     include 'yama'
     include 'mollyguard'
-  #  include 'monitoring'
+    include 'basetools'
+  # include 'monitoring'
+    include 'cleanup'
+    include 'cloudagent'
+    include 'sketchopsec'
+    include 'logstashconfig'
 
-# ELK Setup
-#  package { ['openjdk-8-jre-headless']:
-#    ensure => 'installed',
-#    notify => Class['elasticsearch']
-#  }
+    include 'docker'
 
-#  class { 'elasticsearch':
-#    restart_on_change => true,
-#    repo_version => '5.x',
-#    manage_repo => true,
-#    require => Package['openjdk-8-jre-headless']
-#  }
-
-#   elasticsearch::instance { 'es-01':
-#    config => {
-#      'network.host' => 'elk.infra.redteam',
-#    }
-#  }
-
-  class { 'logstash':
-    logstash_group  => 'adm',
-    settings => {
-      'http.host' => 'elk.infra.redteam',
+    class { 'docker::compose':
     }
-  }
 
-  logstash::configfile { 'inputs':
-    source => "puppet:///modules/elk/ls.conf",
-  }
+    include 'elastickibana'
 
-  class { 'kibana' :
-    config => {
-      'server.host'       => 'elk.infra.redteam',
-      'server.port'       => '5601',
-      'elasticsearch.url' => 'http://localhost:9200',
-    }
-  }
-
-  include 'logstashconfig'
-  include 'elkconfig'
 }

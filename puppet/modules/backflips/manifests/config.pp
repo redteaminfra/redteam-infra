@@ -1,33 +1,48 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class backflips::config {
 
     $backflip_dirs = [ "/opt/backflips",
                        "/opt/backflips/etc",
-                       "/opt/backflips/etc/ssh",
-                       "/opt/backflips/keys" ]
+                       "/opt/backflips/keys",
+                       "/opt/backflips/osx-ssh-backflip",
+                       "/opt/backflips/linux-ssh-backflip"]
 
     file { $backflip_dirs:
         owner => 'root',
-        group => 'root',
+        group => 'flip',
         mode => '755',
         ensure => 'directory',
+        require => [ Group['flip'], User['flip'] ],
     }
 
-    file { "/opt/backflips/implant.py":
-        path => "/opt/backflips/implant.py",
+    file { "/opt/backflips/etc/ssh":
+        path => "/opt/backflips/etc/ssh",
+        owner => 'flip',
+        group => 'flip',
+        mode => '755',
+        ensure => 'directory',
+        require => File["/opt/backflips/etc"],
+    }
+
+    file { "/opt/backflips/linux-ssh-backflip/implant.py":
+        path => "/opt/backflips/linux-ssh-backflip/implant.py",
         owner => 'root',
         group => 'root',
         mode => '644',
         ensure => present,
-        source => "puppet:///modules/backflips/backflips/implant.py",
+        source => "puppet:///modules/backflips/linux-ssh-backflip/implant.py",
+        require => File["/opt/backflips"],
     }
 
-    file { "/opt/backflips/install_implant.py":
-        path => "/opt/backflips/install_implant.py",
+    file { "/opt/backflips/linux-ssh-backflip/install_implant.py":
+        path => "/opt/backflips/linux-ssh-backflip/install_implant.py",
         owner => 'root',
         group => 'root',
         mode => '644',
         ensure => present,
-        source => "puppet:///modules/backflips/backflips/install_implant.py",
+        source => "puppet:///modules/backflips/linux-ssh-backflip/install_implant.py",
+        require => File["/opt/backflips"],
     }
 
     file { "/opt/backflips/README.md":
@@ -36,25 +51,68 @@ class backflips::config {
         group => 'root',
         mode => '644',
         ensure => present,
-        source => "puppet:///modules/backflips/backflips/README.md",
+        source => "puppet:///modules/backflips/README.md",
+        require => File["/opt/backflips"],
     }
 
-    file { "/opt/backflips/install_proxy.py":
-        path => "/opt/backflips/install_proxy.py",
+    file { "/opt/backflips/install_autossh_backflip.py":
+        path => "/opt/backflips/install_autossh_backflip.py",
         owner => 'root',
         group => 'root',
         mode => '755',
         ensure => present,
-        source => "puppet:///modules/backflips/backflips/install_proxy.py",
+        source => "puppet:///modules/backflips/install_autossh_backflip.py",
+        require => File["/opt/backflips"],
     }
 
-    file { "/opt/backflips/make_backflip.py":
-        path => "/opt/backflips/make_backflip.py",
+    file { "/opt/backflips/linux-ssh-backflip/make_backflip.py":
+        path => "/opt/backflips/linux-ssh-backflip/make_backflip.py",
         owner => 'root',
         group => 'root',
         mode => '755',
         ensure => present,
-        source => "puppet:///modules/backflips/backflips/make_backflip.py",
+        source => "puppet:///modules/backflips/linux-ssh-backflip/make_backflip.py",
+        require => File["/opt/backflips"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/backflipdeploy.py":
+        path => "/opt/backflips/osx-ssh-backflip/backflipdeploy.py",
+        owner => 'root',
+        group => 'root',
+        mode => '755',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/backflipdeploy.py",
+        require => File["/opt/backflips/osx-ssh-backflip"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/cleanup.py":
+        path => "/opt/backflips/osx-ssh-backflip/cleanup.py",
+        owner => 'root',
+        group => 'root',
+        mode => '644',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/cleanup.py",
+        require => File["/opt/backflips/osx-ssh-backflip"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/loadssh_template.sh":
+        path => "/opt/backflips/osx-ssh-backflip/loadssh_template.sh",
+        owner => 'root',
+        group => 'root',
+        mode => '755',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/loadssh_template.sh",
+        require => File["/opt/backflips/osx-ssh-backflip"],
+    }
+
+    file { "/opt/backflips/osx-ssh-backflip/README.md":
+        path => "/opt/backflips/osx-ssh-backflip/README.md",
+        owner => 'root',
+        group => 'root',
+        mode => '644',
+        ensure => present,
+        source => "puppet:///modules/backflips/osx-ssh-backflip/README.md",
+        require => File["/opt/backflips/osx-ssh-backflip"],
     }
 
     file { "/opt/backflips/etc/ssh/sshd_config":
@@ -63,13 +121,15 @@ class backflips::config {
         group => 'root',
         mode => '644',
         ensure => present,
-        source => "puppet:///modules/backflips/sshd_config"
+        source => "puppet:///modules/backflips/sshd_config",
+        require => File["/opt/backflips/etc/ssh"],
     }
 
     exec { "rsa_keygen_rsa":
         command => "/usr/bin/ssh-keygen -f /opt/backflips/etc/ssh/ssh_host_rsa_key -N '' -t rsa",
         creates => ["/opt/backflips/etc/ssh/ssh_host_rsa_key",
                     "/opt/backflips/etc/ssh/ssh_host_rsa_key.pub"],
+        user => 'flip',
         require => File["/opt/backflips/etc/ssh"],
     }
 
@@ -77,6 +137,7 @@ class backflips::config {
         command => "/usr/bin/ssh-keygen -f /opt/backflips/etc/ssh/ssh_host_ed25519_key -N '' -t ed25519",
         creates => ["/opt/backflips/etc/ssh/ssh_host_ed25519_key",
                     "/opt/backflips/etc/ssh/ssh_host_ed25519_key.pub"],
+        user => 'flip',
         require => File["/opt/backflips/etc/ssh"],
     }
 

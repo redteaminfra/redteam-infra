@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class monitoring::config {
 
   exec { "clone_elastalert":
@@ -79,6 +81,7 @@ class monitoring::config {
 
   exec { "reload_elastalert":
     command => "/bin/systemctl daemon-reload && /bin/systemctl enable elastalert.service && /bin/systemctl start elastalert.service",
+    refreshonly => true,
   }
 
 }

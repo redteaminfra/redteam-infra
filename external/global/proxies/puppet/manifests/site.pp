@@ -1,31 +1,27 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 node "default" {
   include 'hostsexternal'
   include 'gitpuppet'
   include 'ssh'
   include 'dante'
   include 'volunteerssh'
-  include 'modrewrite'
   include 'unattendedupgrades'
   include 'yama'
   include 'nmap'
   include 'mollyguard'
+  include 'basetools'
   include 'proxytools'
-  include 'backflips'
-  include 'tinyproxy'
+  #include 'tinyproxy'
+  include 'sshproxy'
+  include 'cleanup'
+  include 'cloudagent'
+  include 'openresty'
+  include 'sketchopsec'
+  include 'logstashconfig'
+  include 'nfsclient'
+
 
   package { ['openjdk-8-jre-headless']:
-      ensure => 'installed',
-      notify => Class['logstash']
   }
-
-  class { 'logstash':
-      logstash_group => 'adm'
-  }
-
-  logstash::configfile { 'inputs':
-    source => "puppet:///modules/elk/proxy.conf",
-  }
-
-  include 'logstashconfig'
-
 }

@@ -1,10 +1,12 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class proxytools::packages {
     $packages = ['asciinema',
-                 'screen',
-                 'tmux',
                  'zile',
                  'emacs',
                  'nmap',
-                 'nikto' ]
+                 'nikto',
+                 'xclip',
+                 'autossh']
     package { $packages: ensure => "installed" }
 }

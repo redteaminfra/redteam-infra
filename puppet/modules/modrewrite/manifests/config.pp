@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class modrewrite::config {
 
     file { "/root/override.patch":
@@ -18,10 +20,12 @@ class modrewrite::config {
     exec { "enable_a2enmod":
         command => "/usr/sbin/a2enmod rewrite proxy proxy_http",
         notify => Exec['systemctl-apache2'],
+        refreshonly => true,
     }
 
     exec { "systemctl-apache2":
 	  command => "/bin/systemctl enable apache2 && /bin/systemctl restart apache2",
+      refreshonly => true,
 	}
 
     file { "/var/www/html/.htaccess":
@@ -30,7 +34,7 @@ class modrewrite::config {
         group => 'root',
         mode => '644',
         ensure => present,
-        replace => 'no',
+        replace => 'yes',
         source => "puppet:///modules/modrewrite/.htaccess",
 	}
 }

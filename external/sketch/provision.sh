@@ -1,19 +1,31 @@
 #!/bin/bash
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 
 if [ $(whoami) != "root" ]; then
     echo "you must be root"
     exit 1
 fi
 
-cat <<EOF >> /etc/sysctl.conf
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
+if [[ -z $1 ]];
+then
+    echo "./provision.sh <hostname>"
+    echo "Example: ./provision.sh edge-sketch5"
+    exit 1
+fi
+
+HOSTNAME=$1
+
+hostnamectl set-hostname $HOSTNAME
+
+# Disable IPV6 for reals
+cat << EOF >> /etc/default/grub.d/99-disable-ipv6.cfg
+GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
 EOF
-sysctl -p
+update-grub
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update && apt-get -y install screen ufw simpleproxy
+apt-get update && apt-get -y install screen tmux ufw nginx simpleproxy python
 
 useradd -p '*' -m -s '/bin/bash' -k /etc/skel  user
 mkdir ~user/.ssh
@@ -40,6 +52,11 @@ chmod 440 /etc/sudoers.d/99user
 
 /etc/init.d/ssh reload
 ufw allow ssh
+ufw allow http
+ufw allow https
 ufw --force enable
-apt-get install unattended-upgrades
+apt-get -y install unattended-upgrades
 
+useradd -s /bin/bash -d /home/sketchssh -m sketchssh
+usermod -p '*' sketchssh
+usermod -U sketchssh

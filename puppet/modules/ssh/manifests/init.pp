@@ -1,12 +1,14 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 class ssh {
 
-    file { '/etc/infra/git-sshKeys.sh':
-        path => "/etc/infra/git-sshKeys.sh",
+    file { '/etc/infra/git-sshkeys.sh':
+        path => "/etc/infra/git-sshkeys.sh",
         owner => 'root',
         mode => '775',
         require => File['/etc/infra'],
         ensure => present,
-        source => "puppet:///modules/ssh/git-sshKeys.sh"
+        source => "puppet:///modules/ssh/git-sshkeys.sh"
     }
 
     file { '/etc/infra/ssh_tags.py':
@@ -44,7 +46,7 @@ class ssh {
     }
 
     cron { gitsshkeys:
-        command => "/etc/infra/git-sshKeys.sh 2>&1 | /usr/bin/logger -t git-sshkeys",
+        command => "/etc/infra/git-sshkeys.sh 2>&1 | /usr/bin/logger -t git-sshkeys",
         environment => "PATH=/bin:/usr/bin:/sbin:/usr/sbin",
         user    => root,
         minute  => '*/10'

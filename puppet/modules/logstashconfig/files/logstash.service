@@ -1,0 +1,19 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
+[Unit]
+Description=logstash
+
+[Service]
+Type=simple
+User=logstash
+Group=adm
+EnvironmentFile=-/etc/default/logstash
+EnvironmentFile=-/etc/sysconfig/logstash
+ExecStart=/usr/share/logstash/bin/logstash "--path.settings" "/etc/logstash"
+Restart=always
+WorkingDirectory=/
+Nice=19
+LimitNOFILE=16384
+
+[Install]
+WantedBy=multi-user.target

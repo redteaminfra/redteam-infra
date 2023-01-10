@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
 node "default" {
     include 'hostsexternal'
     include 'gitpuppet'
@@ -7,6 +9,8 @@ node "default" {
     include 'unattendedupgrades'
     include 'yama'
     include 'mollyguard'
+    include 'cleanup'
+    include 'cloudagent'
 
     package { ['openjdk-8-jre-headless']:
         ensure => 'installed',
