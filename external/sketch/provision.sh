@@ -54,6 +54,7 @@ chmod 440 /etc/sudoers.d/99user
 ufw allow ssh
 ufw allow http
 ufw allow https
+ufw allow 2222/tcp
 ufw --force enable
 apt-get -y install unattended-upgrades
 
