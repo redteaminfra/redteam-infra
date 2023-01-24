@@ -19,7 +19,7 @@ resource "oci_core_instance" "proxy" {
     #    hostname_label = self.display_name #"proxy${format("%02g", count.index + 1)}-${var.operation_name}"
     #    display_name   = "proxy${format("%02g", count.index + 1)}-${var.operation_name}"
 
-    private_ip             = cidrhost(var.subnet_cidr_blocks["proxy"], count.index + 10)
+    private_ip             = cidrhost(var.subnet_cidr_blocks["proxy"], count.index + 11)
     assign_public_ip       = true
     skip_source_dest_check = true
     nsg_ids                = [
