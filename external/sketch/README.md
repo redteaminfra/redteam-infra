@@ -4,6 +4,8 @@ A very simple set of provision scripts for zero-trust reflector proxies.
 
 # Moving Parts
 
+If you are using Linode, skip `provision.sh` and use the Linode instructions
+
 ## provision.sh
 
 Rediculous bash script that:
@@ -22,6 +24,10 @@ You will need to add a SSH public key to this script.
 ```
 ./provision.sh <hostname>
 ```
+
+## Linode
+See `linode/README.md`
+
 ### How to Play with provision.sh
 
 1. On trusted host:

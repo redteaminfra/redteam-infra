@@ -1,0 +1,112 @@
+---
+- name: Configure sketch hosts
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Set the hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: disable IPv6
+      copy:
+        dest: /etc/default/grub.d/99-disable-ipv6.cfg
+        content: |
+          GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
+      register: reboot_required
+
+    # update/upgrade/install packages
+    - name: update/upgrade
+      apt:
+        update_cache: yes
+        upgrade: dist
+    - name: install apt packages
+      apt:
+        name:
+          - unattended-upgrades
+          - nginx
+
+    - name: create user
+      user:
+        name: user
+        password: "*"
+        shell: /bin/bash
+        create_home: yes
+        state: present
+    - name: add key to user
+      authorized_key:
+        user: user
+        state: present
+        key: "{{ lookup('file', '{{ ssh_key }}') }}"
+    - name: created sudoers.d/user
+      copy:
+        dest: /etc/sudoers.d/99user
+        owner: root
+        group: root
+        mode: '0600'
+        content: |
+          user ALL=(ALL) NOPASSWD:ALL
+    - name: create sketchssh
+      user:
+        name: sketchssh
+        password: "*"
+        create_home: yes
+        shell: /bin/bash
+        state: present
+
+    - name: disable ssh password auth
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication yes'
+        line: 'PasswordAuthentication no'
+    - name: disabled ssh pam
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?UsePAM yes'
+        line: 'UsePAM no'
+    - name: disable password auth with pam
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?ChallengeResponseAuthentication yes'
+        line: 'ChallengeResponseAuthentication no'
+
+    - name: allow ssh
+      ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+    - name: allow http
+      ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+    - name: allow https
+      ufw:
+        rule: allow
+        port: "443"
+        proto: tcp
+    - name: allow 2222
+      ufw:
+        rule: allow
+        port: '2222'
+        proto: tcp
+    - name: enable ufw
+      ufw:
+        state: enabled
+
+    - name: replace root user in ssh configuration
+      become: no
+      replace:
+        path: "{{ ssh_config_path }}"
+        regexp: '(?<=User )root'
+        replace: 'user'
+      delegate_to: localhost
+
+
+  handlers:
+    - name: update grub
+      become: yes
+      command: update-grub
+
+  vars:
+    ansible_command_timeout: 90

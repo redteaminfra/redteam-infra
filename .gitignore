@@ -8,3 +8,6 @@ external/aws/host-share/bootstrap-puppet.tgz
 network-name
 external/aws/*/homebase/homebase-*
 puppet/modules/cobaltstrike/files/cobaltstrike.tgz
+.terraform*
+terraform.tfstate*
+inventory.ini
