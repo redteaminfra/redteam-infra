@@ -46,11 +46,13 @@ Configure different regions for your middle and edge instances.
 
 ```terraform
 middle_region = "REGION-A"
-edge_region   = "REGION-B"
+edge_regions   = ["REGION-B",  "REGION-C", "REGION-D"]
 ```
 
 ### Instance Count
 Configure multiple edge instances. (Can also be done with middle)
+
+**NOTE:** If you have instances in multiple regions do not modify the edge count, this will have unintended consequences. 
 
 ```terraform
 edge_count = "N"

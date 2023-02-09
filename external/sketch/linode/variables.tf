@@ -1,5 +1,5 @@
 variable "middle_region" {}
-variable "edge_region" {}
+variable "edge_regions" {}
 variable "linode_image" {}
 variable "linode_api_token" {}
 variable "engagement_name" {}

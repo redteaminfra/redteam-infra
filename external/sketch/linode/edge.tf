@@ -1,7 +1,7 @@
 resource "linode_instance" "edge" {
   label           = "edge${format("%02g", count.index + 1)}-${var.engagement_name}"
-  region          = var.edge_region
-  count           = var.edge_count
+  region          = element(var.edge_regions, count.index)
+  count           = max(var.edge_count, length(var.edge_regions))
   type            = var.edge_type
   image           = var.linode_image
   tags            = [var.engagement_name]
