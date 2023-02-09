@@ -26,6 +26,6 @@ variable "middle_count" {
   default = 1
 }
 
-variable "edge_count" {
+variable "edge_count_per_region" {
   default = 1
 }

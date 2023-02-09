@@ -52,11 +52,27 @@ edge_regions   = ["REGION-B",  "REGION-C", "REGION-D"]
 ### Instance Count
 Configure multiple edge instances. (Can also be done with middle)
 
-**NOTE:** If you have instances in multiple regions do not modify the edge count, this will have unintended consequences. 
+```terraform
+edge_count_per_region = "N"
+```
+
+#### Multiple Regions and Instance Count > 1
+
+If you configure you variables like so:
 
 ```terraform
-edge_count = "N"
+edge_regions   = ["REGION-B",  "REGION-C", "REGION-D"]
+edge_count_per_region = "2"
 ```
+
+You will produce a total of **6** instances:
+
+- `engagement-REGION-B-01` 
+- `engagement-REGION-B-02` 
+- `engagement-REGION-C-01` 
+- `engagement-REGION-C-02` 
+- `engagement-REGION-D-01` 
+- `engagement-REGION-D-02`
 
 ### Instance Type
 Can be done with both middle and edge instances.
