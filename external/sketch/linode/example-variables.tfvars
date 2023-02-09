@@ -3,7 +3,7 @@ linode_api_token = ""
 
 # Which Linode region should these be built in
 middle_region = ""
-edge_regions   = ""
+edge_regions   = [""]
 
 # Host image you would like to use
 linode_image = ""
