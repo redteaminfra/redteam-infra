@@ -4,9 +4,10 @@ resource "oci_core_instance" "proxy" {
   depends_on          = [oci_core_instance.homebase]
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
-  display_name        = "proxy${format("%02g", count.index + 1)}-${var.operation_name}"
+  display_name        = "proxy${format("%02g", count.index + 1)}-${var.engagement_name}"
   shape               = var.proxy_shape
   count               = var.proxy_count
+  freeform_tags       = local.tags
 
   source_details {
     source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
@@ -28,8 +29,8 @@ resource "oci_core_instance" "proxy" {
   }
 
   metadata = {
-    ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-        user_data           = base64encode(file("../global/host-share/user_data.yml"))
+    ssh_authorized_keys = file(var.ssh_provisioning_public_key)
+    user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {

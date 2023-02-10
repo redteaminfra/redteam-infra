@@ -3,8 +3,9 @@
 resource "oci_core_instance" "homebase" {
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
-  display_name        = "homebase-${var.operation_name}"
+  display_name        = "homebase-${var.engagement_name}"
   shape               = var.homebase_shape
+  freeform_tags       = local.tags
 
   source_details {
     source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
@@ -14,15 +15,15 @@ resource "oci_core_instance" "homebase" {
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.infra.id
-    hostname_label = "homebase-${var.operation_name}"
+    hostname_label = "homebase-${var.engagement_name}"
 
     private_ip       = cidrhost(var.subnet_cidr_blocks["infra"], 10)
     assign_public_ip = true
   }
 
   metadata = {
-    ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-     user_data           = base64encode(file("../global/host-share/user_data.yml"))
+    ssh_authorized_keys = file(var.ssh_provisioning_public_key)
+   user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {
@@ -38,7 +39,7 @@ resource "oci_core_instance" "homebase" {
 
   # create ssh stanza
   provisioner "local-exec" {
-    command = "${path.module}/templates/generate_ssh_stanza.rb --opname ${var.operation_name} --homebase_ip ${self.public_ip}"
+    command = "${path.module}/templates/generate_ssh_stanza.rb --opname ${var.engagement_name} --homebase_ip ${self.public_ip}"
   }
 
   # bootstrap puppet

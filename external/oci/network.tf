@@ -9,20 +9,23 @@
 resource "oci_core_vcn" "infra_vcn" {
   cidr_block     = var.vcn_cidr_block
   compartment_id = var.compartment_id
-  display_name   = format("%s-vcn", var.operation_name)
-  dns_label      = format("%s", var.operation_name)
+  display_name   = format("%s-vcn", var.engagement_name)
+  dns_label      = format("%s", var.engagement_name)
+  freeform_tags  = local.tags
 }
 
 resource "oci_core_internet_gateway" "internet_gateway" {
   compartment_id = var.compartment_id
   display_name   = "vcn-shared-internet-gw"
   vcn_id         = oci_core_vcn.infra_vcn.id
+  freeform_tags  = local.tags
 }
 
 resource "oci_core_route_table" "internet_gateway_route_table" {
   compartment_id = var.compartment_id
   display_name   = "vcn-shared-igw-route"
   vcn_id         = oci_core_vcn.infra_vcn.id
+  freeform_tags  = local.tags
 
   route_rules {
     destination       = "0.0.0.0/0"
@@ -33,11 +36,13 @@ resource "oci_core_route_table" "internet_gateway_route_table" {
 resource "oci_core_nat_gateway" "nat_gateway" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.infra_vcn.id
+  freeform_tags  = local.tags
 }
 
 resource "oci_core_route_table" "nat_gateway_route_table" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.infra_vcn.id
+  freeform_tags  = local.tags
 
   route_rules {
     destination       = "0.0.0.0/0"
@@ -53,6 +58,7 @@ resource "oci_core_subnet" "infra" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domain.ad.name
   vcn_id              = oci_core_vcn.infra_vcn.id
+  freeform_tags       = local.tags
 
   security_list_ids = [
     oci_core_security_list.vcn_all.id,
@@ -73,6 +79,7 @@ resource "oci_core_subnet" "utility" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domain.ad.name
   vcn_id              = oci_core_vcn.infra_vcn.id
+  freeform_tags       = local.tags
 
   security_list_ids = [
     oci_core_security_list.vcn_all.id,
@@ -92,6 +99,7 @@ resource "oci_core_subnet" "proxy" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domain.ad.name
   vcn_id              = oci_core_vcn.infra_vcn.id
+  freeform_tags       = local.tags
 
   security_list_ids = [
     oci_core_security_list.vcn_all.id,
@@ -111,6 +119,7 @@ resource "oci_core_subnet" "proxy" {
 # https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_dhcp_options
 resource "oci_core_default_dhcp_options" "default-dhcp-options" {
   manage_default_resource_id = oci_core_vcn.infra_vcn.default_dhcp_options_id
+  freeform_tags              = local.tags
   options {
     type               = "DomainNameServer"
     server_type        = "CustomDnsServer"
@@ -125,6 +134,7 @@ resource "oci_core_security_list" "vcn_all" {
   compartment_id = var.compartment_id
   display_name   = "VCN All - traffic flows freely inside VCN"
   vcn_id         = oci_core_vcn.infra_vcn.id
+  freeform_tags  = local.tags
 
   # create egress rules for each protocol
   dynamic "egress_security_rules" {
@@ -149,6 +159,7 @@ resource "oci_core_security_list" "all_egress_list" {
   compartment_id = var.compartment_id
   display_name   = "all-egress-list"
   vcn_id         = oci_core_vcn.infra_vcn.id
+  freeform_tags  = local.tags
 
   dynamic "egress_security_rules" {
     for_each = var.network_protocol
@@ -163,7 +174,7 @@ resource "oci_core_security_list" "ssh_from_anywhere" {
   compartment_id = var.compartment_id
   display_name   = "SSH from Anywhere"
   vcn_id         = oci_core_vcn.infra_vcn.id
-
+  freeform_tags  = local.tags
 
   ingress_security_rules {
     protocol = var.network_protocol["tcp"]
@@ -180,6 +191,7 @@ resource "oci_core_security_list" "ssh_from_company" {
   compartment_id = var.compartment_id
   display_name   = "SSH from company"
   vcn_id         = oci_core_vcn.infra_vcn.id
+  freeform_tags  = local.tags
 
   # Allow SSH for each allowed subnet in variables.tfvars
   dynamic "ingress_security_rules" {
@@ -202,7 +214,8 @@ resource "oci_core_security_list" "ssh_from_company" {
 resource "oci_core_network_security_group" "proxies" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.infra_vcn.id
-  display_name   = "Proxy Security Group"
+  display_name   = "${var.engagement_name} Proxy Security Group"
+  freeform_tags  = local.tags
 }
 
 resource "oci_core_network_security_group_security_rule" "https" {

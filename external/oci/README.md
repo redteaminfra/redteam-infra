@@ -15,7 +15,7 @@ tenancy=< TENANCY OCID HERE >
 region=<REGION HERE >
 ```
 
-You'll also want to define the following variables in `variables.tfvars`:
+Copy `example-variables.tfvars` to `variables.tfvars` and modify the following variables to suit your needs:
 
 ``` terraform
 # Provider initialization (tenancy, api user, key, region, etc.)
@@ -38,8 +38,8 @@ region         = ""
 # Which availability domain
 ad_number      = "1"
 
-# The operations name, infrastructure will be named after this
-operation_name = ""
+# The engagement's name, infrastructure will be named after this
+engagement_name = ""
 
 # define the shape for homebase
 homebase_shape = "VM.Standard2.1"

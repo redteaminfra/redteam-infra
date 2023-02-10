@@ -11,3 +11,4 @@ puppet/modules/cobaltstrike/files/cobaltstrike.tgz
 .terraform*
 terraform.tfstate*
 inventory.ini
+variables.tfvars
