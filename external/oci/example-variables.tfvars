@@ -10,6 +10,9 @@ private_key_path = ""
 ssh_provisioning_private_key = ""
 ssh_provisioning_public_key  = ""
 
+# Optional, default path is `~/.ssh`
+#ssh_config_path              = ""
+
 # Which compartment the infra be setup in:
 compartment_id = ""
 

@@ -14,6 +14,9 @@ variable "homebase_shape" {}
 variable "proxy_shape" {}
 variable "elk_shape" {}
 
+variable "ssh_config_path" {
+  default = "~/.ssh"
+}
 
 variable "image_username" {
   default = "ubuntu"

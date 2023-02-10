@@ -37,11 +37,6 @@ resource "oci_core_instance" "homebase" {
 
   preserve_boot_volume = var.preserve_boot_volume
 
-  # create ssh stanza
-  provisioner "local-exec" {
-    command = "${path.module}/templates/generate_ssh_stanza.rb --opname ${var.engagement_name} --homebase_ip ${self.public_ip}"
-  }
-
   # bootstrap puppet
   provisioner "local-exec" {
     command = "bash -c \"cd $(git rev-parse --show-toplevel); tar -czf external/global/host-share/bootstrap-puppet.tgz .git\""
