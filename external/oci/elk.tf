@@ -22,8 +22,8 @@ resource "oci_core_instance" "elk" {
   }
 
   metadata = {
-    ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-    #    user_data           = base64encode(file("../global/host-share/user_data.yml"))
+    ssh_authorized_keys = file(var.ssh_provisioning_public_key)
+    user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {

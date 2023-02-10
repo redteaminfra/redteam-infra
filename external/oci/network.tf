@@ -13,20 +13,35 @@ resource "oci_core_vcn" "infra_vcn" {
   dns_label      = format("%s", var.operation_name)
 }
 
-resource "oci_core_internet_gateway" "igw" {
+resource "oci_core_internet_gateway" "internet_gateway" {
   compartment_id = var.compartment_id
   display_name   = "vcn-shared-internet-gw"
   vcn_id         = oci_core_vcn.infra_vcn.id
 }
 
-resource "oci_core_route_table" "igw" {
+resource "oci_core_route_table" "internet_gateway_route_table" {
   compartment_id = var.compartment_id
   display_name   = "vcn-shared-igw-route"
   vcn_id         = oci_core_vcn.infra_vcn.id
 
   route_rules {
     destination       = "0.0.0.0/0"
-    network_entity_id = oci_core_internet_gateway.igw.id
+    network_entity_id = oci_core_internet_gateway.internet_gateway.id
+  }
+}
+
+resource "oci_core_nat_gateway" "nat_gateway" {
+  compartment_id = var.compartment_id
+  vcn_id         = oci_core_vcn.infra_vcn.id
+}
+
+resource "oci_core_route_table" "nat_gateway_route_table" {
+  compartment_id = var.compartment_id
+  vcn_id         = oci_core_vcn.infra_vcn.id
+
+  route_rules {
+    destination       = "0.0.0.0/0"
+    network_entity_id = oci_core_nat_gateway.nat_gateway.id
   }
 }
 
@@ -45,7 +60,7 @@ resource "oci_core_subnet" "infra" {
     oci_core_security_list.ssh_from_company.id
   ]
 
-  route_table_id = oci_core_route_table.igw.id
+  route_table_id = oci_core_route_table.internet_gateway_route_table.id
 
   display_name = "infra-subnet"
   dns_label    = "infra"
@@ -64,7 +79,7 @@ resource "oci_core_subnet" "utility" {
     oci_core_security_list.all_egress_list.id
   ]
 
-  route_table_id = oci_core_route_table.igw.id
+  route_table_id = oci_core_route_table.nat_gateway_route_table.id
 
   display_name = "utility-subnet"
   dns_label    = "utility"
@@ -83,7 +98,7 @@ resource "oci_core_subnet" "proxy" {
     oci_core_security_list.all_egress_list.id,
   ]
 
-  route_table_id = oci_core_route_table.igw.id
+  route_table_id = oci_core_route_table.internet_gateway_route_table.id
 
   display_name = "proxy-subnet"
   dns_label    = "proxy"
