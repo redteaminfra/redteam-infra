@@ -5,7 +5,7 @@ That payload should then be executed as a shell script on a victim MacOS host to
 
 ## Usage
 
-`sudo python3 makebackflipy.py <username> <victim_host> <c2_fqdn/ip> <port> <remote_port> [victim_proxy]`
+`sudo python3 makebackflipy.py <username> <victim_host> <c2_fqdn/ip> <port> <remote_port> [victim_proxy:port]`
 
 ## Arguments
 
@@ -19,7 +19,7 @@ port: Port that forwards back to the victim (tcp/22). Use a range of 4000 and up
 
 remote_port: The secondary edge port that the backflip SSH service is running on, which for RTI is 2222.
 
-victim_proxy: If your victim is on a network where a proxy is needed to talk to the internet you should supply it here.
+victim_proxy:port: If your victim is on a network where a proxy is needed to talk to the internet you should supply it here.
 
 ## Clean Up
 To remove the backflip on the host mac
