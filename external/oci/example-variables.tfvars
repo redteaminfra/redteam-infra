@@ -10,6 +10,9 @@ private_key_path = ""
 ssh_provisioning_private_key = ""
 ssh_provisioning_public_key  = ""
 
+# Optional, default path is `~/.ssh`
+#ssh_config_path              = ""
+
 # Which compartment the infra be setup in:
 compartment_id = ""
 
@@ -20,8 +23,8 @@ region         = ""
 # Which availability domain
 ad_number      = "1"
 
-# The operations name, infrastructure will be named after this
-operation_name = ""
+# The engagement's name, infrastructure will be named after this
+engagement_name = ""
 
 # define the shape for homebase
 homebase_shape = "VM.Standard2.1"

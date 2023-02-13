@@ -1,0 +1,24 @@
+Host homebase-${engagement_name}
+     Hostname ${homebase_ip}
+     ## Uncomment AddressFamily if you have WSL errors to force ipv4
+     # AddressFamily inet
+     ## Etherpad
+     # LocalForward 9001 127.0.0.1:9001
+     ## Mythic
+     # LocalForward 7443 127.0.0.1:7443
+     ## Change 59xx to your VNC Port and uncomment this forward. Your UID is found in sshkeys users.json
+     ## Your port number is (5900 + (UID - 6000) + 1)
+     # LocalForward 5901 127.0.0.1:59xx
+
+Host proxy01-${engagement_name}
+    Hostname proxy01-${engagement_name}.infra.redteam
+    ProxyJump homebase-${engagement_name}
+
+Host proxy02-${engagement_name}
+    Hostname proxy02-${engagement_name}.infra.redteam
+    ProxyJump homebase-${engagement_name}
+
+Host elk-${engagement_name}
+     Hostname elk-${engagement_name}.infra.redteam
+     ProxyJump homebase-${engagement_name}
+     # LocalForward 5601 192.168.1.13:5601

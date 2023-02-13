@@ -4,8 +4,9 @@ resource "oci_core_instance" "elk" {
   depends_on          = [oci_core_instance.homebase]
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
-  display_name        = "elk-${var.operation_name}"
+  display_name        = "elk-${var.engagement_name}"
   shape               = var.elk_shape
+  freeform_tags       = local.tags
 
   source_details {
     source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
@@ -15,15 +16,15 @@ resource "oci_core_instance" "elk" {
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.utility.id
-    hostname_label = "elk-${var.operation_name}"
+    hostname_label = "elk-${var.engagement_name}"
 
     private_ip       = cidrhost(var.subnet_cidr_blocks["utility"], 13)
     assign_public_ip = false
   }
 
   metadata = {
-    ssh_authorized_keys = "${file(var.ssh_provisioning_public_key)}"
-    #    user_data           = base64encode(file("../global/host-share/user_data.yml"))
+    ssh_authorized_keys = file(var.ssh_provisioning_public_key)
+    user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {

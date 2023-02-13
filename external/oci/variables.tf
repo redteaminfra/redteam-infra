@@ -9,11 +9,14 @@ variable "private_key_path" {}
 variable "ssh_provisioning_private_key" {}
 variable "ssh_provisioning_public_key" {}
 variable "region" {}
-variable "operation_name" {}
+variable "engagement_name" {}
 variable "homebase_shape" {}
 variable "proxy_shape" {}
 variable "elk_shape" {}
 
+variable "ssh_config_path" {
+  default = "~/.ssh"
+}
 
 variable "image_username" {
   default = "ubuntu"

