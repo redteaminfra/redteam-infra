@@ -1,0 +1,6 @@
+---
+- name: install molly-guard
+  apt:
+    name:
+      - molly-guard
+    state: present
