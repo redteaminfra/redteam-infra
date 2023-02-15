@@ -1,5 +1,3 @@
-# Copyright (c) 2023, Oracle and/or its affiliates.
-
 logoutput: syslog
 
 user.privileged: proxy
@@ -10,11 +8,11 @@ user.libwrap: nobody
 internal: 0.0.0.0 port=1080
 
 # The proxying network interface or address.
-external: <%= `cat /proc/net/route`.split("\n")[1].split("\x30")[0] %>
+external: {{ ansible_default_ipv4.interface }}
 
 # socks-rules determine what is proxied through the external interface.
 # The default of "none" permits anonymous access.
-method: none
+socksmethod: none
 
 # client-rules determine who can connect to the internal interface.
 # The default of "none" permits anonymous access.
@@ -25,12 +23,12 @@ client pass {
         log: connect disconnect error
 }
 
-pass {
+socks pass {
         from: 0.0.0.0/0 to: 0.0.0.0/0
         command: bind connect udpassociate
         log: error connect disconnect #iooperation
 }
-pass {
+socks pass {
         from: 0.0.0.0/0 to: 0.0.0.0/0
         command: bindreply udpreply
         log: error connect disconnect #iooperation

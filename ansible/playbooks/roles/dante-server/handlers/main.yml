@@ -1,0 +1,6 @@
+---
+- name: restart dante
+  systemd:
+    name: danted.service
+    enabled: true
+    state: restarted
