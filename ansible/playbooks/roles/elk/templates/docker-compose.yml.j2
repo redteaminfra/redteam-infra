@@ -3,7 +3,7 @@
 version: '2.2'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.21
+    image: docker.elastic.co/elasticsearch/elasticsearch:{{ elk_version }}
     container_name: redelasticsearch
     environment:
       - cluster.name=docker-cluster
@@ -20,7 +20,7 @@ services:
     networks:
       - esnet
   elasticsearch2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.21
+    image: docker.elastic.co/elasticsearch/elasticsearch:{{ elk_version }}
     container_name: elasticsearch2
     environment:
       - cluster.name=docker-cluster
@@ -37,7 +37,7 @@ services:
       - esnet
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.8.21
+    image: docker.elastic.co/kibana/kibana:{{ elk_version }}
     ports:
       - 5601:5601
     environment:

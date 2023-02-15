@@ -1,0 +1,12 @@
+---
+- name: update apt and upgrade
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: install software common to all hosts
+  apt:
+    name:
+      - python3-pip
+      - screen
+      - tmux
