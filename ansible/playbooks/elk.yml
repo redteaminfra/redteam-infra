@@ -1,0 +1,5 @@
+---
+- hosts: elk
+  become: yes
+  roles:
+    - role: elk
