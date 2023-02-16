@@ -1,0 +1,16 @@
+---
+# tasks file for unattended-upgrades
+- name: install unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: present
+  when: ansible_facts.os_family == 'Debian'
+
+- name: copy unattended configuration
+  copy:
+    src: files/99unattended-upgrades
+    dest: /etc/apt/apt.conf.d/99unattended-upgrades
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_facts.os_family == 'Debian'
