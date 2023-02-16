@@ -1,0 +1,30 @@
+---
+# tasks file for loot
+- name: ensure redteam group exists
+  group:
+    name: redteam
+    state: present
+
+- name: create loot directory
+  file:
+    path: /loot
+    owner: nobody
+    group: redteam
+    mode: 0777
+    state: directory
+
+- name: copy README.md
+  copy:
+    src: files/README.md
+    dest: /loot/README.md
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy TEMPLATE.md
+  copy:
+    src: files/TEMPLATE.md
+    dest: /loot/TEMPLATE.md
+    owner: root
+    group: root
+    mode: 0644
