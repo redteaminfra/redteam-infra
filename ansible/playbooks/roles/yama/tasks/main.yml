@@ -1,0 +1,10 @@
+---
+# tasks file for yama
+
+- name: set yama
+  sysctl:
+    name: kernel.yama.ptrace_scope
+    value: '3'
+    state: present
+    reload: true
+
