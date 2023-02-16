@@ -1,0 +1,61 @@
+---
+- name: add elastic key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: add elastic repo
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/{{ logstash_repo }}/apt stable main
+    state: present
+
+- name: install required packages
+  apt:
+    name:
+      - apt-transport-https
+      - logstash
+      - openjdk-{{ openjdk_version }}-jre-headless
+    update_cache: yes
+
+- name: add hostname to /etc/default/logstash
+  lineinfile:
+    path: /etc/default/logstash
+    regex: '^hostname'
+    line: 'hostname {{ ansible_hostname }}'
+    create: true
+    owner: root
+    group: root
+    mode: 0644
+
+- name: point to elk server
+  lineinfile:
+    path: /etc/default/logstash
+    regex: '^server'
+    line: 'server elk'
+
+- name: copy logstash host configuration
+  copy:
+    src: files/{{ inventory_hostname }}.conf
+    dest: /etc/logstash/conf.d/inputs/{{ inventory_hostname }}.conf
+    mode: 0644
+    owner: root
+    group: root
+    force: true
+
+- name: copy logstash configuration
+  copy:
+    src: files/logstash.yml
+    dest: /etc/logstash/logstash.yml
+    mode: 0644
+    owner: root
+    group: root
+    force: true
+
+- name: copy logstash configuration
+  copy:
+    src: files/logstash.yml
+    dest: /etc/logstash/logstash.yml
+    mode: 0644
+    owner: root
+    group: root
+    force: true

@@ -1,0 +1,3 @@
+---
+logstash_repo: 6.x
+openjdk_version: 11
