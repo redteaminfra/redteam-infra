@@ -1,0 +1,21 @@
+---
+# tasks file for sshproxy
+- name: copy sshproxy tool
+  copy:
+    src: files/
+    dest: /opt/sshproxy/
+    owner: root
+    group: root
+
+- name: create ssh key folder
+  file:
+    path: /opt/sshproxy/keys
+    owner: root
+    mode: 0755
+    state: directory
+
+- name: generate ssh-keypair
+  openssh_keypair:
+    path: /opt/sshproxy/keys/sketchkey
+    type: rsa
+    state: present

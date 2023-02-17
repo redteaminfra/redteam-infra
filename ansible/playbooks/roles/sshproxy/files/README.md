@@ -18,6 +18,6 @@ Siphoned up by `install_sketch.py` to give a one liner command to run on sketch 
 
 ## How to Setup
 
-1. Run `install_sketch.py` on a proxy and then copy the contents to run on two or more sketch boxes (one middle, and N+1 edges). This will distrubte key material living on a proxy such that the autossh tunnel can be established. 
+1. Run `install_sketch.py` on a proxy and then copy the contents to run on two or more sketch boxes (one middle, and N+1 edges). This will distribute key material living on a proxy such that the autossh tunnel can be established. 
 
 2. Run `install_proxy.py` on a proxy after key material is placed for the sketch setup wanted. This will create a forward socks port with autossh that can then be used as a SOCKS proxy. 
