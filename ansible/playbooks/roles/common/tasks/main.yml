@@ -10,3 +10,12 @@
       - python3-pip
       - screen
       - tmux
+
+- name: /etc/hosts
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
