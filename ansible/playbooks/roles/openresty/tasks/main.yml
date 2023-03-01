@@ -1,0 +1,43 @@
+---
+# tasks file for openresty
+- name: add openresty key
+  apt_key:
+    url: https://openresty.org/package/pubkey.gpg
+    state: present
+
+- name: add openresty repo
+  apt_repository:
+    repo: deb https://openresty.org/package/ubuntu {{ ansible_distribution_release }} main
+    state: present
+
+- name: install openresty
+  apt:
+    name: openresty
+    state: present
+    update_cache: yes
+
+- name: create openresty log directory
+  file:
+    path: /var/log/openresty
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: copy openresty config
+  copy:
+    src: files/nginx.conf
+    dest: /usr/local/openresty/nginx/conf/nginx.conf
+    owner: root
+    mode: 0644
+
+- name: enable log rotate for openresty
+  copy:
+    src: files/openresty
+    dest: /etc/logrotate.d/openresty
+    owner: root
+    mode: 0644
+
+- name: reload openresty
+  systemd:
+    name: openresty.service
+    state: reloaded
