@@ -1,0 +1,10 @@
+127.0.0.1   {{ ansible_facts.hostname }}.infra.redteam  {{ ansible_facts.hostname }}    {{ ansible_facts.hostname.split('-')[0] }}  localhost
+
+{% for host in groups['all'] %}
+{% if hostvars[host].ansible_hostname != ansible_facts.hostname %}
+{{ hostvars[host].ansible_default_ipv4.address }}   {{ hostvars[host].ansible_hostname }}.infra.redteam {{ hostvars[host].ansible_hostname }}   {{ hostvars[host].ansible_hostname.split('-')[0] }}
+{% endif %}
+{% endfor %}
+
+# blackhole asciinema to prevent accidental asciinema upload on any machine
+127.0.0.1 asciinema.org
