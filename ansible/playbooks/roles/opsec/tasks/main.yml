@@ -1,0 +1,21 @@
+---
+# tasks file for opsec
+- name: ensure cidrs are defined
+  assert:
+    that:
+      - "{{ cidrs }} is defined"
+      - "{{ cidrs }} | length > 0"
+      - "{{ cidrs }} != None"
+    fail_msg: "OPSEC cidrs are not defined need to be defined for this role to work. Either define it or remove this role."
+
+- name: block cidrs for opsec
+  iptables:
+    chain: OUTPUT
+    destination: "{{ item }}"
+    jump: DROP
+    state: present
+  loop: "{{ cidrs }}"
+
+- name: save iptables
+  shell:
+    cmd: iptables-save > /etc/iptables/rules.v4
