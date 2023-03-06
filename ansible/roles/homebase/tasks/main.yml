@@ -1,6 +1,6 @@
 ---
 # tasks file for homebase
-- name: install packages
+- name: install base packages for homebase
   apt:
     name:
       - asciinema
@@ -25,10 +25,10 @@
     group: root
     mode: 0755
 
-- name: dot_screensaver
+- name: dot_xscreensaver
   copy:
-    src: files/dot_screensaver
-    dest: /usr/local/lib/dot_screensaver
+    src: files/dot_xscreensaver
+    dest: /usr/local/lib/dot_xscreensaver
     owner: root
     group: root
     mode: 0755
@@ -43,7 +43,7 @@
 
 - name: implant_cryptor
   copy:
-    src: files/implant_cryptor
+    src: files/implant_cryptor.py
     dest: /usr/local/bin/implant_cryptor
     owner: root
     group: root
