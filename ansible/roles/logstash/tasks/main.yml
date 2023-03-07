@@ -13,9 +13,15 @@
   apt:
     name:
       - apt-transport-https
-      - logstash
       - openjdk-{{ openjdk_version }}-jre-headless
     update_cache: yes
+
+- name: install logstash
+  apt:
+    name:
+      - logstash
+    update_cache: yes
+    cache_valid_time: 3600
 
 - name: add hostname to /etc/default/logstash
   lineinfile:
@@ -33,13 +39,19 @@
     regex: '^server'
     line: 'server elk'
 
+- name: create inputs directory
+  file:
+    path: /etc/logstash/conf.d/inputs
+    mode: 0755
+    owner: root
+    state: directory
+
 - name: copy logstash host configuration
   copy:
-    src: files/{{ inventory_hostname }}.conf
-    dest: /etc/logstash/conf.d/inputs/{{ inventory_hostname }}.conf
+    src: files/{{ group }}.conf
+    dest: /etc/logstash/conf.d/inputs/{{ group }}.conf
     mode: 0644
     owner: root
-    group: root
     force: true
 
 - name: copy logstash configuration
@@ -48,7 +60,6 @@
     dest: /etc/logstash/logstash.yml
     mode: 0644
     owner: root
-    group: root
     force: true
 
 - name: copy logstash configuration
@@ -57,5 +68,4 @@
     dest: /etc/logstash/logstash.yml
     mode: 0644
     owner: root
-    group: root
     force: true
