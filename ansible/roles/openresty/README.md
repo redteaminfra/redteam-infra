@@ -1,14 +1,14 @@
-Role Name
+openresty
 =========
 
-Install the openresty package from openresty's repos
+Installs Open Resty to proxies, so we can use nginx with Proxy Protocol, as well as all the extendable features Open Resty provides.
 
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - openresty
+```yml
+- hosts: servers
+  roles:
+     - openresty
+```
