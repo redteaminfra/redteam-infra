@@ -1,0 +1,36 @@
+---
+- name: example task to create users and groups
+  hosts: all
+  become: yes
+  task:
+    - name: add groups
+      group:
+        name: "{{ item }}"
+        state: present
+      with_items: [ "core", "redteam" ]
+
+    - name: allow group redteam to sudo
+      copy:
+        dest: /etc/sudoers.d/redteam
+        owner: root
+        mode: 0600
+        content: |
+          %redteam ALL=(ALL) NOPASSWD:ALL
+
+    - name: add hacker
+      user:
+        name: hacker
+        uid: 6000
+        group: redteam
+        groups: core
+        append: no
+        password: '*'
+        state: present
+
+    - name add hacker's public key
+      authorized_key:
+        user: hacker
+        state: present
+        exclusive: true
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
