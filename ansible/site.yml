@@ -11,4 +11,7 @@
 - import_playbook: homebase.yml
 - import_playbook: proxies.yml
 - import_playbook: elk.yml
-- import_playbook: ssh/users.yml
+- import_playbook: users/users.yml
+
+- import_playbook: playbooks/reboot.yml
+

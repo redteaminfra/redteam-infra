@@ -5,14 +5,14 @@ ansible_ssh_host_key_checking=no
 ansible_ssh_private_key_file=${key}
 ansible_ssh_common_args=-o UserKnownHostsFile=/dev/null
 
+[homebase]
+${homebase}
+
 [proxies:vars]
 ansible_ssh_extra_args=-o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${key} -W %h:%p ${username}@${homebase}'
 
 [elk:vars]
 ansible_ssh_extra_args=-o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${key} -W %h:%p ${username}@${homebase}'
-
-[homebase]
-${homebase}
 
 [proxies]
 %{ for display_name, private_ip in proxies ~}

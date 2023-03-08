@@ -48,8 +48,8 @@
 
 - name: copy logstash host configuration
   copy:
-    src: files/{{ group }}.conf
-    dest: /etc/logstash/conf.d/inputs/{{ group }}.conf
+    src: files/{{ group_names[0] }}.conf
+    dest: /etc/logstash/conf.d/inputs/{{ group_names[0] }}.conf
     mode: 0644
     owner: root
     force: true

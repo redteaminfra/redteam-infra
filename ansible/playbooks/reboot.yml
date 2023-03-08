@@ -1,0 +1,10 @@
+- hosts: all
+  become: yes
+  serial:
+    - 1
+    - 10
+  tasks:
+    - name: reboot all hosts
+      reboot:
+        search_paths:
+          - /lib/molly-guard
