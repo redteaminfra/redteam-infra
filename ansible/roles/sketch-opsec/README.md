@@ -1,4 +1,4 @@
-Role Name
+sketch-opsec
 =========
 
 Provisions OPSEC firewall rules for sketch instances. Ensures that only the middle sketch boxes can be reached from proxies, and blocks all connections to edges.
@@ -18,10 +18,8 @@ Role Variables
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
 ```yml
 - hosts: servers
   roles:
-    - { role: sketchopsec, vars: { middles: ['4.2.2.1', '4.2.2.2'], edges: ['4.2.2.3', '4.2.2.4'] } }
+    - { role: sketch-opsec, vars: { middles: ['4.2.2.1', '4.2.2.2'], edges: ['4.2.2.3', '4.2.2.4'] } }
 ```

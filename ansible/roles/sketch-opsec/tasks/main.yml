@@ -18,7 +18,7 @@
     jump: DROP
   loop: "{{ middles }}"
   when: ('homebase' in group_names) or
-        ('elk' in group_names)
+    ('elk' in group_names)
 
 - name: block edges
   iptables:
@@ -28,5 +28,4 @@
   loop: "{{ edges }}"
 
 - name: save iptables
-  shell:
-    cmd: iptables-save > /etc/iptables/rules.v4
+  command: iptables-save -f /etc/iptables/rules.v4
