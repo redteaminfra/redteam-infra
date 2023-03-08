@@ -4,6 +4,7 @@
   apt:
     name:
       - nfs-kernel-server
+      - acl
     state: present
 
 - name: enable the nfs-server
@@ -37,3 +38,14 @@
   systemd:
     name: nfs-kernel-server.service
     state: restarted
+
+- name: set acls for directories
+  acl:
+    default: true
+    entity: redteam
+    etype: group
+    permissions: rwX
+    state: present
+    recursive: true
+    path: "{{ item }}"
+  loop: "{{ directories }}"

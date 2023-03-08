@@ -1,4 +1,4 @@
-Role Name
+nfs-client
 =========
 
 Connect to NFS shares.
@@ -13,16 +13,12 @@ Role Variables
 
 List of shares to mount, the `directories` variable should probably contain the same directories as what the `nfs-server` has.
 
-Dependencies
-------------
-
-Just an NFS server.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yml
+- hosts: proxies
+  roles:
+     - { role: nfs-client, vars { directories: [ '/dropbox', '/goodies' ] } }
+```

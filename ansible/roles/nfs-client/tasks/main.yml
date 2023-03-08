@@ -23,7 +23,7 @@
 - name: mount all directories
   mount:
     path: "{{ item }}"
-    src: "{{ homebase.ansible_default_ipv4.address }}:{{ item }}"
+    src: "{{ hostvars[groups['homebase'][0]].ansible_default_ipv4.address }}:{{ item }}"
     fstype: nfs
     opts: auto,rw,nofail,noatime,nolock,intr,tcp,actimeo=1800
     state: mounted

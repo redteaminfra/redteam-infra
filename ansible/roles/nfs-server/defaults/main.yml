@@ -2,3 +2,11 @@
 # defaults file for nfs-server
 directories:
   - /dropbox
+
+ports:
+  - 111
+  - 2049
+
+protocols:
+  - udp
+  - tcp
