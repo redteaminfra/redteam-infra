@@ -41,3 +41,16 @@
   systemd:
     name: openresty.service
     state: reloaded
+
+- name: allow ports for openresty
+  iptables:
+    chain: INPUT
+    action: insert
+    jump: ACCEPT
+    protocol: tcp
+    source: 0.0.0.0/0
+    destination_port: "{{ item }}"
+  with_items: "{{ openresty_ports }}"
+
+- name: save iptables
+  command: iptables-save -f /etc/iptables/rules.v4
