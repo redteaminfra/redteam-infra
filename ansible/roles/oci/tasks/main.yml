@@ -28,12 +28,11 @@
     chain: OUTPUT
     destination: 169.254.169.254/32
     protocol: "{{ item }}"
-    destination_port: '53'
+    destination_port: "53"
     jump: DROP
     state: present
     comment: "disable access to OCI's VCN DNS resolver"
-  with_items: ['tcp', 'udp']
+  with_items: ["tcp", "udp"]
 
 - name: save iptables
-  shell:
-    cmd: iptables-save > /etc/iptables/rules.v4
+  command: iptables-save -f /etc/iptables/rules.v4

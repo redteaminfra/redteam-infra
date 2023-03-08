@@ -19,10 +19,8 @@ nameserver 8.8.8.8
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
 ```yml
-- hosts: servers
+- hosts: all
   roles:
    - { role: oci, vars: { dns_servers: [ '1.1.1.1', '8.8.8.8' ] } }
 ```
