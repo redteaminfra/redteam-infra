@@ -7,6 +7,7 @@
   apt_repository:
     repo: deb https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable
     state: present
+    update_cache: yes
 
 - name: Install Docker
   apt:
@@ -15,6 +16,7 @@
     - docker-compose-plugin
     state: latest
     update_cache: true
+    cache_valid_time: 3600
 
 - name: Start and enable Docker
   service:
