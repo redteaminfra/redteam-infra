@@ -1,26 +1,14 @@
-Role Name
+molly-guard
 =========
 
-Installs the molly-guard package
+Installs the `mollyguard` package to force typing in the hostname to avoid accidental reboots.
 
-Requirements
-------------
-
-None
-
-Role Variables
---------------
-
-None
-
-Dependencies
-------------
-
-None
 
 Example Playbook
 ----------------
 
-    - hosts: servers
-      roles:
-         - molly-guard
+```yml
+- hosts: all
+  roles:
+     - molly-guard
+```
