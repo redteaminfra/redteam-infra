@@ -4,6 +4,21 @@
     update_cache: yes
     upgrade: dist
 
+- name: allow 192.168.0.0/16
+  iptables:
+    action: insert
+    chain: "{{ item }}"
+    jump: ACCEPT
+    source: 192.168.0.0/16
+    destination: 192.168.0.0/16
+  loop:
+    - INPUT
+    - OUTPUT
+
+- name: save iptables
+  command:
+    cmd: iptables-save -f /etc/iptables/rules.v4
+
 - name: install software common to all hosts
   apt:
     name:
@@ -11,11 +26,26 @@
       - screen
       - tmux
 
+- name: permanently disable IPv6
+  copy:
+    dest: /etc/default/grub.d/99-disable-ipv6.cfg
+    content: |
+      GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
+
+- name: update grub to disable IPv6 on reboot
+  command: update-grub
+
+- name: immediately disable IPv6
+  sysctl:
+    name: net.ipv6.conf.all.disable_ipv6
+    value: '1'
+    state: present
+    sysctl_set: true
+
 - name: /etc/hosts
   template:
     src: templates/hosts.j2
     dest: /etc/hosts
     owner: root
-    group: root
     mode: 0644
     backup: true
