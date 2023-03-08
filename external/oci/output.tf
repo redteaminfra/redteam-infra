@@ -14,6 +14,25 @@ resource "local_file" "ssh_stanza" {
   })
 }
 
+
+resource "local_file" "ansible_inventory" {
+  depends_on = [oci_core_instance.homebase, oci_core_instance.proxy, oci_core_instance.elk]
+  filename = "../../ansible/inventory.ini"
+  file_permission = "0600"
+  content = templatefile("../templates/inventory.ini.tftpl", {
+    homebase = oci_core_instance.homebase.display_name,
+    proxies  = { for instance in oci_core_instance.proxy: instance.display_name => instance.private_ip },
+    elk      = { (oci_core_instance.elk.display_name) = oci_core_instance.elk.private_ip },
+    username = var.image_username,
+    key      = var.ssh_provisioning_private_key
+  })
+}
+
+output "run-ansible" {
+  value = "Add your ssh users.yml file to ../../ansible/playbooks make any modification you need to site.yml, homebase.yml, proxies.yml, elk.yml, then run ansible\n\n\tcd ../../ansible && ansible-playbook -i inventory.ini site.yml\n"
+}
+
 output "good-bye" {
   value = "Have a nice day!"
 }
+

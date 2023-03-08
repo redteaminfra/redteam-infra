@@ -35,6 +35,6 @@ proxy_count    = 2
 elk_shape      = "VM.Standard2.1"
 
 # Set to IP's and/or IP ranges you would like to have SSH access to the infrastructure
-# Each item in range should be an address range in cidr formate
+# Each item in range should be an address range in cidr format
 # e.g. ssh_allowed_cidr_ranges = ["192.168.32.0/25", "172.16.0.0/16"]
 ssh_allowed_cidr_ranges = []
