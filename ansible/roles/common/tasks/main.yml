@@ -16,8 +16,7 @@
     - OUTPUT
 
 - name: save iptables
-  command:
-    cmd: iptables-save -f /etc/iptables/rules.v4
+  command: iptables-save -f /etc/iptables/rules.v4
 
 - name: install software common to all hosts
   apt:
