@@ -1,0 +1,7 @@
+---
+- hosts: homebase
+  become: yes
+  roles:
+    - nfs-server
+    - homebase
+    - etherpad

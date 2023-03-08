@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: yes
+  roles:
+    - common
+    - molly-guard
+    - logstash
+    - yama
+    - oci
+
+- import_playbook: homebase.yml
+- import_playbook: proxies.yml
+- import_playbook: elk.yml
+- import_playbook: ssh/users.yml
