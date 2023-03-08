@@ -1,2 +1,2 @@
 ---
-elk_version: "{{ elk_version | default(\"6.8.23\") }}"
+elk_version: "{{ version | default('6.8.23') }}"
