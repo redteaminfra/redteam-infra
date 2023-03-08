@@ -105,7 +105,7 @@ def check_port(proxyport):
 
 def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP, user):
 
-    ssh_path = "/opt/sshproxy/config-%d" % (proxyport)
+    ssh_path = "/opt/ssh-proxy/config-%d" % (proxyport)
     ssh_contents = SSH % {
         'middleName': middleName,
         'middleIP': middleIP,
@@ -120,7 +120,7 @@ def install_service_files(proxyport, key, middleName, middleIP, edgeName, edgeIP
     with open(ssh_path, "w") as f:
         f.write(ssh_contents)
 
-    service_path = "/etc/systemd/system/sshproxy-%d.service" % (proxyport)
+    service_path = "/etc/systemd/system/ssh-proxy-%d.service" % (proxyport)
     systemd_contents = SYSTEMD % {
         'sshconfig': ssh_path,
         'proxyport': proxyport,
@@ -147,7 +147,7 @@ def start_and_enable(service_path):
 def accept_keys(ssh_path, edgeName, proxyport):
     print("[*] Run these commands to accept the SSH keys and bootstrap the ssh tunnel\n")
     print("sudo ssh -F %s %s\n" % (ssh_path, edgeName))
-    print("sudo systemctl restart sshproxy-%d.service" % proxyport)
+    print("sudo systemctl restart ssh-proxy-%d.service" % proxyport)
 
 
 def main():
