@@ -17,5 +17,4 @@
   loop: "{{ cidrs }}"
 
 - name: save iptables
-  shell:
-    cmd: iptables-save > /etc/iptables/rules.v4
+  command: iptables-save -f /etc/iptables/rules.v4
