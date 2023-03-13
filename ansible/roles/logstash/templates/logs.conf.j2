@@ -10,24 +10,28 @@ input {
           "/var/log/apache2/access.log",
           "/var/log/apache2/error.log",
           "/var/log/openresty/error.log",
-          "/var/log/openresty/access.log"
+          "/var/log/openresty/access.log",
+          "/opt/cobaltstrike/logs/*/*/*.log",
+          "/opt/cobaltstrike/logs/*/*.log",
+          "/opt/cobaltstrike/logs/C2-Monitor.log",
+          "/opt/irc/irclogs/#*.log"
         ]
   }
 }
 
 filter {
   mutate {
-    update => { "host" => "${hostname}" }
+    update => { "host" => "{{ ansible_hostname }}" }
   }
   grok {
-    match => { "message" => "%{IP:client}" }
+    match => { "message" => "{{ ansible_default_ipv4.address }}" }
   }
 }
 
 
 output {
   elasticsearch {
-    hosts => "${server}:9200"
+    hosts => "elk:9200"
     index => "logstash-%{+YYYY.MM.dd}"
     document_type => "%{[@metadata][type]}"
   }

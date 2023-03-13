@@ -26,8 +26,8 @@
 - name: add hostname to /etc/default/logstash
   lineinfile:
     path: /etc/default/logstash
-    regex: '^hostname'
-    line: 'hostname {{ ansible_hostname }}'
+    regex: '(?i)^hostname'
+    line: 'HOSTNAME={{ ansible_hostname }}'
     create: true
     owner: root
     group: root
@@ -36,20 +36,20 @@
 - name: point to elk server
   lineinfile:
     path: /etc/default/logstash
-    regex: '^server'
-    line: 'server elk'
+    regex: '(?i)^server'
+    line: 'SERVER=elk'
 
 - name: create inputs directory
   file:
-    path: /etc/logstash/conf.d/inputs
+    path: /etc/logstash/conf.d/
     mode: 0755
     owner: root
     state: directory
 
 - name: copy logstash host configuration
-  copy:
-    src: files/{{ group_names[0] }}.conf
-    dest: /etc/logstash/conf.d/inputs/{{ group_names[0] }}.conf
+  template:
+    src: templates/logs.conf.j2
+    dest: /etc/logstash/conf.d/logs.conf
     mode: 0644
     owner: root
     force: true
@@ -69,3 +69,18 @@
     mode: 0644
     owner: root
     force: true
+
+- name: copy logstash service
+  copy:
+    src: files/logstash.service
+    dest: /etc/systemd/system/logstash.service
+    mode: 0644
+    owner: root
+
+- name: enable logstash
+  systemd:
+    name: logstash.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+

@@ -17,6 +17,7 @@ services:
       - esdata1:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+    restart: unless-stopped
     networks:
       - esnet
   elasticsearch2:
@@ -33,6 +34,7 @@ services:
         hard: -1
     volumes:
       - esdata2:/usr/share/elasticsearch/data
+    restart: unless-stopped
     networks:
       - esnet
 
@@ -43,6 +45,7 @@ services:
     environment:
       SERVER_NAME: elk.infra.redteam
       ELASTICSEARCH_HOSTS: http://redelasticsearch:9200
+    restart: unless-stopped
     networks:
       - esnet
 
