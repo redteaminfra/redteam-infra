@@ -1,0 +1,28 @@
+---
+- name: increase vm.max_map_count
+  sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    reload: true
+
+- name: create elk directory
+  file:
+    path: /opt/elk/
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Create Docker Compose template
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /opt/elk/docker-compose.yml
+    mode: 0644
+    owner: root
+    group: root
+
+- name: run docker-compose ELK stack
+  command: docker compose up -d
+  args:
+    chdir: /opt/elk

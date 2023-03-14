@@ -1,9 +1,0 @@
-#!/bin/bash
-
-CIDRS="10.10.10.10/32
-"
-
-for i in $CIDRS; do
-    iptables -A OUTPUT -p tcp --dest $i -m state --state NEW -j DROP
-    iptables -A OUTPUT -p udp --dest $i -j DROP
-done

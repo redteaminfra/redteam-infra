@@ -1,0 +1,38 @@
+# Copyright (c) 2023, Oracle and/or its affiliates.
+
+input {
+  file {
+    type => "syslog"
+    path => [
+          "/var/log/auth.log",
+          "/var/log/kern.log",
+          "/var/log/syslog",
+          "/var/log/apache2/access.log",
+          "/var/log/apache2/error.log",
+          "/var/log/openresty/error.log",
+          "/var/log/openresty/access.log",
+          "/opt/cobaltstrike/logs/*/*/*.log",
+          "/opt/cobaltstrike/logs/*/*.log",
+          "/opt/cobaltstrike/logs/C2-Monitor.log",
+          "/opt/irc/irclogs/#*.log"
+        ]
+  }
+}
+
+filter {
+  mutate {
+    update => { "host" => "{{ ansible_hostname }}" }
+  }
+  grok {
+    match => { "message" => "{{ ansible_default_ipv4.address }}" }
+  }
+}
+
+
+output {
+  elasticsearch {
+    hosts => "elk:9200"
+    index => "logstash-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}

@@ -1,0 +1,6 @@
+---
+- hosts: elk
+  become: yes
+  roles:
+    - elk
+    - unattended-upgrades

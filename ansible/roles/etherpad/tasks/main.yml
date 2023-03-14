@@ -1,0 +1,31 @@
+---
+# tasks file for etherpad
+- name: create user etherpad
+  user:
+    name: etherpad
+    uid: 5001
+    home: /opt/etherpad
+    system: true
+    shell: /usr/sbin/nologin
+    state: present
+
+- name: create etherpad data directory
+  file:
+    path: /opt/etherpad/etherpad_data
+    owner: etherpad
+    group: etherpad
+    mode: 0700
+    state: directory
+
+- name: copy docker-compose.yml
+  copy:
+    src: files/docker-compose.yml
+    dest: /opt/etherpad/docker-compose.yml
+    owner: etherpad
+    group: etherpad
+    mode: 0600
+
+- name: run docker-compose etherpad
+  command: docker compose up -d
+  args:
+    chdir: /opt/etherpad

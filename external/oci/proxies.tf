@@ -30,7 +30,6 @@ resource "oci_core_instance" "proxy" {
 
   metadata = {
     ssh_authorized_keys = file(var.ssh_provisioning_public_key)
-    user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {
@@ -40,58 +39,5 @@ resource "oci_core_instance" "proxy" {
       name          = "Compute Instance Monitoring"
       desired_state = "DISABLED"
     }
-  }
-
-  connection {
-    host        = self.private_ip
-    type        = "ssh"
-    user        = var.image_username
-    private_key = file(var.ssh_provisioning_private_key)
-    timeout     = "3m"
-
-    bastion_host = oci_core_instance.homebase.public_ip
-    bastion_user = var.image_username
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /tmp/host-share/",
-    ]
-  }
-
-  provisioner "file" {
-    source      = "../global/host-share/"
-    destination = "/tmp/host-share/"
-  }
-
-  provisioner "file" {
-    source      = "../../puppet"
-    destination = "/tmp/host-share/"
-  }
-
-  provisioner "file" {
-    source      = "../global/proxies"
-    destination = "/tmp/host-share/"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /tmp/host-share/puppet/manifests",
-      "ln -s /tmp/host-share/proxies/puppet//manifests/site.pp /tmp/host-share/puppet/manifests/site.pp",
-      "if [ ! -L /etc/infra/site ]; then sudo mkdir -p /etc/infra && sudo ln -s external/global/proxies/puppet/manifests/site.pp /etc/infra/site; fi",
-    ]
-  }
-
-  provisioner "remote-exec" {
-      inline = [
-        "cloud-init status --wait"
-      ]
-    }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo bash -e /tmp/host-share/finish.sh",
-      "sudo bash -e /tmp/host-share/oci_iptables_fix.sh",
-    ]
   }
 }

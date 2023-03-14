@@ -1,0 +1,2 @@
+---
+elk_version: "{{ version | default('6.8.23') }}"

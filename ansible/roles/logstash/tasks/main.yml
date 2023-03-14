@@ -1,0 +1,86 @@
+---
+- name: add elastic key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: add elastic repo
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/{{ logstash_repo }}/apt stable main
+    state: present
+
+- name: install required packages
+  apt:
+    name:
+      - apt-transport-https
+      - openjdk-{{ openjdk_version }}-jre-headless
+    update_cache: yes
+
+- name: install logstash
+  apt:
+    name:
+      - logstash
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: add hostname to /etc/default/logstash
+  lineinfile:
+    path: /etc/default/logstash
+    regex: '(?i)^hostname'
+    line: 'HOSTNAME={{ ansible_hostname }}'
+    create: true
+    owner: root
+    group: root
+    mode: 0644
+
+- name: point to elk server
+  lineinfile:
+    path: /etc/default/logstash
+    regex: '(?i)^server'
+    line: 'SERVER=elk'
+
+- name: create inputs directory
+  file:
+    path: /etc/logstash/conf.d/
+    mode: 0755
+    owner: root
+    state: directory
+
+- name: copy logstash host configuration
+  template:
+    src: templates/logs.conf.j2
+    dest: /etc/logstash/conf.d/logs.conf
+    mode: 0644
+    owner: root
+    force: true
+
+- name: copy logstash configuration
+  copy:
+    src: files/logstash.yml
+    dest: /etc/logstash/logstash.yml
+    mode: 0644
+    owner: root
+    force: true
+
+- name: copy logstash configuration
+  copy:
+    src: files/logstash.yml
+    dest: /etc/logstash/logstash.yml
+    mode: 0644
+    owner: root
+    force: true
+
+- name: copy logstash service
+  copy:
+    src: files/logstash.service
+    dest: /etc/systemd/system/logstash.service
+    mode: 0644
+    owner: root
+
+- name: enable logstash
+  systemd:
+    name: logstash.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+

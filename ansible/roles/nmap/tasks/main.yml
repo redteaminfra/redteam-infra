@@ -1,0 +1,8 @@
+---
+- name: determine if nmap exists
+  command: which nmap
+  register: result
+  failed_when: result.rc > 2
+
+- include_tasks: nmap.yml
+  when: result.rc == 1

@@ -23,7 +23,6 @@ resource "oci_core_instance" "homebase" {
 
   metadata = {
     ssh_authorized_keys = file(var.ssh_provisioning_public_key)
-   user_data           = base64encode(file("../global/host-share/user_data.yml"))
   }
 
   agent_config {
@@ -36,59 +35,4 @@ resource "oci_core_instance" "homebase" {
   }
 
   preserve_boot_volume = var.preserve_boot_volume
-
-  # bootstrap puppet
-  provisioner "local-exec" {
-    command = "bash -c \"cd $(git rev-parse --show-toplevel); tar -czf external/global/host-share/bootstrap-puppet.tgz .git\""
-  }
-
-  connection {
-    host        = self.public_ip
-    type        = "ssh"
-    user        = var.image_username
-    private_key = file(var.ssh_provisioning_private_key)
-    timeout     = "3m"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /tmp/host-share/",
-    ]
-  }
-
-  provisioner "file" {
-    source      = "../global/host-share/"
-    destination = "/tmp/host-share/"
-  }
-
-  provisioner "file" {
-    source      = "../../puppet"
-    destination = "/tmp/host-share/"
-  }
-
-  provisioner "file" {
-    source      = "../global/homebase"
-    destination = "/tmp/host-share/"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /tmp/host-share/puppet/manifests",
-      "ln -s /tmp/host-share/homebase/puppet/manifests/site.pp /tmp/host-share/puppet/manifests/site.pp",
-      "if [ ! -L /etc/infra/site ]; then sudo mkdir -p /etc/infra && sudo ln -s external/global/homebase/puppet/manifests/site.pp /etc/infra/site; fi",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "cloud-init status --wait"
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo bash -e /tmp/host-share/finish.sh",
-      "sudo bash -e /tmp/host-share/oci_iptables_fix.sh",
-    ]
-  }
 }

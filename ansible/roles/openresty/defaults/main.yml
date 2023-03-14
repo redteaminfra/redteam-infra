@@ -1,0 +1,3 @@
+openresty_ports:
+  - 80
+  - 443

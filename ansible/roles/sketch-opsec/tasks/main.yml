@@ -1,0 +1,31 @@
+---
+# tasks file for sketchopsec
+- name: ensure middles and edges are defined
+  assert:
+    that:
+      - "{{ middles }} is defined"
+      - "{{ middles }} | length > 0"
+      - "{{ middles }} != None"
+      - "{{ edges }} is defined"
+      - "{{ edges }} | length > 0"
+      - "{{ edges }} != None"
+    fail_msg: "Middles and Edges need to be defined for this role to work."
+
+- name: block middles
+  iptables:
+    chain: OUTPUT
+    destination: "{{ item }}"
+    jump: DROP
+  loop: "{{ middles }}"
+  when: ('homebase' in group_names) or
+    ('elk' in group_names)
+
+- name: block edges
+  iptables:
+    chain: OUTPUT
+    destination: "{{ item }}"
+    jump: DROP
+  loop: "{{ edges }}"
+
+- name: save iptables
+  command: iptables-save -f /etc/iptables/rules.v4

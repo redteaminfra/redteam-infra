@@ -1,0 +1,22 @@
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=ubuntu
+ansible_ssh_host_key_checking=no
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+ansible_ssh_common_args=-o UserKnownHostsFile=/dev/null
+
+[homebase]
+homebase-development
+
+[proxies:vars]
+ansible_ssh_extra_args=-o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 -W %h:%p ubuntu@homebase-development'
+
+[elk:vars]
+ansible_ssh_extra_args=-o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 -W %h:%p ubuntu@homebase-development'
+
+[proxies]
+proxy01-development ansible_host=192.168.2.11
+proxy02-development ansible_host=192.168.2.12
+
+[elk]
+elk-development ansible_host=192.168.1.13

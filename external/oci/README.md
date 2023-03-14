@@ -15,7 +15,7 @@ tenancy=< TENANCY OCID HERE >
 region=< REGION HERE >
 ```
 
-Copy `example-variables.tfvars` to `variables.tfvars` and modify the following variables to suit your needs:
+Copy `variables.tfvars.example` to `variables.tfvars` and modify the following variables to suit your needs:
 
 ``` terraform
 # Provider initialization (tenancy, api user, key, region, etc.)
@@ -67,6 +67,9 @@ From there you can run
 
 ### ssh-config
 An SSH config will be placed into your defined `ssh_config_path` the default path is `~/.ssh`. It will be named after your engagement name
+
+### ansible inventory
+An `inventory.ini` file will be created with homebase, proxy and elk hosts and placed in `../../ansible/`
 
 # Making Changes
 

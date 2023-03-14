@@ -1,0 +1,11 @@
+---
+- hosts: proxies
+  become: yes
+  roles:
+    - nfs-client
+    - nmap
+    - ssh-proxy
+    - openresty
+    - dante-server
+    - unattended-upgrades
+    - proxies
