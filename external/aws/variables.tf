@@ -1,25 +1,29 @@
-variable "instance_types" {
-  type    = "map"
-  default = {
-    "dev" = "t3.nano"
-    "prod" = "t3.large"
-  }
+variable "homebase_shape" {}
+variable "proxy_shape" {}
+variable "elk_shape" {}
+
+variable "image_username" {
+  default = "ubuntu"
 }
 
-variable "amis" {
-  type = "map"
-  default = {
-    "ubuntu18.04" = "ami-0e3e4660d8725dd31"
-    "kali 2018.3a" = "ami-0f95cde6ebe3f5ec3"
-  }
+variable "ssh_config_path" {
+  default = "~/.ssh"
 }
 
 variable "env" {
   default = "dev"
 }
 
+variable "boot_volume_size_in_gbs" {
+  default = 512
+}
+
 variable "profile" {
   default = "terraform"
+}
+
+variable "proxy_count" {
+  default = 1
 }
 
 variable "region" {
@@ -38,12 +42,18 @@ variable "key_name" {
   default = "~/.ssh/id_rsa"
 }
 
-variable "aws_key_name" {
+variable "public_key" {
+  default = "~/.ssh/id_rsa.pub"
+  
 }
 
-variable "op_name" {
+variable "engagement_name" {
 }
 
-variable "subnet_cidr" {
+variable "vpc_cidr_block" {
   default = "192.168.0.0/16"
+}
+
+variable "ssh_allowed_cidr_ranges" {
+  type = set(string)
 }

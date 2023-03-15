@@ -12,19 +12,9 @@ You'll need to generate a PRIVATEKEY.pem file and copy it in to the ~/.aws direc
 
 To do so, log in to AWS and navigate to EC2. Under Network and Security select 'Key Pairs'. Select 'Create Key Pair' and use your username. It should automatically download a .pem file. Copy this .pem file to your AWS directory and rename (mv) it from your username to 'PRIVATEKEY.pem'
 
-Source your aws setup from `~/.aws/awssetup.sh` and make it look like
 
-```
-export AWS_KEY="KEY"
-export AWS_SECRET="SECRET"
-export AWS_KEYNAME=USERNAME
-export AWS_KEYPATH=~/.aws/PRIVATEKEY.pem
-export AWS_ACCESS_KEY_ID="KEY"
-export AWS_SECRET_ACCESS_KEY="SECRET"
-```
-From there run `source ~/.aws/awssetup.sh` before doing any deployments.
 
-You also need to set up your AWS credentials in `~/.aws/credentials`
+You also need to put your AWS credentials in `~/.aws/credentials`
 
 ```
 [default]
@@ -41,14 +31,46 @@ Also set `~/.aws/config` to your zone such as
 region=us-west-2
 ```
 
-You will also need to set up a `variables.tfvars` file
+You will also need to set up a `variables.tfvars` file see the `example-variables.tfvars` for an example.
 
-```
-key_name = "<Location of your key ie ~/.ssh/deploy. Note; this cannot be a password protected key>"
-op_name = "<OP NAME HERE>"
-aws_key_name = "<Name you will give your key in AWS>"
-```
+``` terraform
+# Provider initialization (tenancy, api user, key, region, etc.)
+shared_credentials_file = "~/.aws/credentials"
 
+
+
+# Optional, default path is `~/.ssh`
+#ssh_config_path              = ""
+
+#Key Pair for sshing to hosts
+key_name = "~/.ssh/id_rsa"
+public_key = "~/.ssh/id_rsa.pub"
+
+# Which region
+aws_key_name = ""
+# use the Region Identifier, e.g: us-west-2
+region         = "us-west-2"
+# Which availability zone
+availability_zone      = "us-west-2a"
+
+# The engagement's name, infrastructure will be named after this
+engagement_name = "test"
+
+#"dev" = "t3.medium"
+#"prod" = "t3.large"
+# define the shape for homebase
+homebase_shape = "t3.medium"
+# define the shape for proxies
+proxy_shape    = "t3.medium"
+proxy_count    = 2
+# define the shape for elk
+elk_shape      = "t3.medium"
+
+# Set to IP's and/or IP ranges you would like to have SSH access to the infrastructure
+# Each item in range should be an address range in cidr formate
+# e.g. ssh_allowed_cidr_ranges = ["192.168.32.0/25", "172.16.0.0/16"]
+ssh_allowed_cidr_ranges = [""]
+```
 ## Repo Setup
 
 Because terraform makes a local folder to house all information about state, we need a copy of this repository for every VPC we need in AWS.
@@ -65,23 +87,30 @@ Once the repo is forked and cloned, you may need to make some additional modific
 
 In order to start an OP VPC you will need to
 
-1. fork repo to https://github/Intel/redteam-infra/
+1. fork repo to https://github.com/redteaminfra/redteam-infra
 2. change homebase to m4.4xlarge
 3. change ELK to t2.large
 
-## Setup Rules for VPC
-
-1. Put a list of OPs in `ssh_from_company` in `main.tf` that your company uses for OUTBOUND traffic. This will be used for both SSH inbound and OPSEC rules
-
 ## Make a new VPC
 
-1. terraform init
-2. terraform apply -auto-approve -var-file=variables.tfvars
+1. `terraform init`
+2. `terraform apply -auto-approve -var-file=variables.tfvars`
 
 ## Destroy a VPC
 
-1. `virtualenv -p python3 venv`
-2. `. venv/bin/activate`
-3. `pip3 install -r requirements.txt`
-4. `./backup_ebs.py -i <VPC-########> -d <description>`
-5. `./del_vpc.py -i <VPC-########>`
+1. `terraform destroy -var-file=variables.tfvars`
+
+
+### ssh-config
+An SSH config will be placed into your defined `ssh_config_path` the default path is `~/.ssh`. It will be named after your engagement name
+
+### ansible inventory
+An `inventory.ini` file will be created with homebase, proxy and elk hosts and placed in `../../ansible/`
+
+# Making Changes
+
+## Proxy Inbound Network Rules
+
+We define one Network Security Group (NSG) for both proxies and `network.tf` becomes the source for the rules governing the NSG. The NSG is attached to the proxy01 and proxy02 VNIC.
+
+Terraform will cycle the VNIC when doing this attachment, so if you are applying this change to a running infra, it will cause the proxies to have new public IP.

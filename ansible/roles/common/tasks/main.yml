@@ -4,6 +4,14 @@
     update_cache: yes
     upgrade: dist
 
+- name: install software common to all hosts
+  apt:
+    name:
+      - python3-pip
+      - screen
+      - tmux
+      - iptables-persistent
+
 - name: allow 192.168.0.0/16
   iptables:
     action: insert
@@ -18,13 +26,6 @@
 - name: save iptables
   command: iptables-save -f /etc/iptables/rules.v4
 
-- name: install software common to all hosts
-  apt:
-    name:
-      - python3-pip
-      - screen
-      - tmux
-
 - name: permanently disable IPv6
   copy:
     dest: /etc/default/grub.d/99-disable-ipv6.cfg
@@ -33,6 +34,17 @@
 
 - name: update grub to disable IPv6 on reboot
   command: update-grub
+
+- name: update hostnames if required
+  hostname:
+    name: "{{ inventory_hostname }}"
+  when: ansible_facts.hostname != inventory_hostname
+
+- name: update facts if required
+  setup:
+    filter:
+      - 'ansible_hostname'
+  when: ansible_facts.hostname != inventory_hostname
 
 - name: /etc/hosts
   template:
