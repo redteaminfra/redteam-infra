@@ -71,17 +71,6 @@ elk_shape      = "t3.medium"
 # e.g. ssh_allowed_cidr_ranges = ["192.168.32.0/25", "172.16.0.0/16"]
 ssh_allowed_cidr_ranges = [""]
 ```
-## Repo Setup
-
-Because terraform makes a local folder to house all information about state, we need a copy of this repository for every VPC we need in AWS.
-
-1. git clone https://github.com/redteaminfra/redteam-infra <OPNAME>
-2. Make a new repo in RedTeamInfra called <OPNAME>
-3. git remote rm origin
-4. git remote add origin git@github.com:redteaminfra/<OPNAME>
-5. git push origin master
-
-Once the repo is forked and cloned, you may need to make some additional modifications to the puppet modules depending on your use cases. View the README in the puppet repo for additional documentation.
 
 ## What to do
 
