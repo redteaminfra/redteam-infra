@@ -18,9 +18,6 @@ variable "boot_volume_size_in_gbs" {
   default = 512
 }
 
-variable "profile" {
-  default = "terraform"
-}
 
 variable "proxy_count" {
   default = 1
