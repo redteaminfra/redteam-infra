@@ -20,8 +20,6 @@ You also need to put your AWS credentials in `~/.aws/credentials`
 [default]
 aws_access_key_id = <STUFF>
 aws_secret_access_key = <THINGS>
-AWS_KEY = <Same as aws_access_key_id>
-AWS_SECRET=<Same as aws_secret_access_key>
 ```
 
 Also set `~/.aws/config` to your zone such as

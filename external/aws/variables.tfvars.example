@@ -14,12 +14,12 @@ public_key = "~/.ssh/id_rsa.pub"
 # Which region
 aws_key_name = ""
 # use the Region Identifier, e.g: us-west-2
-region         = "us-west-2"
+region = ""
 # Which availability zone
-availability_zone      = "us-west-2a"
+availability_zone = ""
 
 # The engagement's name, infrastructure will be named after this
-engagement_name = "test"
+engagement_name = ""
 
 #"dev" = "t3.medium"
 #"prod" = "t3.large"
