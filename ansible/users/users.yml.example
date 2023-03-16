@@ -2,7 +2,7 @@
 - name: example task to create users and groups
   hosts: all
   become: yes
-  task:
+  tasks:
     - name: add groups
       group:
         name: "{{ item }}"
@@ -26,8 +26,9 @@
         append: no
         password: '*'
         state: present
+        shell: /bin/bash
 
-    - name add hacker's public key
+    - name: add hacker's public key
       authorized_key:
         user: hacker
         state: present
