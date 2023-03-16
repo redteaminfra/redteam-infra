@@ -10,14 +10,9 @@ variable "ssh_config_path" {
   default = "~/.ssh"
 }
 
-variable "env" {
-  default = "dev"
-}
-
 variable "boot_volume_size_in_gbs" {
   default = 512
 }
-
 
 variable "proxy_count" {
   default = 1
