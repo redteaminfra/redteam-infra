@@ -93,6 +93,7 @@ An SSH config will be placed into your defined `ssh_config_path` the default pat
 
 ### ansible inventory
 An `inventory.ini` file will be created with homebase, proxy and elk hosts and placed in `../../ansible/`
+Inside the `ansible/site.yaml uncomment the aws role to ensure that the VPC DNS resolver is blocked.
 
 # Making Changes
 
