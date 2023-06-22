@@ -10,7 +10,6 @@ resource "oci_core_vcn" "infra_vcn" {
   cidr_block     = var.vcn_cidr_block
   compartment_id = var.compartment_id
   display_name   = format("%s-vcn", var.engagement_name)
-  dns_label      = format("%s", var.engagement_name)
   freeform_tags  = local.tags
 }
 
@@ -69,7 +68,6 @@ resource "oci_core_subnet" "infra" {
   route_table_id = oci_core_route_table.internet_gateway_route_table.id
 
   display_name = "infra-subnet"
-  dns_label    = "infra"
   cidr_block   = var.subnet_cidr_blocks["infra"]
 }
 
@@ -89,7 +87,6 @@ resource "oci_core_subnet" "utility" {
   route_table_id = oci_core_route_table.nat_gateway_route_table.id
 
   display_name = "utility-subnet"
-  dns_label    = "utility"
   cidr_block   = var.subnet_cidr_blocks["utility"]
 }
 
@@ -109,7 +106,6 @@ resource "oci_core_subnet" "proxy" {
   route_table_id = oci_core_route_table.internet_gateway_route_table.id
 
   display_name = "proxy-subnet"
-  dns_label    = "proxy"
   cidr_block   = var.subnet_cidr_blocks["proxy"]
 }
 
