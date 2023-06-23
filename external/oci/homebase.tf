@@ -15,7 +15,6 @@ resource "oci_core_instance" "homebase" {
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.infra.id
-    hostname_label = "homebase-${var.engagement_name}"
 
     private_ip       = cidrhost(var.subnet_cidr_blocks["infra"], 10)
     assign_public_ip = true

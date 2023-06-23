@@ -17,7 +17,6 @@ resource "oci_core_instance" "proxy" {
 
   create_vnic_details {
     subnet_id = oci_core_subnet.proxy.id
-    #    hostname_label = self.display_name #"proxy${format("%02g", count.index + 1)}-${var.operation_name}"
     #    display_name   = "proxy${format("%02g", count.index + 1)}-${var.operation_name}"
 
     private_ip             = cidrhost(var.subnet_cidr_blocks["proxy"], count.index + 11)

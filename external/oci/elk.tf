@@ -16,7 +16,6 @@ resource "oci_core_instance" "elk" {
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.utility.id
-    hostname_label = "elk-${var.engagement_name}"
 
     private_ip       = cidrhost(var.subnet_cidr_blocks["utility"], 13)
     assign_public_ip = false
