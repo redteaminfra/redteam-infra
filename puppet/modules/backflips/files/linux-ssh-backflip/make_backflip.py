@@ -93,7 +93,7 @@ def main():
     f = tempfile.NamedTemporaryFile(delete=False)
     f.write(cmd)
     print "[+] This is also available to you in the file %s" % f.name
-    print "[*] Once this tunnel is up run: install_../autossh_backflip.py %s PROXYPORT %s" % (port, KEYPATH)
+    print "[*] Once this tunnel is up run: ../install_autossh_backflip.py %s PROXYPORT %s" % (port, KEYPATH)
 
 
 if __name__ == "__main__":
