@@ -16,6 +16,14 @@
     state: present
     update_cache: yes
 
+- name: create nginx directory
+  file:
+    path: /etc/nginx/sites-enabled
+    state: directory
+    owner: root
+    mode: 0755
+    recurse: yes
+
 - name: create openresty log directory
   file:
     path: /var/log/openresty
