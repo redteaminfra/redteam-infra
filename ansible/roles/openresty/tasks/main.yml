@@ -16,9 +16,17 @@
     state: present
     update_cache: yes
 
-- name: create nginx directory
+- name: create nginx sites-enabled directory
   file:
     path: /etc/nginx/sites-enabled
+    state: directory
+    owner: root
+    mode: 0755
+    recurse: yes
+  
+- name: create nginx sites-available directory
+  file:
+    path: /etc/nginx/sites-available
     state: directory
     owner: root
     mode: 0755
