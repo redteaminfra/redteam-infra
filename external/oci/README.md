@@ -8,9 +8,8 @@ Copy `variables.tfvars.example` to `variables.tfvars` and modify the following v
 
 ``` terraform
 # Provider initialization
-# See https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/clitoken.htm for more detail documentation
+# See https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/clitoken.htm for more details documentation
 config_file_profile = ""
-
 
 # Used for initial ssh cap from where terraform is run (ie workstation) into cloud instances
 ssh_provisioning_private_key = ""
@@ -53,7 +52,7 @@ ssh_allowed_cidr_ranges = []
 Can be whatever you'd like, tenancy name is recommended
 
 Running something like: 
-`oci session authenticate --profile-name CloudyCloudMcCloud --region us-ashburn-1 --tenancy-name CloudyCloudMcCloud` will launch a web browser for you to authenticate to your tenancy. It will also give you the URI you need to visit if a web-browser isn't configured to open.
+`oci session authenticate --profile-name CloudyCloudMcCloud --region us-ashburn-1 --tenancy-name CloudyCloudMcCloud` will launch a web browser for you to authenticate to your tenancy. It will also give you the URI you need to visit if a web-browser isn't configured to open. Use the value for `--profile-name` as the value for your `config_file_profile` variable.
 
 From there you can run
 
