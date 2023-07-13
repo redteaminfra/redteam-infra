@@ -70,6 +70,12 @@
     owner: root
     force: true
 
+- name: ensure logstash can read logs
+  user:
+    name: "logstash"
+    groups: "adm"
+    append: true
+
 - name: copy logstash service
   copy:
     src: files/logstash.service

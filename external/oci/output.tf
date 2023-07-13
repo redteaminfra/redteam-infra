@@ -1,7 +1,7 @@
 # Copyright (c) 2023, Oracle and/or its affiliates.
 
-output "ubuntu-20-04-latest-name" {
-  value = data.oci_core_images.ubuntu-20-04.images.0.display_name
+output "ubuntu-version-name" {
+  value = data.oci_core_images.ubuntu-version.images.0.display_name
 }
 
 resource "local_file" "ssh_stanza" {

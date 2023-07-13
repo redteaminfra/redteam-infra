@@ -14,6 +14,15 @@ variable "homebase_shape" {}
 variable "proxy_shape" {}
 variable "elk_shape" {}
 
+variable "ubuntu-version" {
+  description = "The version of Ubuntu you would like to use. Use the version number."
+  default = "22.04"
+}
+
+variable "is_production" {
+  default = false
+}
+
 variable "ssh_config_path" {
   default = "~/.ssh"
 }
