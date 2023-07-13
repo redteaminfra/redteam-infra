@@ -1,11 +1,7 @@
 # Copyright (c) 2023, Oracle and/or its affiliates.
 
-variable "tenancy_ocid" {}
-variable "user_ocid" {}
 variable "compartment_id" {}
 variable "ad_number" {}
-variable "fingerprint" {}
-variable "private_key_path" {}
 variable "ssh_provisioning_private_key" {}
 variable "ssh_provisioning_public_key" {}
 variable "region" {}
@@ -13,6 +9,8 @@ variable "engagement_name" {}
 variable "homebase_shape" {}
 variable "proxy_shape" {}
 variable "elk_shape" {}
+
+variable "config_file_profile" {}
 
 variable "ubuntu-version" {
   description = "The version of Ubuntu you would like to use. Use the version number."

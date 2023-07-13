@@ -1,10 +1,7 @@
 # Copyright (c) 2023, Oracle and/or its affiliates.
 
-# Provider initialization (tenancy, api user, key, region, etc.)
-tenancy_ocid     = ""
-user_ocid        = ""
-fingerprint      = ""
-private_key_path = ""
+# Provider initialization
+config_file_profile = ""
 
 # Used for initial ssh cap from where terraform is run (ie workstation) into cloud instances
 ssh_provisioning_private_key = ""
