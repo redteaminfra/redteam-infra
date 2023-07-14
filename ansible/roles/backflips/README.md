@@ -1,29 +1,22 @@
-Role Name
+backflips
 =========
 
-A brief description of the role goes here.
+These are backflip scripts used to create ssh backflips. This allows
+for a connection outbound from a compromised unix system to an attack
+machine that provides a reverse tunnel back into the attack machine's
+ssh server. It deploys keys to make this all possible.
 
-Requirements
-------------
+Linux backflips are in `files/flip_files/linux-ssh-backflips`.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+OS X backflips are in `files/flip_files/osx-ssh-backflips`.
 
-Role Variables
---------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
 
 ```yml
-- hosts: servers
+- hosts: proxies
   roles:
    - backflips
 ```
