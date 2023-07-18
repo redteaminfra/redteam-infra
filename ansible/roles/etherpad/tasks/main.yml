@@ -7,6 +7,7 @@
     home: /opt/etherpad
     system: true
     shell: /usr/sbin/nologin
+    create_home: false
     state: present
 
 - name: create etherpad data directory
@@ -14,8 +15,9 @@
     path: /opt/etherpad/etherpad_data
     owner: etherpad
     group: etherpad
-    mode: 0700
+    mode: 0755
     state: directory
+    recurse: true
 
 - name: copy docker-compose.yml
   copy:

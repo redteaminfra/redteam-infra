@@ -2,6 +2,7 @@ version: '3'
 services:
   etherpad:
     image: etherpad/etherpad
+    restart: unless-stopped
     ports:
       - "9001:9001"
     volumes:
