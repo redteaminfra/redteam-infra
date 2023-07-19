@@ -15,6 +15,10 @@ resource "oci_core_instance" "proxy" {
     boot_volume_size_in_gbs = var.boot_volume_size_in_gbs
   }
 
+  instance_options {
+    are_legacy_imds_endpoints_disabled = true
+  }
+
   create_vnic_details {
     subnet_id = oci_core_subnet.proxy.id
     #    display_name   = "proxy${format("%02g", count.index + 1)}-${var.operation_name}"

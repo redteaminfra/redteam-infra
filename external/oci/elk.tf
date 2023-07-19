@@ -8,6 +8,10 @@ resource "oci_core_instance" "elk" {
   shape               = var.elk_shape
   freeform_tags       = local.tags
 
+  instance_options {
+    are_legacy_imds_endpoints_disabled = true
+  }
+
   source_details {
     source_id               = data.oci_core_images.ubuntu-version.images.0.id
     source_type             = "image"

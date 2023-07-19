@@ -7,6 +7,10 @@ resource "oci_core_instance" "homebase" {
   shape               = var.is_production ? "BM.Standard2.52" : var.homebase_shape
   freeform_tags       = local.tags
 
+  instance_options {
+    are_legacy_imds_endpoints_disabled = true
+  }
+
   source_details {
     source_id               = data.oci_core_images.ubuntu-version.images.0.id
     source_type             = "image"
