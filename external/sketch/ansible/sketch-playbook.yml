@@ -59,16 +59,22 @@
         path: /etc/ssh/sshd_config
         regexp: '^#?PasswordAuthentication yes'
         line: 'PasswordAuthentication no'
+      notify:
+      - reload sshd
     - name: disabled ssh pam
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?UsePAM yes'
         line: 'UsePAM no'
+      notify:
+      - reload sshd
     - name: disable password auth with pam
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?ChallengeResponseAuthentication yes'
         line: 'ChallengeResponseAuthentication no'
+      notify:
+      - reload sshd
 
     - name: allow ssh
       ufw:
@@ -102,11 +108,16 @@
         replace: 'user'
       delegate_to: localhost
 
-
   handlers:
     - name: update grub
       become: yes
       command: update-grub
+
+  handlers:
+    - name: reload sshd
+      service:
+        name: sshd
+        state: reloaded
 
   vars:
     ansible_command_timeout: 90
