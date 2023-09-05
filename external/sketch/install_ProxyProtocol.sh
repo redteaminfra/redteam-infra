@@ -41,6 +41,13 @@ stream {
             proxy_pass $NEXTHOP:443;
             proxy_protocol on;
         }
+    upstream ssh {
+        server $NEXTHOP:2222;
+    }
+    server {
+        listen        2222;
+        proxy_pass    ssh;
+    }
 }
 EOF
 fi
@@ -57,7 +64,6 @@ stream {
         listen 443;
         proxy_pass $NEXTHOP:443;
     }
-
     upstream ssh {
         server $NEXTHOP:2222;
     }
