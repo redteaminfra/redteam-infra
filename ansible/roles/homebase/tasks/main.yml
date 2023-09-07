@@ -40,3 +40,41 @@
     owner: root
     group: root
     mode: 0755
+
+- name: Remove firefox snap
+  community.general.snap:
+    name: firefox
+    state: absent
+
+- name: remove firefox apt package
+  ansible.builtin.apt:
+    name: firefox
+    state: absent
+
+- name: Add mozzila repository from PPA and install its signing key
+  ansible.builtin.apt_repository:
+    repo: ppa:mozillateam/ppa
+
+- name: update package cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install the firefox from ppa
+  ansible.builtin.apt:
+    name: firefox
+
+- name: 51unattended-upgrades-firefox
+  copy:
+    src: files/51unattended-upgrades-firefox
+    dest: /etc/apt/apt.conf.d/51unattended-upgrades-firefox
+    owner: root
+    group: root
+    mode: 0755
+
+- name: pin-firefox
+  copy:
+    src: files/mozilla-firefox
+    dest: /etc/apt/preferences.d/mozilla-firefox
+    owner: root
+    group: root
+    mode: 0755
