@@ -25,14 +25,6 @@
     group: root
     mode: 0755
 
-- name: dot_xscreensaver
-  copy:
-    src: files/dot_xscreensaver
-    dest: /usr/local/lib/dot_xscreensaver
-    owner: root
-    group: root
-    mode: 0755
-
 - name: hashit
   copy:
     src: files/hashit

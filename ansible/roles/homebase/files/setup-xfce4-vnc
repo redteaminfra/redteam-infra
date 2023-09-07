@@ -31,10 +31,6 @@ EOF
     chmod 600 ~/.vnc/passwd
 fi
 
-# disable your screensaver
-cp /usr/local/lib/dot_screensaver ~/.xscreensaver
-chown $(whoami):$(whoami) ~/.xscreensaver
-
 VNCNUMBER=$(($(id -u) - 6000 + 1))
 PIDFILE="$HOME/.vnc/$(hostname):$VNCNUMBER.pid"
 if [[ -e $PIDFILE && -e /proc/$(cat $PIDFILE) ]]; then
