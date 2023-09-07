@@ -14,6 +14,9 @@ if [ ! -d ~/.vnc ]; then
     cat << EOF > ~/.vnc/xstartup
 #!/bin/bash
 
+xfconf-query -c xfce4-screensaver -p '/saver/enabled' -t bool -s false --create
+xfconf-query -c xfce4-screensaver -p '/lock/enabled' -t bool -s false --create
+
 [ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
 # vncconfig gives cut-n-paste support as well as resizing
 vncconfig -iconic &
