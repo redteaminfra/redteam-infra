@@ -14,8 +14,12 @@ if [ ! -d ~/.vnc ]; then
     cat << EOF > ~/.vnc/xstartup
 #!/bin/bash
 
+# disable screen lock
 xfconf-query -c xfce4-screensaver -p '/saver/enabled' -t bool -s false --create
 xfconf-query -c xfce4-screensaver -p '/lock/enabled' -t bool -s false --create
+
+# disable screen blank
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-enabled -t bool --create -s false
 
 [ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
 # vncconfig gives cut-n-paste support as well as resizing
