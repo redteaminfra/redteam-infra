@@ -25,6 +25,24 @@
     group: root
     mode: 0755
 
+- name: ensure polkit path exists
+  file:
+    path: /etc/polkit-1/localauthority/50-local.d
+    state: directory
+    recurse: yes
+    mode: 0755
+
+- name: xfce color profile
+  copy:
+    src: files/45-allow-colord.pkla
+    dest: /etc/polkit-1/localauthority/50-local.d/45-allow-colord.pkla
+    mode: 0755
+
+- name: Restart polkit
+  systemd:
+    name: polkit
+    state: restarted
+
 - name: hashit
   copy:
     src: files/hashit
