@@ -6,6 +6,10 @@ variable "engagement_name" {}
 variable "ssh_private_key" {}
 variable "ssh_public_key" {}
 
+variable "allowed_tcp_ports" {
+  default = ["22", "80", "443", "2222"]
+}
+
 variable "ssh_config_path" {
   default = "~/.ssh"
 }

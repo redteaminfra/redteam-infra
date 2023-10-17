@@ -4,16 +4,18 @@
   become: yes
 
   tasks:
+    - name: Append IP of each host to a local temporary file
+      local_action:
+        module: lineinfile
+        path: "ansible_ips.txt"
+        line: "{{ ansible_facts['default_ipv4']['address'] }}"
+        create: yes
+      run_once: false
+      become: no
+
     - name: Set the hostname
       hostname:
         name: "{{ inventory_hostname }}"
-
-    - name: disable IPv6
-      copy:
-        dest: /etc/default/grub.d/99-disable-ipv6.cfg
-        content: |
-          GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
-      register: reboot_required
 
     # update/upgrade/install packages
     - name: update/upgrade
@@ -76,26 +78,55 @@
       notify:
       - reload sshd
 
+    - name: Read IPs from the local temporary file
+      local_action:
+        module: command
+        cmd: cat ansible_ips.txt
+      register: ip_output
+      become: no
+
+    - name: Allow all ips in ip_output in ufw
+      ufw:
+        rule: allow
+        from_ip: "{{ item }}"
+      with_items: "{{ ip_output.stdout_lines }}"
+
     - name: allow ssh
       ufw:
         rule: allow
         port: "22"
         proto: tcp
+        src: 0.0.0.0/0
     - name: allow http
       ufw:
         rule: allow
         port: "80"
         proto: tcp
+        src: 0.0.0.0/0
     - name: allow https
       ufw:
         rule: allow
         port: "443"
         proto: tcp
+        src: 0.0.0.0/0
     - name: allow 2222
       ufw:
         rule: allow
         port: '2222'
         proto: tcp
+        src: 0.0.0.0/0
+
+    - name: Block incoming ipv6
+      ufw:
+        rule: deny
+        proto: ipv6
+        direction: in
+    - name: Block outgoing ipv6
+      ufw:
+        rule: deny
+        proto: ipv6
+        direction: out
+
     - name: enable ufw
       ufw:
         state: enabled
@@ -108,10 +139,12 @@
         replace: 'user'
       delegate_to: localhost
 
-  handlers:
-    - name: update grub
-      become: yes
-      command: update-grub
+    - name: Clean up temporary file
+      local_action:
+        module: file
+        path: "ansible_ips.txt"
+        state: absent
+      become: no
 
   handlers:
     - name: reload sshd

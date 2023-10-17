@@ -26,14 +26,18 @@
 - name: save iptables
   command: iptables-save -f /etc/iptables/rules.v4
 
-- name: permanently disable IPv6
-  copy:
-    dest: /etc/default/grub.d/99-disable-ipv6.cfg
-    content: |
-      GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
+- name: flush ip6tables rules
+  command: ip6tables -F
 
-- name: update grub to disable IPv6 on reboot
-  command: update-grub
+- name: DROP INPUT, FORWARD, and OUTPUT chains for ipv6
+  command: ip6tables -P {{ item }} DROP
+  loop:
+    - INPUT
+    - FORWARD
+    - OUTPUT
+
+- name: save ip6tables
+  command: ip6tables-save -f /etc/iptables/rules.v6
 
 - name: update hostnames if required
   hostname:
