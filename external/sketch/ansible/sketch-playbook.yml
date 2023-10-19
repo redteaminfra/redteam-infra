@@ -3,6 +3,14 @@
   hosts: all
   become: yes
 
+  vars:
+    required_ports:
+      - 22
+      - 80
+      - 443
+      - 2222
+    ansible_command_timeout: 90
+
   tasks:
     - name: Append IP of each host to a local temporary file
       local_action:
@@ -91,41 +99,21 @@
         from_ip: "{{ item }}"
       with_items: "{{ ip_output.stdout_lines }}"
 
-    - name: allow ssh
+    - name: Open required ports
       ufw:
         rule: allow
-        port: "22"
+        port: "{{ item }}"
         proto: tcp
-        src: 0.0.0.0/0
-    - name: allow http
-      ufw:
-        rule: allow
-        port: "80"
-        proto: tcp
-        src: 0.0.0.0/0
-    - name: allow https
-      ufw:
-        rule: allow
-        port: "443"
-        proto: tcp
-        src: 0.0.0.0/0
-    - name: allow 2222
-      ufw:
-        rule: allow
-        port: '2222'
-        proto: tcp
-        src: 0.0.0.0/0
+      with_items: "{{ required_ports }}"
 
-    - name: Block incoming ipv6
+    - name: Block incoming/outgoing ipv6
       ufw:
         rule: deny
         proto: ipv6
-        direction: in
-    - name: Block outgoing ipv6
-      ufw:
-        rule: deny
-        proto: ipv6
-        direction: out
+        direction: "{{ item }}"
+      with_items:
+        - in
+        - out
 
     - name: enable ufw
       ufw:
