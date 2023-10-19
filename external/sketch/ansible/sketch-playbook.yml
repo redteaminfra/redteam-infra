@@ -47,7 +47,7 @@
       authorized_key:
         user: user
         state: present
-        key: "{{ lookup('file', '{{ ssh_key }}') }}"
+        key: "{{ lookup('file', '{{ ssh_pub_key }}') }}"
     - name: created sudoers.d/user
       copy:
         dest: /etc/sudoers.d/99user
@@ -140,5 +140,3 @@
         name: sshd
         state: reloaded
 
-  vars:
-    ansible_command_timeout: 90
