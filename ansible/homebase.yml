@@ -1,6 +1,18 @@
 ---
 - hosts: homebase
   become: yes
+  tasks:
+    - name: Ensure /root has .ssh directory
+      file:
+        path: /root/.ssh
+        state: directory
+        mode: 0700
+    - name: Copy ssh private key to root
+      copy:
+        src: "{{ ssh_private_key }}"
+        dest: /root/.ssh/private_key
+        mode:
+          0600
   roles:
     - nfs-server
     - homebase

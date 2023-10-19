@@ -3,10 +3,6 @@
 # Provider initialization
 config_file_profile = ""
 
-# Used for initial ssh cap from where terraform is run (ie workstation) into cloud instances
-ssh_provisioning_private_key = ""
-ssh_provisioning_public_key  = ""
-
 # Optional, default path is `~/.ssh`
 #ssh_config_path              = ""
 

@@ -14,6 +14,17 @@ resource "local_file" "ssh_stanza" {
   })
 }
 
+resource "local_sensitive_file" "ssh_private_key" {
+  content = tls_private_key.ssh_key.private_key_openssh
+  filename = pathexpand("~/.ssh/${var.engagement_name}")
+  file_permission = "0600"
+}
+
+resource "local_file" "ssh_public_key" {
+  content = tls_private_key.ssh_key.public_key_openssh
+  filename = pathexpand("~/.ssh/${var.engagement_name}.pub")
+  file_permission = "0600"
+}
 
 resource "local_file" "ansible_inventory" {
   depends_on = [oci_core_instance.homebase, oci_core_instance.proxy, oci_core_instance.elk]
@@ -24,7 +35,7 @@ resource "local_file" "ansible_inventory" {
     proxies  = { for instance in oci_core_instance.proxy: instance.display_name => instance.private_ip },
     elk      = { (oci_core_instance.elk.display_name) = oci_core_instance.elk.private_ip },
     username = var.image_username,
-    key      = var.ssh_provisioning_private_key
+    key      = local_sensitive_file.ssh_private_key.filename
   })
 }
 

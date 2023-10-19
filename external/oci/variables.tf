@@ -2,8 +2,6 @@
 
 variable "compartment_id" {}
 variable "ad_number" {}
-variable "ssh_provisioning_private_key" {}
-variable "ssh_provisioning_public_key" {}
 variable "region" {}
 variable "engagement_name" {}
 variable "homebase_shape" {}

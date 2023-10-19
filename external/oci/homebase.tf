@@ -25,7 +25,7 @@ resource "oci_core_instance" "homebase" {
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.ssh_provisioning_public_key)
+    ssh_authorized_keys = tls_private_key.ssh_key.public_key_openssh
   }
 
   agent_config {

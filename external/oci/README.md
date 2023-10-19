@@ -11,10 +11,6 @@ Copy `variables.tfvars.example` to `variables.tfvars` and modify the following v
 # See https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/clitoken.htm for more details documentation
 config_file_profile = ""
 
-# Used for initial ssh cap from where terraform is run (ie workstation) into cloud instances
-ssh_provisioning_private_key = ""
-ssh_provisioning_public_key  = ""
-
 # Optional, default path is `~/.ssh`
 # ssh_config_path              = ""
 
@@ -58,6 +54,9 @@ From there you can run
 
 1. `terraform init`
 2. `terraform apply -var-file=variables.tfvars`
+
+### ssh keys
+SSH keys will be created and placed into ~/.ssh. They keys will be named after your engagement name, with the public key having a `.pub` extension. `ssh-config` has no bearing on the location of the keys.
 
 ### ssh-config
 An SSH config will be placed into your defined `ssh_config_path` the default path is `~/.ssh`. It will be named after your engagement name
