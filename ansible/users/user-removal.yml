@@ -1,0 +1,25 @@
+---
+- name: Remove User and Terminate Processes
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: "target_user"
+      prompt: "Enter the username to be removed"
+      private: no
+
+  tasks:
+    - name: Terminate all processes of the user
+      command:
+        cmd: "pkill -u {{ target_user }}"
+      ignore_errors: yes
+
+    - name: Ensure the user is logged out
+      command:
+        cmd: "pkill -KILL -u {{ target_user }}"
+      ignore_errors: yes
+
+    - name: Remove the user (but keep the home directory)
+      user:
+        name: "{{ target_user }}"
+        state: absent
+        remove: no
