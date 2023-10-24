@@ -17,6 +17,9 @@ config_file_profile = ""
 # Which compartment the infra be setup in:
 compartment_id = ""
 
+# If you would like to move backups to a different compartment specify the OCID here:
+# backup_compartment_id = ""
+
 # Which region
 # https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm
 # use the Region Identifier, e.g: us-sanjose-1

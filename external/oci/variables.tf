@@ -64,3 +64,8 @@ variable "subnet_cidr_blocks" {
 variable "ssh_allowed_cidr_ranges" {
   type = set(string)
 }
+
+variable "backup_compartment_id" {
+  description = "The compartment ID where backups will be stored."
+  default = ""
+}

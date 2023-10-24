@@ -39,6 +39,25 @@ resource "local_file" "ansible_inventory" {
   })
 }
 
+resource "local_file" "oci_instance_backup" {
+  count = var.is_production ? 1 : 0
+  depends_on = [oci_core_instance.homebase, oci_core_instance.proxy, oci_core_instance.elk]
+  filename = "oci-instance-backup.sh"
+  file_permission = "0755"
+  content = templatefile("../templates/oci-instance-backup.sh.tftpl", {
+    hosts = merge(
+        {for instance in oci_core_instance.homebase.* : instance.display_name => instance.boot_volume_id},
+        {for instance in oci_core_instance.proxy : instance.display_name => instance.boot_volume_id},
+        {for instance in oci_core_instance.elk.* : instance.display_name => instance.boot_volume_id}
+      ),
+    config_file_profile = var.config_file_profile,
+    compartment_id = var.compartment_id,
+    engagement_name = var.engagement_name,
+    region = var.region,
+    backup_compartment_id = var.backup_compartment_id,
+  })
+}
+
 output "run-ansible" {
   value = "Add your ssh users.yml file to ../../ansible/playbooks make any modification you need to site.yml, homebase.yml, proxies.yml, elk.yml, then run ansible\n\n\tcd ../../ansible && ansible-playbook -i inventory.ini site.yml\n"
 }
