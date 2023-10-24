@@ -1,6 +1,6 @@
 ---
 # tasks file for etherpad
-- name: create user etherpad
+- name: Create user etherpad
   user:
     name: etherpad
     uid: 5001
@@ -10,7 +10,7 @@
     create_home: false
     state: present
 
-- name: create etherpad data directory
+- name: Create etherpad data directory
   file:
     path: /opt/etherpad/etherpad_data
     owner: etherpad
@@ -19,7 +19,7 @@
     state: directory
     recurse: true
 
-- name: copy docker-compose.yml
+- name: Copy docker-compose.yml
   copy:
     src: files/docker-compose.yml
     dest: /opt/etherpad/docker-compose.yml
@@ -27,7 +27,7 @@
     group: etherpad
     mode: 0600
 
-- name: run docker-compose etherpad
+- name: Run docker-compose etherpad
   command: docker compose up -d
   args:
     chdir: /opt/etherpad

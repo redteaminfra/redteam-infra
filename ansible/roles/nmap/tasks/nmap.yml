@@ -1,5 +1,5 @@
 ---
-- name: install build essential so we can compile nmap
+- name: Install build essential so we can compile nmap
   apt:
     name:
       - build-essential
@@ -16,26 +16,27 @@
     remote_src: yes
     creates: "{{ src_path }}/nmap-{{ nmap_version }}"
 
-- name: configure nmap
+- name: Configure nmap
   command: "./configure"
   args:
     chdir: "{{ src_path }}/nmap-{{ nmap_version }}"
   
-- name: build nmap
+- name: Build nmap
   make:
     chdir: "{{ src_path }}/nmap-{{ nmap_version }}"
   
-- name: install nmap
+- name: Install nmap
   make:
     chdir: "{{ src_path }}/nmap-{{ nmap_version }}"
     target: "install"
   
-- name: clean up src-directory
+- name: Clean up src-directory
   file:
     path: "{{ src_path }}/nmap-{{ nmap_version }}"
     state: absent
   
-- name: clean up download
+- name: Clean up download
   file:
     path: "{{ tmp_path }}"
     state: absent
+

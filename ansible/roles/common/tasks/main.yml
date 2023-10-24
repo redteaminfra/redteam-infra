@@ -1,10 +1,11 @@
 ---
-- name: update apt and upgrade
+- name: Update apt and upgrade
   apt:
     update_cache: yes
     upgrade: dist
+    allow_downgrade: yes
 
-- name: install software common to all hosts
+- name: Install software common to all hosts
   apt:
     name:
       - python3-pip
@@ -12,7 +13,7 @@
       - tmux
       - iptables-persistent
 
-- name: allow 192.168.0.0/16
+- name: Allow 192.168.0.0/16
   iptables:
     action: insert
     chain: "{{ item }}"
@@ -23,10 +24,10 @@
     - INPUT
     - OUTPUT
 
-- name: save iptables
+- name: Save iptables
   command: iptables-save -f /etc/iptables/rules.v4
 
-- name: flush ip6tables rules
+- name: Flush ip6tables rules
   command: ip6tables -F
 
 - name: DROP INPUT, FORWARD, and OUTPUT chains for ipv6
@@ -36,15 +37,15 @@
     - FORWARD
     - OUTPUT
 
-- name: save ip6tables
+- name: Save ip6tables
   command: ip6tables-save -f /etc/iptables/rules.v6
 
-- name: update hostnames if required
+- name: Update hostnames if required
   hostname:
     name: "{{ inventory_hostname }}"
   when: ansible_facts.hostname != inventory_hostname
 
-- name: update facts if required
+- name: Update facts if required
   setup:
     filter:
       - 'ansible_hostname'

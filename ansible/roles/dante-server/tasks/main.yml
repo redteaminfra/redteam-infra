@@ -1,11 +1,11 @@
 ---
-- name: install dante server
+- name: Install dante server
   apt:
     name:
       - dante-server
     state: present
 
-- name: generate dante configuration
+- name: Generate dante configuration
   template:
     src: templates/danted.conf.j2
     dest: /etc/danted.conf
@@ -14,4 +14,4 @@
     mode: 0644
     backup: true
   notify:
-    - restart dante
+    - Restart dante

@@ -1,15 +1,15 @@
 ---
-- name: example task to create users and groups
+- name: Example task to create users and groups
   hosts: all
   become: yes
   tasks:
-    - name: add groups
+    - name: Add groups
       group:
         name: "{{ item }}"
         state: present
       with_items: [ "core", "redteam" ]
 
-    - name: allow group redteam to sudo
+    - name: Allow group redteam to sudo
       copy:
         dest: /etc/sudoers.d/redteam
         owner: root
@@ -17,7 +17,7 @@
         content: |
           %redteam ALL=(ALL) NOPASSWD:ALL
 
-    - name: add hacker
+    - name: Add hacker
       user:
         name: hacker
         uid: 6000
@@ -28,7 +28,7 @@
         state: present
         shell: /bin/bash
 
-    - name: add hacker's public key
+    - name: Add hacker's public key
       authorized_key:
         user: hacker
         state: present

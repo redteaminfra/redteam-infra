@@ -1,22 +1,22 @@
 ---
 # tasks file for openresty
-- name: add openresty key
+- name: Add openresty key
   apt_key:
     url: https://openresty.org/package/pubkey.gpg
     state: present
 
-- name: add openresty repo
+- name: Add openresty repo
   apt_repository:
     repo: deb https://openresty.org/package/ubuntu {{ ansible_distribution_release }} main
     state: present
 
-- name: install openresty
+- name: Install openresty
   apt:
     name: openresty
     state: present
     update_cache: yes
 
-- name: create nginx sites-enabled directory
+- name: Create nginx sites-enabled directory
   file:
     path: /etc/nginx/sites-enabled
     state: directory
@@ -24,7 +24,7 @@
     mode: 0755
     recurse: yes
   
-- name: create nginx sites-available directory
+- name: Create nginx sites-available directory
   file:
     path: /etc/nginx/sites-available
     state: directory
@@ -32,33 +32,33 @@
     mode: 0755
     recurse: yes
 
-- name: create openresty log directory
+- name: Create openresty log directory
   file:
     path: /var/log/openresty
     state: directory
     owner: root
     mode: 0755
 
-- name: copy openresty config
+- name: Copy openresty config
   copy:
     src: files/nginx.conf
     dest: /usr/local/openresty/nginx/conf/nginx.conf
     owner: root
     mode: 0644
 
-- name: enable log rotate for openresty
+- name: Enable log rotate for openresty
   copy:
     src: files/openresty
     dest: /etc/logrotate.d/openresty
     owner: root
     mode: 0644
 
-- name: reload openresty
+- name: Reload openresty
   systemd:
     name: openresty.service
     state: reloaded
 
-- name: allow ports for openresty
+- name: Allow ports for openresty
   iptables:
     chain: INPUT
     action: insert
@@ -68,5 +68,5 @@
     destination_port: "{{ item }}"
   with_items: "{{ openresty_ports }}"
 
-- name: save iptables
+- name: Save iptables
   command: iptables-save -f /etc/iptables/rules.v4

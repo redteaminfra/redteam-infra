@@ -1,28 +1,28 @@
 ---
 # tasks file for oci
-- name: stop resovled
+- name: Stop resovled
   systemd:
     name: systemd-resolved.service
     state: stopped
 
-- name: disable resovled
+- name: Disable resovled
   systemd:
     name: systemd-resolved.service
     enabled: false
 
-- name: mask resolved
+- name: Mask resolved
   systemd:
     name: systemd-resolved.service
     masked: true
 
-- name: add dns server
+- name: Add dns server
   template:
     src: templates/resolv.conf.j2
     dest: /etc/resolv.conf
     owner: root
     mode: 0644
 
-- name: block access to vcn DNS resolver
+- name: Block access to vcn DNS resolver
   iptables:
     action: insert
     chain: OUTPUT
@@ -34,5 +34,5 @@
     comment: "disable access to OCI's VCN DNS resolver"
   with_items: ["tcp", "udp"]
 
-- name: save iptables
+- name: Save iptables
   command: iptables-save -f /etc/iptables/rules.v4

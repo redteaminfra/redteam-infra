@@ -1,6 +1,6 @@
 ---
 # tasks file for homebase
-- name: install base packages for homebase
+- name: Install base packages for homebase
   apt:
     name:
       - asciinema
@@ -17,7 +17,7 @@
       - proxychains4
     state: present
 
-- name: setup-xfce4-vnc
+- name: Setup-xfce4-vnc
   copy:
     src: files/setup-xfce4-vnc
     dest: /usr/local/bin/setup-xfce4-vnc
@@ -32,7 +32,7 @@
     recurse: yes
     mode: 0755
 
-- name: xfce color profile
+- name: Xfce color profile
   copy:
     src: files/45-allow-colord.pkla
     dest: /etc/polkit-1/localauthority/50-local.d/45-allow-colord.pkla
@@ -47,7 +47,7 @@
     name: polkit
     state: restarted
 
-- name: hashit
+- name: Hashit
   copy:
     src: files/hashit
     dest: /usr/local/bin/hashit
@@ -55,7 +55,7 @@
     group: root
     mode: 0755
 
-- name: implant_cryptor
+- name: Implant_cryptor
   copy:
     src: files/implant_cryptor.py
     dest: /usr/local/bin/implant_cryptor

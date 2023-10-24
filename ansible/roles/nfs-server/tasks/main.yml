@@ -1,23 +1,23 @@
 ---
 # tasks file for nfs-server
-- name: install nfs-common
+- name: Install nfs-common
   apt:
     name:
       - nfs-kernel-server
       - acl
     state: present
 
-- name: enable the nfs-server
+- name: Enable the nfs-server
   systemd:
     name: nfs-kernel-server.service
     enabled: true
 
-- name: ensure redteam group exists
+- name: Ensure redteam group exists
   group:
     name: redteam
     state: present
 
-- name: create directories
+- name: Create directories
   file:
     path: "{{ item }}"
     state: directory
@@ -26,7 +26,7 @@
     group: redteam
   loop: "{{ directories }}"
 
-- name: configure export file
+- name: Configure export file
   template:
     src: templates/exports.j2
     dest: /etc/exports
@@ -34,12 +34,12 @@
     owner: root
     group: root
 
-- name: restart nfs
+- name: Restart nfs
   systemd:
     name: nfs-kernel-server.service
     state: restarted
 
-- name: set acls for directories
+- name: Set acls for directories
   acl:
     default: true
     entity: redteam
