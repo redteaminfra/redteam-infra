@@ -10,9 +10,6 @@
       - tigervnc-viewer
       - zile
       - emacs
-      - firefox
-      - nmap
-      - nikto
       - xclip
       - proxychains4
     state: present
