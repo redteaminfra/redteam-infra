@@ -1,0 +1,6 @@
+---
+# tasks file for keepassxc
+- name: Install KeepassXC
+  apt:
+    name: keepassxc
+    state: present
