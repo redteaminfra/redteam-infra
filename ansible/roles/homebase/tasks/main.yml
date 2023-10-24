@@ -22,7 +22,16 @@
     group: root
     mode: 0755
 
-- name: ensure polkit path exists
+- name: Add block to /etc/skel/.profile to run setup-xfce4-vnc on first login
+  blockinfile:
+    path: "/etc/skel/.profile"
+    block: |
+      # This script will run setup-xfce4-vnc if it has not been setup yet.
+      if [[ ! -f "$HOME/.vnc/xstartup" ]]; then
+          /usr/local/bin/setup-xfce4-vnc
+      fi
+
+- name: Ensure polkit path exists
   file:
     path: /etc/polkit-1/localauthority/50-local.d
     state: directory
