@@ -38,6 +38,10 @@
     dest: /etc/polkit-1/localauthority/50-local.d/45-allow-colord.pkla
     mode: 0755
 
+- name: Set xfce 4 terminal to the default shell
+  command:
+    cmd: update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal.wrapper
+
 - name: Restart polkit
   systemd:
     name: polkit
