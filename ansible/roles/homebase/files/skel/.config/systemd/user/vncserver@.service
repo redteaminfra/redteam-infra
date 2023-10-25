@@ -1,0 +1,13 @@
+[Unit]
+Description=Start TigerVNC server on :%i
+After=network.target
+
+[Service]
+Type=forking
+Environment="DISPLAY=:%i"
+ExecStartPre=/bin/sh -c '/usr/bin/vncserver -kill :%i > /dev/null 2>&1 || :'
+ExecStart=/usr/bin/vncserver :%i
+ExecStop=/usr/bin/vncserver -kill :%i
+
+[Install]
+WantedBy=default.target

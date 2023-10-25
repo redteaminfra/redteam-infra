@@ -14,22 +14,20 @@
       - proxychains4
     state: present
 
-- name: Setup-xfce4-vnc
+- name: Move skel to skel
   copy:
-    src: files/setup-xfce4-vnc
-    dest: /usr/local/bin/setup-xfce4-vnc
-    owner: root
-    group: root
+    src: files/skel/
+    dest: /etc/skel/
+
+- name: Set executable bit on /etc/skel/.vnc/xstartup
+  file:
+    path: /etc/skel/.vnc/xstartup
     mode: 0755
 
 - name: Add block to /etc/skel/.profile to run setup-xfce4-vnc on first login
   blockinfile:
     path: "/etc/skel/.profile"
-    block: |
-      # This script will run setup-xfce4-vnc if it has not been setup yet.
-      if [[ ! -f "$HOME/.vnc/xstartup" ]]; then
-          /usr/local/bin/setup-xfce4-vnc
-      fi
+    block: "{{ lookup('file', 'files/skel-append-profile.sh') }}"
 
 - name: Ensure polkit path exists
   file:

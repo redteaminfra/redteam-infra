@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# disable screen lock
+xfconf-query -c xfce4-screensaver -p '/saver/enabled' -t bool -s false --create
+xfconf-query -c xfce4-screensaver -p '/lock/enabled' -t bool -s false --create
+
+# disable screen blank
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-enabled -t bool --create -s false
+
+# set blank screen background (faster vnc)
+xfconf-query -c xfce4-desktop --create -p /backdrop/screen0/monitorVNC-0/workspace0/image-style -t int -s 0
+
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+# vncconfig gives cut-n-paste support as well as resizing
+vncconfig -iconic &
+
+# xfce4 is our default desktop env
+xfce4-session
