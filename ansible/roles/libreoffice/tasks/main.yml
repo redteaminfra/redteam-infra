@@ -1,0 +1,6 @@
+---
+# tasks file for libreoffice
+- name: Install LibreOffice
+  apt:
+    name: libreoffice
+    state: present
