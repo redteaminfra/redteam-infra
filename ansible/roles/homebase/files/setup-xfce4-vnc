@@ -44,12 +44,12 @@ if [[ -e $PIDFILE && -e /proc/$(cat $PIDFILE) ]]; then
     # vnc might be running or might be stale
     echo "vnc is running"
 else
-    vncserver :$VNCNUMBER
+    vncserver :$VNCNUMBER > /dev/null
 fi
 
 #if crontab doesn't have vnc starting on boot, make it so
 crontab -l | grep setup-xfce4-vnc || {
-    ( crontab -l ; echo $'SHELL=/bin/bash\n@reboot /usr/local/bin/setup-xfce4-vnc' ) | crontab -
+    ( echo $'SHELL=/bin/bash\n@reboot /usr/local/bin/setup-xfce4-vnc' ) | crontab -
 }
 
 if [ ! -d ~/proxy01 ] ; then
@@ -77,3 +77,6 @@ tcp_connect_time_out 8000
 socks5  192.168.2.12 1080
 EOF
 fi
+
+echo "xfce4 and VNC configured."
+echo "Have a nice day!"
