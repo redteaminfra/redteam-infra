@@ -1,0 +1,17 @@
+---
+# tasks file for vs-code
+- name: Add Microsoft GPG key
+  apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+
+- name: Add VS Code repository
+  apt_repository:
+    repo: deb https://packages.microsoft.com/repos/vscode stable main
+    state: present
+
+- name: Install VS Code from repository
+  apt:
+    name: code
+    update_cache: yes
+    state: present
