@@ -3,6 +3,12 @@
   "PrivacySandboxAdTopicsEnabled": false,
   "PrivacySandboxSiteEnabledAdsEnabled": false,
   "PrivacySandboxAdMeasurementEnabled": false,
+  "UserFeedbackAllowed": false,
+  "MetricsReportingEnabled": false,
+  "DnsOverHttpsMode": "off",
+  "SearchSuggestEnabled": false,
+  "SyncDisabled": true,
+  "PasswordManagerEnabled": false,
   "ExtensionSettings": {
     "cjpalhdlnbpafiamejdnhcphjbkeiagm": {
       "installation_mode": "normal_installed",
