@@ -16,7 +16,9 @@ resource "local_file" "ansible_inventory" {
   file_permission = "0600"
   content = templatefile("templates/inventory.tftpl", {
     middles = linode_instance.middle.*,
-    edges = linode_instance.edge.*
+    edges = linode_instance.edge.*,
+    ssh_priv_key_path = local.ssh_priv_key_path,
+    engagement_name = var.engagement_name
   })
 }
 
