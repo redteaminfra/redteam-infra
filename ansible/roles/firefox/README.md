@@ -8,6 +8,8 @@ Installs a number of extensions by default:
 - Privacy Badger
 - Proxy SwitchyOmega
 
+Set a number of settings by default. View `files/firefox-policies.json` for more details.
+
 You can read more on Firefox policies here: https://archive.ph/c0FM3
 
 Example Playbook

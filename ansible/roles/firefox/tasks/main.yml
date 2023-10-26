@@ -65,3 +65,15 @@
 - name: Set Firefox as default browser
   command:
     cmd: update-alternatives --set x-www-browser /usr/bin/firefox
+
+- name: Create /etc/firefox/policies
+  file:
+    path: /etc/firefox/policies
+    state: directory
+    mode: 0755
+
+- name: Copy firefox-policies.json to /etc/firefox/policies
+  copy:
+    src: files/firefox-policies.json
+    dest: /etc/firefox/policies/policies.json
+    mode: 0644
