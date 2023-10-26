@@ -66,3 +66,20 @@
     owner: root
     group: root
     mode: 0755
+
+- name: Remove unwanted xfce4 utilities
+  apt:
+    name:
+     - xfce4-screensaver
+     - xfce4-power-manager
+    state: absent
+
+- name: Kill the removed xfce4 utilities
+  command:
+    cmd: killall "{{ item }}"
+  with_items:
+    - xfce4-screensaver
+    - xfce4-power-manager
+  register: result
+  failed_when: result.rc >= 2
+
