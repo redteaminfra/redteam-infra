@@ -15,3 +15,15 @@
     name: google-chrome-stable
     state: latest
     update_cache: yes
+
+- name: Ensure /etc/opt/chrome/policies/managed/ directory exists
+  file:
+    path: /etc/opt/chrome/policies/managed/
+    state: directory
+    mode: 0755
+
+- name: Copy chrome-policies.json to target location
+  copy:
+    src: files/chrome-policies.json
+    dest: /etc/opt/chrome/policies/managed/policies.json
+    mode: 0644
