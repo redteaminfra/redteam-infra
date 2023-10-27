@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# This script will create a full backup of all boot volumes attached to the instances in the engagement.
+
+# Set the OCID for the where backups are archived
+BACKUP_OCID="${backup_compartment_id}"
+
+# Check if OCI CLI is installed
+if command -v oci >/dev/null 2>&1; then
+    echo "Backing up engagement instances."
+    echo "This will take some time, waiting for the backups to become available."
+else
+    echo "OCI CLI is not installed. Exiting."
+    exit 1
+fi
+
+# Create an array to store the OCIDs of the boot volume backups
+BOOT_VOLUME_OCIDS=()
+
+# Create tmp file to store the OCIDs of the boot volume backups
+TMPFILE=$(mktemp /tmp/oci-boot-volume-backup.XXXXXX)
+
+if [[ ! $TMPFILE || ! -e $TMPFILE ]]; then
+    echo "Could not create temp file"
+    exit 1
+fi
+
+echo "Created $TMPFILE"
+
+%{ for host,ocid in hosts ~}
+oci --profile ${config_file_profile} --auth security_token --region ${region} bv boot-volume-backup create --boot-volume-id ${ocid} --type FULL --wait-for-state AVAILABLE --display-name ${host}-backup >> $TMPFILE
+%{ endfor ~}
+
+# Read the tmp file and store the boot volume backup OCIDs in the array.
+while IFS= read -r line; do
+    if [[ $line == *bootvolumebackup* ]]; then
+        ocid=$(sed -n 's/.*"id": "\([^"]*\)",$/\1/p' <<< "$line")
+        if [[ -n $ocid ]]; then
+            BOOT_VOLUME_OCIDS+=("$ocid")
+        fi
+    fi
+done < "$TMPFILE"
+
+if [[ -n $BACKUP_OCID ]]; then
+    echo "Moving boot volume backups to compartment $BACKUP_OCID"
+    for ocid in "$${BOOT_VOLUME_OCIDS[@]}"; do
+        oci --profile ${config_file_profile} --auth security_token --region ${region} bv boot-volume-backup change-compartment --boot-volume-backup-id $ocid --compartment-id $BACKUP_OCID
+    done
+fi
+
+echo "You can delete these volumes by running the following command:"
+for ocid in "$${BOOT_VOLUME_OCIDS[@]}"; do
+    echo "oci --profile ${config_file_profile} --auth security_token --region ${region} bv boot-volume-backup delete --boot-volume-backup-id $ocid --force"
+done
+
+# Cleanup TMPFILE
+echo "Cleaning up..."
+rm -f $TMPFILE
+
+echo "Have a nice day!"

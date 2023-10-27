@@ -1,44 +1,58 @@
 ---
+- name: Gather IPs
+  hosts: all
+  tasks:
+    - name: Store the IP of each host in its own variable
+      set_fact:
+        host_ip_address: "{{ ansible_facts['default_ipv4']['address'] }}"
+
 - name: Configure sketch hosts
   hosts: all
   become: yes
 
+  vars:
+    required_ports:
+      - 22
+      - 80
+      - 443
+      - 2222
+    ansible_command_timeout: 90
+
   tasks:
+    - name: Aggregate IPs from all hosts
+      set_fact:
+        aggregated_ips: "{{ groups['all'] | map('extract', hostvars, 'host_ip_address') | list }}"
+      delegate_to: localhost
+
     - name: Set the hostname
       hostname:
         name: "{{ inventory_hostname }}"
 
-    - name: disable IPv6
-      copy:
-        dest: /etc/default/grub.d/99-disable-ipv6.cfg
-        content: |
-          GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ipv6.disable=1"
-      register: reboot_required
-
-    # update/upgrade/install packages
-    - name: update/upgrade
+    - name: Update apt and upgrade
       apt:
         update_cache: yes
         upgrade: dist
-    - name: install apt packages
+
+    - name: Install required packages
       apt:
         name:
           - unattended-upgrades
           - nginx
+        state: present
 
-    - name: create user
+    - name: Create user
       user:
         name: user
         password: "*"
         shell: /bin/bash
         create_home: yes
         state: present
-    - name: add key to user
+    - name: Add key to user
       authorized_key:
         user: user
         state: present
-        key: "{{ lookup('file', '{{ ssh_key }}') }}"
-    - name: created sudoers.d/user
+        key: "{{ lookup('file', '{{ ssh_pub_key }}') }}"
+    - name: Created sudoers.d/user
       copy:
         dest: /etc/sudoers.d/99user
         owner: root
@@ -46,7 +60,7 @@
         mode: '0600'
         content: |
           user ALL=(ALL) NOPASSWD:ALL
-    - name: create sketchssh
+    - name: Create sketchssh
       user:
         name: sketchssh
         password: "*"
@@ -54,47 +68,55 @@
         shell: /bin/bash
         state: present
 
-    - name: disable ssh password auth
+    - name: Disable ssh password auth
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PasswordAuthentication yes'
         line: 'PasswordAuthentication no'
-    - name: disabled ssh pam
+      notify:
+      - Reload sshd
+    - name: Disabled ssh pam
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?UsePAM yes'
         line: 'UsePAM no'
-    - name: disable password auth with pam
+      notify:
+      - Reload sshd
+    - name: Disable password auth with pam
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?ChallengeResponseAuthentication yes'
         line: 'ChallengeResponseAuthentication no'
+      notify:
+      - Reload sshd
 
-    - name: allow ssh
+    - name: Allow all IPs in aggregated_ips to allow in ufw
       ufw:
         rule: allow
-        port: "22"
-        proto: tcp
-    - name: allow http
+        from_ip: "{{ item }}"
+      with_items: "{{ aggregated_ips }}"
+
+    - name: Open required ports
       ufw:
         rule: allow
-        port: "80"
+        port: "{{ item }}"
         proto: tcp
-    - name: allow https
+      with_items: "{{ required_ports }}"
+
+    - name: Block incoming/outgoing ipv6
       ufw:
-        rule: allow
-        port: "443"
-        proto: tcp
-    - name: allow 2222
-      ufw:
-        rule: allow
-        port: '2222'
-        proto: tcp
-    - name: enable ufw
+        rule: deny
+        proto: ipv6
+        direction: "{{ item }}"
+      with_items:
+        - in
+        - out
+
+    - name: Enable ufw
       ufw:
         state: enabled
 
-    - name: replace root user in ssh configuration
+    - name: Replace root user in ssh configuration
       become: no
       replace:
         path: "{{ ssh_config_path }}"
@@ -102,11 +124,16 @@
         replace: 'user'
       delegate_to: localhost
 
+    - name: Clean up temporary file
+      local_action:
+        module: file
+        path: "ansible_ips.txt"
+        state: absent
+      become: no
 
   handlers:
-    - name: update grub
-      become: yes
-      command: update-grub
+    - name: Reload sshd
+      service:
+        name: sshd
+        state: reloaded
 
-  vars:
-    ansible_command_timeout: 90

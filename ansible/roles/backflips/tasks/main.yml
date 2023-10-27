@@ -1,0 +1,86 @@
+---
+# tasks file for backflips
+
+- name: Ensure wamerican is installed
+  apt:
+    name: wamerican
+    state: present
+
+- name: Create flip group
+  group:
+    name: flip
+    state: present
+    system: true
+
+- name: Create flip user
+  user:
+    name: flip
+    group: flip
+    state: present
+    system: true
+    create_home: false
+    home: /opt/backflips
+    shell: /usr/sbin/nologin
+
+- name: Create home
+  file:
+    path: /opt/backflips
+    owner: flip
+    group: flip
+    mode: 0755
+    state: directory
+
+- name: Copy files to host
+  copy:
+    src: files/flip_files/
+    dest: /opt/backflips/
+    owner: flip
+    group: flip
+
+- name: Generate rsa keypair
+  community.crypto.openssh_keypair:
+    path: /opt/backflips/etc/ssh/ssh_host_rsa_key
+    type: rsa
+    size: 4096
+    group: flip
+    owner: flip
+
+- name: Generate ed25519 keypair
+  community.crypto.openssh_keypair:
+    path: /opt/backflips/etc/ssh/ssh_host_ed25519_key
+    type: ed25519
+    owner: flip
+    group: flip
+
+- name: Install systemd service
+  copy:
+    src: files/service_files/ssh-backflips.service
+    dest: /etc/systemd/system/ssh-backflips.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: Enable backflip service
+  systemd:
+    name: ssh-backflips
+    enabled: true
+
+- name: Start backflip service
+  systemd:
+    name: ssh-backflips
+    state: started
+
+- name: Allow 2222
+  iptables:
+    action: insert
+    chain: "INPUT"
+    jump: ACCEPT
+    protocol: tcp
+    destination_port: 2222
+
+- name: Save iptables
+  command: iptables-save -f /etc/iptables/rules.v4

@@ -1,7 +1,7 @@
 ---
 # tasks file for yama
 
-- name: set yama
+- name: Set yama
   sysctl:
     name: kernel.yama.ptrace_scope
     value: '3'

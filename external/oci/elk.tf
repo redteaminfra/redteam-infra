@@ -8,22 +8,25 @@ resource "oci_core_instance" "elk" {
   shape               = var.elk_shape
   freeform_tags       = local.tags
 
+  instance_options {
+    are_legacy_imds_endpoints_disabled = true
+  }
+
   source_details {
-    source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
+    source_id               = data.oci_core_images.ubuntu-version.images.0.id
     source_type             = "image"
     boot_volume_size_in_gbs = var.boot_volume_size_in_gbs
   }
 
   create_vnic_details {
     subnet_id      = oci_core_subnet.utility.id
-    hostname_label = "elk-${var.engagement_name}"
 
     private_ip       = cidrhost(var.subnet_cidr_blocks["utility"], 13)
     assign_public_ip = false
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.ssh_provisioning_public_key)
+    ssh_authorized_keys = tls_private_key.ssh_key.public_key_openssh
   }
 
   agent_config {

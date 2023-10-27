@@ -1,20 +1,16 @@
 # Copyright (c) 2023, Oracle and/or its affiliates.
 
-# Provider initialization (tenancy, api user, key, region, etc.)
-tenancy_ocid     = ""
-user_ocid        = ""
-fingerprint      = ""
-private_key_path = ""
-
-# Used for initial ssh cap from where terraform is run (ie workstation) into cloud instances
-ssh_provisioning_private_key = ""
-ssh_provisioning_public_key  = ""
+# Provider initialization
+config_file_profile = ""
 
 # Optional, default path is `~/.ssh`
 #ssh_config_path              = ""
 
 # Which compartment the infra be setup in:
 compartment_id = ""
+
+# If you would like to move backups to a different compartment specify the OCID here:
+# backup_compartment_id = ""
 
 # Which region
 # https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm

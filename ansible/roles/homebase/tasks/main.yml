@@ -1,6 +1,6 @@
 ---
 # tasks file for homebase
-- name: install base packages for homebase
+- name: Install base packages for homebase
   apt:
     name:
       - asciinema
@@ -10,30 +10,48 @@
       - tigervnc-viewer
       - zile
       - emacs
-      - firefox
-      - nmap
-      - nikto
       - xclip
       - proxychains4
     state: present
 
-- name: setup-xfce4-vnc
+- name: Move skel to skel
   copy:
-    src: files/setup-xfce4-vnc
-    dest: /usr/local/bin/setup-xfce4-vnc
-    owner: root
-    group: root
+    src: files/skel/
+    dest: /etc/skel/
+
+- name: Set executable bit on /etc/skel/.vnc/xstartup
+  file:
+    path: /etc/skel/.vnc/xstartup
     mode: 0755
 
-- name: dot_xscreensaver
-  copy:
-    src: files/dot_xscreensaver
-    dest: /usr/local/lib/dot_xscreensaver
-    owner: root
-    group: root
+- name: Add block to /etc/skel/.profile to run setup-xfce4-vnc on first login
+  blockinfile:
+    path: "/etc/skel/.profile"
+    block: "{{ lookup('file', 'files/skel-append-profile.sh') }}"
+
+- name: Ensure polkit path exists
+  file:
+    path: /etc/polkit-1/localauthority/50-local.d
+    state: directory
+    recurse: yes
     mode: 0755
 
-- name: hashit
+- name: Xfce color profile
+  copy:
+    src: files/45-allow-colord.pkla
+    dest: /etc/polkit-1/localauthority/50-local.d/45-allow-colord.pkla
+    mode: 0755
+
+- name: Set xfce 4 terminal to the default shell
+  command:
+    cmd: update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal.wrapper
+
+- name: Restart polkit
+  systemd:
+    name: polkit
+    state: restarted
+
+- name: Hashit
   copy:
     src: files/hashit
     dest: /usr/local/bin/hashit
@@ -41,10 +59,27 @@
     group: root
     mode: 0755
 
-- name: implant_cryptor
+- name: Implant_cryptor
   copy:
     src: files/implant_cryptor.py
     dest: /usr/local/bin/implant_cryptor
     owner: root
     group: root
     mode: 0755
+
+- name: Remove unwanted xfce4 utilities
+  apt:
+    name:
+     - xfce4-screensaver
+     - xfce4-power-manager
+    state: absent
+
+- name: Kill the removed xfce4 utilities
+  command:
+    cmd: killall "{{ item }}"
+  with_items:
+    - xfce4-screensaver
+    - xfce4-power-manager
+  register: result
+  failed_when: result.rc >= 2
+

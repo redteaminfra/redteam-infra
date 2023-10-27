@@ -1,0 +1,79 @@
+---
+# tasks file for firefox
+- name: Check for sentinel file
+  stat:
+    path: /root/.snapd_disabled
+  register: sentinel
+
+- name: Remove firefox snap
+  community.general.snap:
+    name: firefox
+    state: absent
+  when: not sentinel.stat.exists
+
+- name: Remove firefox apt package
+  ansible.builtin.apt:
+    name: firefox
+    state: absent
+  when: not sentinel.stat.exists
+
+- name: Disable snapd
+  systemd_service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - snapd.service
+    - snapd.socket
+    - snapd.seeded.service
+  when: not sentinel.stat.exists
+
+- name: Mask snapd
+  systemd_service:
+    name: snapd.service
+    masked: true
+  when: not sentinel.stat.exists
+
+- name: Write sentinel file
+  file:
+    path: /root/.snapd_disabled
+    state: touch
+  when: not sentinel.stat.exists
+
+- name: 51unattended-upgrades-firefox
+  copy:
+    src: files/51unattended-upgrades-firefox
+    dest: /etc/apt/apt.conf.d/51unattended-upgrades-firefox
+    mode: 0755
+
+- name: Pin-firefox
+  copy:
+    src: files/mozilla-firefox
+    dest: /etc/apt/preferences.d/mozilla-firefox
+    mode: 0755
+
+- name: Add mozzila repository from PPA and install its signing key
+  ansible.builtin.apt_repository:
+    repo: ppa:mozillateam/ppa
+
+- name: Update package cache and install Firefox
+  ansible.builtin.apt:
+    name: firefox
+    state: present
+    update_cache: yes
+
+- name: Set Firefox as default browser
+  command:
+    cmd: update-alternatives --set x-www-browser /usr/bin/firefox
+
+- name: Create /etc/firefox/policies
+  file:
+    path: /etc/firefox/policies
+    state: directory
+    mode: 0755
+
+- name: Copy firefox-policies.json to /etc/firefox/policies
+  copy:
+    src: files/firefox-policies.json
+    dest: /etc/firefox/policies/policies.json
+    mode: 0644

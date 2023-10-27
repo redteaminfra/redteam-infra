@@ -1,17 +1,17 @@
 ---
 # tasks file for nfs-client
-- name: install nfs-common
+- name: Install nfs-common
   apt:
     name:
       - nfs-common
     state: present
 
-- name: ensure redteam group exists
+- name: Ensure redteam group exists
   group:
     name: redteam
     state: present
 
-- name: create directories
+- name: Create directories
   file:
     path: "{{ item }}"
     state: directory
@@ -20,7 +20,7 @@
     group: redteam
   loop: "{{ directories }}"
 
-- name: mount all directories
+- name: Mount all directories
   mount:
     path: "{{ item }}"
     src: "{{ hostvars[groups['homebase'][0]].ansible_default_ipv4.address }}:{{ item }}"

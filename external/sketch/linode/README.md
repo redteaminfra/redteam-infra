@@ -6,7 +6,7 @@ The first thing you'll need to do is set up a Linode account.
 
 You will need to generate a [Linode API key](https://www.linode.com/docs/products/tools/cloud-manager/guides/cloud-api-keys/)
 
-Next, copy `example-variables.tfvars` to  `variables.tfvars` and edit to suit your needs:
+Next, copy `variables.tfvars.example` to  `variables.tfvars` and edit to suit your needs:
 
 ``` terraform
 # Your Linode API token
@@ -18,15 +18,16 @@ linode_region = ""
 # Host image you would like to use
 linode_image = ""
 
-# Used for initial ssh cap from where terraform is run (ie workstation) into cloud instances
-ssh_private_key = ""
-ssh_public_key  = ""
-
 # Shortname for the engagement, will be used to identify resources in Linode and hostnames
 engagement_name = ""
 
 # Path to place your ssh configuration for this infrastructure
 ssh_config_path = ""
+
+# Change me if you are using different keys than those that are generated with homebase instantiation.
+# Give the path to the private
+# ssh_priv_key_path = 
+# ssh_pub_key_path =
 ```
 
 ## Spin up Instances
@@ -40,6 +41,11 @@ From there you can run
 ## Advanced configuration
 
 A basic configuration will allow you to setup one `middle` and one `edge` instance in your region of choice. You may use these variables in your `variables.tfvars` to change them:
+
+### ssh keys
+By default the public keys placed on the instances will be `~/.ssh/${engagement_name}.pub`. You can change this by overw ritting the default value of `ssh_key_path` in `variables.tfvars`.
+
+```terraform 
 
 ### Regions
 Configure different regions for your middle and edge instances.

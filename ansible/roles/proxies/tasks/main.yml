@@ -1,6 +1,6 @@
 ---
 # tasks file for proxies
-- name: install base packages for proxies
+- name: Install base packages for proxies
   apt:
     name:
       - asciinema

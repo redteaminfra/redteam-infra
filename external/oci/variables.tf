@@ -1,18 +1,23 @@
 # Copyright (c) 2023, Oracle and/or its affiliates.
 
-variable "tenancy_ocid" {}
-variable "user_ocid" {}
 variable "compartment_id" {}
 variable "ad_number" {}
-variable "fingerprint" {}
-variable "private_key_path" {}
-variable "ssh_provisioning_private_key" {}
-variable "ssh_provisioning_public_key" {}
 variable "region" {}
 variable "engagement_name" {}
 variable "homebase_shape" {}
 variable "proxy_shape" {}
 variable "elk_shape" {}
+
+variable "config_file_profile" {}
+
+variable "ubuntu-version" {
+  description = "The version of Ubuntu you would like to use. Use the version number."
+  default = "22.04"
+}
+
+variable "is_production" {
+  default = false
+}
 
 variable "ssh_config_path" {
   default = "~/.ssh"
@@ -58,4 +63,9 @@ variable "subnet_cidr_blocks" {
 
 variable "ssh_allowed_cidr_ranges" {
   type = set(string)
+}
+
+variable "backup_compartment_id" {
+  description = "The compartment ID where backups will be stored."
+  default = ""
 }

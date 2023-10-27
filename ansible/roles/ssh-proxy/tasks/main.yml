@@ -1,20 +1,20 @@
 ---
 # tasks file for ssh-proxy
-- name: copy ssh-proxy tool
+- name: Copy ssh-proxy tool
   copy:
     src: files/
     dest: /opt/ssh-proxy/
     owner: root
     group: root
 
-- name: create ssh key folder
+- name: Create ssh key folder
   file:
     path: /opt/ssh-proxy/keys
     owner: root
     mode: 0755
     state: directory
 
-- name: generate ssh-keypair
+- name: Generate ssh-keypair
   openssh_keypair:
     path: /opt/ssh-proxy/keys/sketchkey
     type: rsa

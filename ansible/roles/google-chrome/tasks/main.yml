@@ -1,0 +1,29 @@
+---
+# tasks file for google-chrome
+- name: Import Google Chrome's GPG key
+  apt_key:
+    url: https://dl.google.com/linux/linux_signing_key.pub
+    state: present
+
+- name: Add Google Chrome's repository
+  apt_repository:
+    repo: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+    state: present
+
+- name: Update apt and install Google Chrome
+  apt:
+    name: google-chrome-stable
+    state: latest
+    update_cache: yes
+
+- name: Ensure /etc/opt/chrome/policies/managed/ directory exists
+  file:
+    path: /etc/opt/chrome/policies/managed/
+    state: directory
+    mode: 0755
+
+- name: Copy chrome-policies.json to target location
+  copy:
+    src: files/chrome-policies.json
+    dest: /etc/opt/chrome/policies/managed/policies.json
+    mode: 0644

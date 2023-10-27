@@ -10,14 +10,17 @@ resource "oci_core_instance" "proxy" {
   freeform_tags       = local.tags
 
   source_details {
-    source_id               = data.oci_core_images.ubuntu-20-04.images.0.id
+    source_id               = data.oci_core_images.ubuntu-version.images.0.id
     source_type             = "image"
     boot_volume_size_in_gbs = var.boot_volume_size_in_gbs
   }
 
+  instance_options {
+    are_legacy_imds_endpoints_disabled = true
+  }
+
   create_vnic_details {
     subnet_id = oci_core_subnet.proxy.id
-    #    hostname_label = self.display_name #"proxy${format("%02g", count.index + 1)}-${var.operation_name}"
     #    display_name   = "proxy${format("%02g", count.index + 1)}-${var.operation_name}"
 
     private_ip             = cidrhost(var.subnet_cidr_blocks["proxy"], count.index + 11)
@@ -29,7 +32,7 @@ resource "oci_core_instance" "proxy" {
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.ssh_provisioning_public_key)
+    ssh_authorized_keys = tls_private_key.ssh_key.public_key_openssh
   }
 
   agent_config {

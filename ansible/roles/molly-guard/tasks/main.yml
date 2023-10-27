@@ -1,5 +1,5 @@
 ---
-- name: install molly-guard
+- name: Install molly-guard
   apt:
     name:
       - molly-guard

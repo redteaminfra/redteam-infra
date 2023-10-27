@@ -1,5 +1,5 @@
 ---
-- name: determine if nmap exists
+- name: Determine if nmap exists
   command: which nmap
   register: result
   failed_when: result.rc > 2
