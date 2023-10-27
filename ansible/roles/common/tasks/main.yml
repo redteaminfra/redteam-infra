@@ -3,7 +3,6 @@
   apt:
     update_cache: yes
     upgrade: dist
-    allow_downgrade: yes
 
 - name: Install software common to all hosts
   apt:
@@ -12,6 +11,7 @@
       - screen
       - tmux
       - iptables-persistent
+    state: present
 
 - name: Allow 192.168.0.0/16
   iptables:
