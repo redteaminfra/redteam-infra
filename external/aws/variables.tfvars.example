@@ -11,8 +11,7 @@ shared_credentials_file = "~/.aws/credentials"
 key_name = "~/.ssh/id_rsa"
 public_key = "~/.ssh/id_rsa.pub"
 
-# Which region
-aws_key_name = ""
+
 # use the Region Identifier, e.g: us-west-2
 region = ""
 # Which availability zone

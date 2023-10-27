@@ -1,0 +1,38 @@
+---
+# tasks file for aws
+- name: stop resovled
+  systemd:
+    name: systemd-resolved.service
+    state: stopped
+
+- name: disable resovled
+  systemd:
+    name: systemd-resolved.service
+    enabled: false
+
+- name: mask resolved
+  systemd:
+    name: systemd-resolved.service
+    masked: true
+
+- name: add dns server
+  template:
+    src: templates/resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    mode: 0644
+
+- name: block access to vcn DNS resolver
+  iptables:
+    action: insert
+    chain: OUTPUT
+    destination: 169.254.169.253/32
+    protocol: "{{ item }}"
+    destination_port: "53"
+    jump: DROP
+    state: present
+    comment: "disable access to AWS's VPC DNS resolver"
+  with_items: ["tcp", "udp"]
+
+- name: save iptables
+  command: iptables-save -f /etc/iptables/rules.v4
