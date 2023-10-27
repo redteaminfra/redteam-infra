@@ -1,4 +1,11 @@
 ---
+- name: Gather IPs
+  hosts: all
+  tasks:
+    - name: Store the IP of each host in its own variable
+      set_fact:
+        host_ip_address: "{{ ansible_facts['default_ipv4']['address'] }}"
+
 - name: Configure sketch hosts
   hosts: all
   become: yes
@@ -12,43 +19,40 @@
     ansible_command_timeout: 90
 
   tasks:
-    - name: Append IP of each host to a local temporary file
-      local_action:
-        module: lineinfile
-        path: "ansible_ips.txt"
-        line: "{{ ansible_facts['default_ipv4']['address'] }}"
-        create: yes
-      run_once: false
-      become: no
+    - name: Aggregate IPs from all hosts
+      set_fact:
+        aggregated_ips: "{{ groups['all'] | map('extract', hostvars, 'host_ip_address') | list }}"
+      delegate_to: localhost
 
     - name: Set the hostname
       hostname:
         name: "{{ inventory_hostname }}"
 
-    # update/upgrade/install packages
-    - name: update/upgrade
+    - name: Update apt and upgrade
       apt:
         update_cache: yes
         upgrade: dist
-    - name: install apt packages
+
+    - name: Install required packages
       apt:
         name:
           - unattended-upgrades
           - nginx
+        state: present
 
-    - name: create user
+    - name: Create user
       user:
         name: user
         password: "*"
         shell: /bin/bash
         create_home: yes
         state: present
-    - name: add key to user
+    - name: Add key to user
       authorized_key:
         user: user
         state: present
         key: "{{ lookup('file', '{{ ssh_pub_key }}') }}"
-    - name: created sudoers.d/user
+    - name: Created sudoers.d/user
       copy:
         dest: /etc/sudoers.d/99user
         owner: root
@@ -56,7 +60,7 @@
         mode: '0600'
         content: |
           user ALL=(ALL) NOPASSWD:ALL
-    - name: create sketchssh
+    - name: Create sketchssh
       user:
         name: sketchssh
         password: "*"
@@ -64,40 +68,40 @@
         shell: /bin/bash
         state: present
 
-    - name: disable ssh password auth
+    - name: Disable ssh password auth
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PasswordAuthentication yes'
         line: 'PasswordAuthentication no'
       notify:
-      - reload sshd
-    - name: disabled ssh pam
+      - Reload sshd
+    - name: Disabled ssh pam
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?UsePAM yes'
         line: 'UsePAM no'
       notify:
-      - reload sshd
-    - name: disable password auth with pam
+      - Reload sshd
+    - name: Disable password auth with pam
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?ChallengeResponseAuthentication yes'
         line: 'ChallengeResponseAuthentication no'
       notify:
-      - reload sshd
+      - Reload sshd
 
-    - name: Read IPs from the local temporary file
-      local_action:
-        module: command
-        cmd: cat ansible_ips.txt
-      register: ip_output
-      become: no
+#    - name: Read IPs from the local temporary file
+#      local_action:
+#        module: command
+#        cmd: cat ansible_ips.txt
+#      register: ip_output
+#      become: no
 
-    - name: Allow all ips in ip_output in ufw
+    - name: Allow all IPs in aggregated_ips to allow in ufw
       ufw:
         rule: allow
         from_ip: "{{ item }}"
-      with_items: "{{ ip_output.stdout_lines }}"
+      with_items: "{{ aggregated_ips }}"
 
     - name: Open required ports
       ufw:
@@ -115,11 +119,11 @@
         - in
         - out
 
-    - name: enable ufw
+    - name: Enable ufw
       ufw:
         state: enabled
 
-    - name: replace root user in ssh configuration
+    - name: Replace root user in ssh configuration
       become: no
       replace:
         path: "{{ ssh_config_path }}"
@@ -135,7 +139,7 @@
       become: no
 
   handlers:
-    - name: reload sshd
+    - name: Reload sshd
       service:
         name: sshd
         state: reloaded
