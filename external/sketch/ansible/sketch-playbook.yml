@@ -90,13 +90,6 @@
       notify:
       - Reload sshd
 
-#    - name: Read IPs from the local temporary file
-#      local_action:
-#        module: command
-#        cmd: cat ansible_ips.txt
-#      register: ip_output
-#      become: no
-
     - name: Allow all IPs in aggregated_ips to allow in ufw
       ufw:
         rule: allow
