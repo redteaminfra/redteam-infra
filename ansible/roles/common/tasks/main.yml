@@ -11,7 +11,21 @@
       - screen
       - tmux
       - iptables-persistent
+      - vim
     state: present
+
+- name: Setup skel
+  copy:
+    src: files/vimrc
+    dest: /etc/skel/.vimrc
+
+- name: Add vim to alternatives
+  command:
+    cmd: update-alternatives --install /usr/bin/editor editor /usr/bin/vim 0
+
+- name: Configure vim as default text editor
+  command:
+    cmd: update-alternatives --set editor /usr/bin/vim
 
 - name: Allow 192.168.0.0/16
   iptables:
