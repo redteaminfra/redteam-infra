@@ -12,6 +12,7 @@
       - tmux
       - iptables-persistent
       - vim
+      - jq
     state: present
 
 - name: Setup skel
