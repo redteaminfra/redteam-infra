@@ -1,0 +1,13 @@
+---
+# tasks file for mythic
+- name: See if Mythic is installed
+  stat:
+    path: /opt/mythic/.env
+  register: mythic_installed
+
+- name: Install Mythic if not installed
+  include_tasks: install_mythic.yml
+  when: mythic_installed.stat.exists == False
+
+- name: Start Mythic
+  include_tasks: start_mythic.yml

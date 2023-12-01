@@ -1,0 +1,14 @@
+---
+- name: Copy Mythic runner to temporary directory
+  copy:
+    src: files/start_mythic.sh
+    dest: /tmp/start_mythic.sh
+    mode: 0755
+
+- name: Run Mythic starter
+  command: /tmp/start_mythic.sh
+
+- name: Cleanup Mythic starter
+  file:
+    path: /tmp/start_mythic.sh
+    state: absent
