@@ -1,0 +1,16 @@
+" Set tabs to 4 spaces
+set tabstop=4
+set shiftwidth=4
+set expandtab
+
+" Prevent creation of swap files
+set noswapfile
+
+" Prevent creation of backup files
+set nobackup
+
+" Show line numbers
+set number
+
+" Enable syntax highlighting
+syntax on

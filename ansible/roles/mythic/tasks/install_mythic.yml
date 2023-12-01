@@ -1,0 +1,32 @@
+---
+# tasks file for mythic
+- name: Include docker role
+  include_role:
+    name: docker
+
+- name: Generate random alpha-numeric password for Mythic
+  set_fact:
+    mythic_password: "{{ lookup('password', '/dev/null', length=32) }}"
+    mythic_admin_password: "{{ lookup('password', '/dev/null', length=24) }}"
+
+- name: Copy Mythic environment file
+  template:
+    src: files/mythic.env.j2
+    dest: /tmp/mythic.env
+    group: redteam
+    mode: 0440
+
+- name: Copy Mythic installer to temporary directory
+  copy:
+    src: files/install_mythic.sh
+    dest: /tmp/install_mythic.sh
+    mode: 0755
+
+- name: Run Mythic installer
+  command: /tmp/install_mythic.sh
+
+- name: Cleanup Mythic installer
+  file:
+    path: /tmp/install_mythic.sh
+    state: absent
+
