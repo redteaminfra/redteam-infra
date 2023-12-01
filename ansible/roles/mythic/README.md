@@ -13,6 +13,23 @@ Passwords are generated on the first run and placed in `/opt/mythic/.env`. You w
 cd /opt/mythic && sudo ./mythic-cli stop && sudo ./mythic-cli uninstall && sudo rm -rf /opt/mythic && docker rm $(docker ps -a -q --filter "name=mythic") && cd
 ```
 
+### Agents
+No agents are installed by default. To install agents visit https://github.com/MythicAgents and then use:
+```commandline
+cd /opt/mythic && sudo ./mythic-cli install https://github.com/MythicAgents/<AGENT>
+```
+
+Be sure to replace `<AGENT>` with the agent you would like to install.
+
+### C2 Profiles
+No C2 profiles are installed by default. You can install C2 profiles by visiting https://github.com/MythicC2Profiles and then use:
+
+```commandline
+cd /opt/mythic && sudo ./mythic-cli install https://github.com/MythicC2Profiles/<PROFILE>
+```
+
+Be sure to replace `<PROFILE>` with the profile you would like to install.
+
 Requirements
 ------------
 
