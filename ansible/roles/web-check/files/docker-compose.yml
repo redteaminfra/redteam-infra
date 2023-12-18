@@ -1,0 +1,7 @@
+version: '3'
+services:
+  web-check:
+    image: lissy93/web-check
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
