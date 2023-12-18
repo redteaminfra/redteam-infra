@@ -1,0 +1,26 @@
+---
+# tasks file for web-check
+- name: Include docker role
+  include_role:
+    name: docker
+
+- name: Create user webchecker
+  user:
+    name: webchecker
+    home: /opt/web-check
+    system: true
+    shell: /usr/sbin/nologin
+    state: present
+
+- name: Copy docker-compose.yml
+  copy:
+    src: files/docker-compose.yml
+    dest: /opt/webchecker/docker-compose.yml
+    owner: webchecker
+    group: webchecker
+    mode: 0600
+
+- name: Run docker-compose web-check
+  command: docker compose up -d
+  args:
+    chdir: /opt/web-check
