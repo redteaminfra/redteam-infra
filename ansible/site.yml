@@ -6,7 +6,7 @@
     - molly-guard
     - logstash
     - yama
-    #- oci
+    - oci
     #- aws
 
 - import_playbook: homebase.yml
