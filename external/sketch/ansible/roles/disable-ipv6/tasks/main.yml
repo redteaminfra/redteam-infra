@@ -36,9 +36,6 @@
     owner: root
     mode: 0755
 
-- name: Restore ipv6 Drop Rules
-  command: ip6tables-restore /etc/ip6tables/rules.v6
-
 - name: Modify ipv6 in UFW
   lineinfile:
     path: /etc/default/ufw
@@ -51,10 +48,9 @@
     dest: /etc/systemd/system/restore-ip6tables.service
     owner: root
     mode: 0755
-  notify:
-    - Enable restore-ip6tables service
 
-- name: Enable restore-ip6tables service
+- name: Enable and start restore-ip6tables service
   systemd:
     name: restore-ip6tables
     enabled: yes  
+    state: reloaded

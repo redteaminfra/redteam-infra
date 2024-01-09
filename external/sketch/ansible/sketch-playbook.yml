@@ -9,6 +9,8 @@
 - name: Configure sketch hosts
   hosts: all
   become: yes
+  roles:
+    - disable-ipv6
 
   vars:
     required_ports:

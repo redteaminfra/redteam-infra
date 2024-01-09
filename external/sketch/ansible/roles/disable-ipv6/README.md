@@ -25,5 +25,5 @@ Example Playbook
 ```yml
 - hosts: all
   roles:
-   - { role: oci, vars: { dns_servers: [ '1.1.1.1', '8.8.8.8' ] } }
+   - { role: disable-ipv6, vars: { dns_servers: [ '1.1.1.1', '8.8.8.8' ] } }
 ```
