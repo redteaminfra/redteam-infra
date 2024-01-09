@@ -1,0 +1,10 @@
+[Unit]
+Description=Restore IPv6 iptables rules
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/ip6tables-restore /etc/ip6tables/rules.v6
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
