@@ -1,0 +1,56 @@
+---
+# tasks file for disable-ipv6
+- name: Make iptables Dir
+  file:
+    path: /etc/ip6tables
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Copy ip6tables Rules
+  copy:
+    src: files/rules.v6
+    dest: /etc/ip6tables/rules.v6
+    owner: root
+    mode: 0755
+
+- name: Stop resovled
+  systemd:
+    name: systemd-resolved.service
+    state: stopped
+
+- name: Disable resovled
+  systemd:
+    name: systemd-resolved.service
+    enabled: false
+
+- name: Mask resolved
+  systemd:
+    name: systemd-resolved.service
+    masked: true
+
+- name: Add dns server
+  template:
+    src: templates/resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    mode: 0755
+
+- name: Modify ipv6 in UFW
+  lineinfile:
+    path: /etc/default/ufw
+    regex: '^IPV6='
+    line: 'IPV6=no'
+
+- name: Create Systemd Service to Restore IPv6 Rules
+  copy:
+    src: files/restore-ip6tables.service
+    dest: /etc/systemd/system/restore-ip6tables.service
+    owner: root
+    mode: 0755
+
+- name: Enable and start restore-ip6tables service
+  systemd:
+    name: restore-ip6tables
+    enabled: yes  
+    state: reloaded
