@@ -4,7 +4,7 @@
   copy:
     src: files/install_ProxyProtocol.sh
     dest: "{{ ansible_user_dir }}/install_ProxyProtocol.sh"
-    mode: 0755  
+    mode: 0755
 
 - name: Run ProxyProtocol on Edge nodes
   become: yes

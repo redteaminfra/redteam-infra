@@ -7,6 +7,8 @@ This will automatically setup the SSH backflip from all edge nodes to middle. An
 
 Best used for when using only one middle sketch.
 
+This assumes you are pointing middle to proxy01.
+
 Requirements
 ------------
 
