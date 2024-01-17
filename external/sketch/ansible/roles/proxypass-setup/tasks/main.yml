@@ -1,5 +1,5 @@
 ---
-# tasks file for backflip-setup
+# tasks file for proxypass-setup
 - name: Copy ProxyProtocol to Sketch Nodes
   copy:
     src: files/install_ProxyProtocol.sh
