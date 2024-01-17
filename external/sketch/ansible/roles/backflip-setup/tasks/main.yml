@@ -4,8 +4,14 @@
   copy:
     src: files/install_ProxyProtocol.sh
     dest: "{{ ansible_user_dir }}/install_ProxyProtocol.sh"
-    mode: 0755
+    mode: 0755  
 
 - name: Run ProxyProtocol on Edge nodes
   become: yes
   shell: "./install_ProxyProtocol.sh {{ hostvars[groups['middle'][0]]['middle_host_ip'] }} edge"
+  when: "'edge' in inventory_hostname"
+
+- name: Run ProxyProtocol on Middle nodes
+  become: yes
+  shell: "./install_ProxyProtocol.sh {{ proxy_public_ip }} middle"
+  when: "'middle' in inventory_hostname"
