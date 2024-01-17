@@ -1,9 +1,9 @@
-backflip-setup
+proxypass-setup
 =========
 
 Optional role.
 
-This will automatically setup the SSH backflip from all edge nodes to middle. And middle to proxy
+This will automatically setup the Proxy Protocol chain from all edge nodes to middle. And middle to proxy
 
 Best used for when using only one middle sketch.
 
@@ -50,5 +50,5 @@ Add to the end of sketch-playbook.yml
   hosts: all
   become: yes
   roles:
-    - backflip-setup
+    - proxypass-setup
 ```
