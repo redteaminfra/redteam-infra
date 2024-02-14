@@ -1,6 +1,7 @@
 variable "homebase_shape" {}
 variable "proxy_shape" {}
 variable "elk_shape" {}
+variable "profile" {}
 
 variable "image_username" {
   default = "ubuntu"

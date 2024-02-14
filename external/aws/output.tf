@@ -1,5 +1,5 @@
 output "ubuntu-20-04-latest-name" {
-  value = data.aws_ami.ubuntu
+  value = data.aws_ami.ubuntu.description
 }
 
 //Builds the ssh config and puts it in the file path specified in vars

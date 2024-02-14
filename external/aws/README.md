@@ -2,6 +2,10 @@
 
 ## How to start
 
+Ensure you have configured aws cli for your account. See [how to sign in](https://docs.aws.amazon.com/signin/latest/userguide/how-to-sign-in.html)
+
+### Trivial use case
+
 The first thing you'll need to do is set up IAM in AWS and generate an EC2 keypair.
 
 To do so, from IAM in AWS make a user and add that user to the group "redteam".
@@ -14,20 +18,8 @@ To do so, log in to AWS and navigate to EC2. Under Network and Security select '
 
 
 
-You also need to put your AWS credentials in `~/.aws/credentials`
+AWS does magic to determine where your credentials are. Just point to the profile that has your information.
 
-```
-[default]
-aws_access_key_id = <STUFF>
-aws_secret_access_key = <THINGS>
-```
-
-Also set `~/.aws/config` to your zone such as
-
-```
-[default]
-region=us-west-2
-```
 
 You will also need to set up a `variables.tfvars` file see the `example-variables.tfvars` for an example.
 
@@ -39,6 +31,7 @@ shared_credentials_file = "~/.aws/credentials"
 
 # Optional, default path is `~/.ssh`
 #ssh_config_path              = ""
+profile = "redteam-infra"
 
 #Key Pair for sshing to hosts
 key_name = "~/.ssh/id_rsa"
