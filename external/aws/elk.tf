@@ -1,5 +1,5 @@
 resource "aws_instance" "elk" {
-  depends_on = [ "aws_instance.homebase" ]
+  depends_on = [ aws_instance.homebase ]
   ami = data.aws_ami.ubuntu.id
   instance_type = var.elk_shape
   key_name = var.key_name
