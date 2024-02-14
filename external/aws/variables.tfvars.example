@@ -2,6 +2,7 @@
 
 # Shared Crediental file Path
 shared_credentials_file = "~/.aws/credentials"
+profile = "redteam-infra"
 
 
 # Optional, default path is `~/.ssh`
