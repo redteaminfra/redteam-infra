@@ -6,12 +6,7 @@ profile = "redteam-infra"
 
 
 # Optional, default path is `~/.ssh`
-#ssh_config_path              = ""
-
-#Key Pair for sshing to hosts
-key_name = "~/.ssh/id_rsa"
-public_key = "~/.ssh/id_rsa.pub"
-
+ssh_config_path = "~/.ssh/redteam-ssh-configs/configs"
 
 # use the Region Identifier, e.g: us-west-2
 region = ""

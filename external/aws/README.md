@@ -33,9 +33,6 @@ shared_credentials_file = "~/.aws/credentials"
 #ssh_config_path              = ""
 profile = "redteam-infra"
 
-#Key Pair for sshing to hosts
-key_name = "~/.ssh/id_rsa"
-public_key = "~/.ssh/id_rsa.pub"
 
 # Which region
 aws_key_name = ""

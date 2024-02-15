@@ -3,7 +3,7 @@ resource "aws_instance" "proxy" {
   count = var.proxy_count
   ami = data.aws_ami.ubuntu.id
   instance_type = var.proxy_shape
-  key_name = var.key_name
+  key_name = aws_key_pair.deployer.key_name
   root_block_device {
     volume_type = "standard"
     volume_size = var.boot_volume_size_in_gbs
