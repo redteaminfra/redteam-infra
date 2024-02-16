@@ -27,10 +27,6 @@ variable "availability_zone" {
   default = "us-west-2a"
 }
 
-variable "shared_credentials_file" {
-  default = "~/.aws/credentials"
-}
-
 variable "engagement_name" {
 }
 

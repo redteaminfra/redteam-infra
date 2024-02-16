@@ -8,8 +8,8 @@ resource "aws_instance" "proxy" {
     volume_type = "standard"
     volume_size = var.boot_volume_size_in_gbs
   }
-  subnet_id = "${aws_subnet.infra.id}"
-  private_ip = "${format("192.168.2.%d", count.index + 11)}"
+  subnet_id = aws_subnet.infra.id
+  private_ip = format("192.168.2.%d", count.index + 11)
   associate_public_ip_address = true
   vpc_security_group_ids = [
     aws_security_group.internal.id,

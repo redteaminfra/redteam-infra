@@ -14,7 +14,7 @@ resource "aws_instance" "homebase" {
     volume_size = var.boot_volume_size_in_gbs
   }
   tags = {
-    Op = "${var.engagement_name}"
+    Op = var.engagement_name
     Name = format("homebase-%s", var.engagement_name)
   }
 }
