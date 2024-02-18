@@ -117,7 +117,7 @@ resource "aws_security_group" "internal" {
   }
 
   tags = {
-    Op = "${var.engagement_name}"
+    Op = var.engagement_name
     Name = "${var.engagement_name}_internal"
   }
 }
@@ -147,7 +147,7 @@ resource "aws_security_group" "web_from_all" {
 resource "aws_security_group" "dns_from_all" {
   name = format("%s_dns_from_all", var.engagement_name)
   description = "Allow incoming dns connections"
-  vpc_id = "${aws_vpc.infra_vpc.id}"
+  vpc_id = aws_vpc.infra_vpc.id
   ingress  {
     from_port = 53
     to_port = 53
@@ -161,7 +161,7 @@ resource "aws_security_group" "dns_from_all" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Op = "${var.engagement_name}"
+    Op = var.engagement_name
     Name = "${var.engagement_name}_dns_from_all"
   }
 }

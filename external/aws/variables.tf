@@ -27,19 +27,6 @@ variable "availability_zone" {
   default = "us-west-2a"
 }
 
-variable "shared_credentials_file" {
-  default = "~/.aws/credentials"
-}
-
-variable "key_name" {
-  default = "~/.ssh/id_rsa"
-}
-
-variable "public_key" {
-  default = "~/.ssh/id_rsa.pub"
-  
-}
-
 variable "engagement_name" {
 }
 
