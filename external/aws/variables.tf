@@ -37,3 +37,8 @@ variable "vpc_cidr_block" {
 variable "ssh_allowed_cidr_ranges" {
   type = set(string)
 }
+
+variable "default_tags" {
+  type = map(string)
+  default = {}
+}
