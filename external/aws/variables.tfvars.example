@@ -29,6 +29,5 @@ elk_shape      = "t3.medium"
 # e.g. ssh_allowed_cidr_ranges = ["192.168.32.0/25", "172.16.0.0/16"]
 ssh_allowed_cidr_ranges = [""]
 
-
 # Default tags to add (in addition to individual tags) to all resources
-default_tags   = {"example-name":"example-value"}
+#default_tags   = { "example-name": "example-value" }
