@@ -62,6 +62,10 @@ output "run-ansible" {
   value = "Add your ssh users.yml file to ../../ansible/playbooks make any modification you need to site.yml, homebase.yml, proxies.yml, elk.yml, then run ansible\n\n\tcd ../../ansible && ansible-playbook -i inventory.ini site.yml\n"
 }
 
+output "proxy_public_ips" {
+  value = [for ip in oci_core_instance.proxy : ip.public_ip]
+}
+
 output "good-bye" {
   value = "Have a nice day!"
 }
