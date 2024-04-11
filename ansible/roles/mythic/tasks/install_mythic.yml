@@ -24,6 +24,8 @@
 
 - name: Run Mythic installer
   command: /tmp/install_mythic.sh
+  environment:
+    GOPROXY: "https://proxy.golang.org"
 
 - name: Cleanup Mythic installer
   file:

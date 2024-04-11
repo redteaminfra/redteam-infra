@@ -25,7 +25,7 @@ Be sure to replace `<AGENT>` with the agent you would like to install.
 No C2 profiles are installed by default. You can install C2 profiles by visiting https://github.com/MythicC2Profiles and then use:
 
 ```commandline
-cd /opt/mythic && sudo ./mythic-cli install https://github.com/MythicC2Profiles/<PROFILE>
+cd /opt/mythic && sudo ./mythic-cli install github https://github.com/MythicC2Profiles/<PROFILE>
 ```
 
 Be sure to replace `<PROFILE>` with the profile you would like to install.
