@@ -69,4 +69,3 @@ output "proxy_public_ips" {
 output "good-bye" {
   value = "Have a nice day!"
 }
-
