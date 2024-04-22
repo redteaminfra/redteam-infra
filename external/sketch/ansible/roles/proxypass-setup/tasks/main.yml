@@ -1,4 +1,21 @@
 ---
+- name: Set fact for 'middle' hosts
+  set_fact:
+    is_middle_host: true
+  when: "'middle' in inventory_hostname"
+
+- name: Gather Middle IPs into a dictionary
+  set_fact:
+    middle_ips_dict: >-
+      {{
+        middle_ips_dict | default({}) | combine(
+          { item: hostvars[item]['host_ip_address'] }
+        )
+      }}
+  loop: "{{ groups['all'] }}"
+  when: hostvars[item]['is_middle_host'] is defined and hostvars[item]['is_middle_host']
+  delegate_to: localhost
+
 - name: Determine middle node IP for each edge node
   set_fact:
     middle_host_ip: "{{ middles['middle01-engagemet-name'] }}"

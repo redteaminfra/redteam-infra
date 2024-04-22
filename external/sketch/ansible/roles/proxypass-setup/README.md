@@ -1,25 +1,30 @@
 proxypass-setup
 =========
 
-Optional role.
-
-This will automatically setup the proxy protocols on port 2222 from all edge nodes to middles and middles to proxies.
-
+This will automatically setup the proxy pass protocols on port 80, 443 and 2222 from all edge nodes to middles and middles to proxies.
 
 Requirements
 ------------
-
-Operators will still be required to collect the Proxy IPs from their OCI/AWS ansible output or hosts and populate the playbook variables.
-
-You will also need to update the role's tasks to point edges to specific middles and middles to specific proxies.
-
-In the role's main tasks file, you will need to update or add/remove depending on how many edges/middles you have. The below example is using 2 edge nodes and 2 middles with 1 proxy.
 
 The naming convention for your edge nodes is based on what region you deploy them to in your `variables.tfvars` file.
 
 Standard naming convention for edges: `edge-engagement-name-region-0X`
 
 Standard naming convention for middles: `middle0X-engagement-name`
+
+## Step 1
+Collect the Proxy IPs from the OCI/AWS terraform output and populate the role variables within the playbook. Ensure the below code snippet is added to the end of your `sketch-playbook.yml` itself as Nginx is required before we can run this role.
+
+```
+- name: Deploy proxypass-setup
+  hosts: all
+  become: yes
+  roles:
+    - { role: proxypass-setup, vars: { proxies: ['10.0.0.1', '10.0.0.2'] }}
+```
+
+## Step 2
+Update role's tasks file to manage the mapping between edges <-> middles & middles <-> proxies. This will be located in the `tasks/main.yml`
 
 ```
 - name: Determine middle node IP for each edge node
@@ -39,42 +44,20 @@ Standard naming convention for middles: `middle0X-engagement-name`
 
 - name: Determine proxy node IP for each middle node
   set_fact:
-    proxy_ip: "{{ proxies[0] }}"
+    proxy_ip: "{{ proxies[1] }}"
   when: "'middle02' in inventory_hostname"
 ```
 
 
 Example Playbook
 ----------------
-
-Add the following to the beginning of your playbook under "Gather IPs" section:
-
-```
- - name: Set fact for 'middle' hosts
-      set_fact:
-        is_middle_host: true
-      when: "'middle' in inventory_hostname"
-
-    - name: Gather Middle IPs into a dictionary
-      set_fact:
-        middle_ips_dict: >-
-          {{
-            middle_ips_dict | default({}) | combine(
-              { item: hostvars[item]['host_ip_address'] }
-            )
-          }}
-      loop: "{{ groups['all'] }}"
-      when: hostvars[item]['is_middle_host'] is defined and hostvars[item]['is_middle_host']
-      delegate_to: localhost
-```
-
-Add the following at the end of your playbook as the edges and middle require nginx before this role can be applied.
+Add the following to the end of your `sketch-playbook.yml` as Nginx is required by Middle and Edge nodes before the role can be applied.
 
 ```
 - name: Deploy proxypass-setup
   hosts: all
   become: yes
   roles:
-    - { role: proxypass-setup, vars: { proxies: ['IP1', 'IP2'], middles: "{{ middle_ips_dict }}" }}
+    - { role: proxypass-setup, vars: { proxies: ['IP1', 'IP2']}}
 ```
 
