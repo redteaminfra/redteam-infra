@@ -29,12 +29,12 @@ Update role's tasks file to manage the mapping between edges <-> middles & middl
 ```
 - name: Determine middle node IP for each edge node
   set_fact:
-    middle_host_ip: "{{ middles['middle01-engagemet-name'] }}"
+    middle_host_ip: "{{ middle_ips_dict['middle01-engagemet-name'] }}"
   when: "inventory_hostname in ['edge-engagement-name-jp-osa-01']"
 
 - name: Determine middle node IP for each edge node
   set_fact:
-    middle_host_ip: "{{ middles['middle02-engagemet-name'] }}"
+    middle_host_ip: "{{ middle_ips_dict['middle02-engagemet-name'] }}"
   when: "inventory_hostname in ['edge-engagemet-name-in-maa-01']"
 
 - name: Determine proxy node IP for each middle node
