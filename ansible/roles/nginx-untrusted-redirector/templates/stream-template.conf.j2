@@ -1,0 +1,9 @@
+server {
+    listen {{ proxy_port }};
+    proxy_pass {{ proxy_ip }}:{{ proxy_port }};
+    {%+ if ansible_hostname.startswith('edge') -%}
+    proxy_protocol on;
+    {% endif %}
+
+    error_log /var/log/nginx/{{ proxy_ip }}-{{ proxy_port }}.error.log warn;
+}
