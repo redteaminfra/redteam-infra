@@ -1,0 +1,14 @@
+[Unit]
+Description=Go File Server
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+Group=nogroup
+EnvironmentFile=-/etc/default/go-fileserver
+ExecStart=/opt/go-fileserver/go-fileserver --bind-address ${BIND_ADDRESS} --token ${TOKEN} --root-file-directory ${ROOT_DIR}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
