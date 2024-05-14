@@ -1,0 +1,56 @@
+---
+# tasks file for go-fileserver
+
+- name: Generate a random token
+  set_fact:
+    token: "{{ lookup('password', '/dev/null length=15 chars=ascii_letters,digits') }}"
+  when: token is not defined or token | trim == ''
+
+- name: Ensure go is installed
+  apt:
+    name: golang-go
+    state: present
+
+- name: Clone the go-fileserver and checkout the correct tag
+  git:
+    repo: https://github.com/zikwall/go-fileserver.git
+    dest: /opt/go-fileserver
+    version: "{{ go_fileserver_version }}"
+
+- name: Build the go-fileserver
+  shell:
+    chdir: /opt/go-fileserver
+    cmd: go build
+
+- name: Create the go-fileserver configuration file
+  template:
+    src: templates/go-fileserver.j2
+    dest: /etc/default/go-fileserver
+    mode: 0644
+
+- name: Install go-fileserver.service
+  copy:
+    src: files/go-fileserver.service
+    dest: /etc/systemd/system/go-fileserver.service
+
+- name: Create the root directory
+  file:
+    path: "{{ root_directory }}"
+    state: directory
+    mode: 0755
+    owner: nobody
+    group: nogroup
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Start go-fileserver
+  systemd:
+    name: go-fileserver
+    state: started
+
+- name: Enable go-fileserver
+  systemd:
+    name: go-fileserver
+    enabled: yes
