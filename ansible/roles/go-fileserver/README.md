@@ -5,7 +5,7 @@ Installs the go-fileserver from https://github.com/zikwall/go-fileserver
 
 > Simple, Powerful and Productive file server written in Go
 
-An easy way to receive files via http. Recommended to sit behind a reverse proxy server. 
+An easy way to receive files via http. Recommended to be installed on homebase and sit behind one of the proxy servers.
 
 An example nginx configuration:
 
