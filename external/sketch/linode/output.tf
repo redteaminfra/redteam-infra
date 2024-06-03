@@ -42,6 +42,10 @@ output "run-ansible" {
   value = "Run ansible to configure hosts with:\n\tansible-playbook ../ansible/sketch-playbook.yml -i inventory.ini -e \"ssh_pub_key=${local.ssh_pub_key_path}\" -e \"ssh_config_path=${local.abs_ssh_config_path}\""
 }
 
+output "middle_public_ips" {
+  value = [for ip in linode_instance.middle: ip.ip_address]
+}
+
 output "good-bye" {
   depends_on = [local_file.ansible_inventory]
   value = "Have a nice day!"
