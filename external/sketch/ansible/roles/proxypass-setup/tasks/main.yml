@@ -1,53 +1,34 @@
 ---
-- name: Set fact for 'middle' hosts
-  set_fact:
-    is_middle_host: true
-  when: "'middle' in inventory_hostname"
+- name: Install nginx
+  apt:
+    name:
+      - nginx
+    state: present
 
-- name: Gather Middle IPs into a dictionary
-  set_fact:
-    middle_ips_dict: >-
-      {{
-        middle_ips_dict | default({}) | combine(
-          { item: hostvars[item]['host_ip_address'] }
-        )
-      }}
-  loop: "{{ groups['all'] }}"
-  when: hostvars[item]['is_middle_host'] is defined and hostvars[item]['is_middle_host']
-  delegate_to: localhost
-
-- name: Determine middle node IP for each edge node
-  set_fact:
-    middle_host_ip: "{{ middle_ips_dict['middle01-engagemet-name'] }}"
-  when: "inventory_hostname in ['edge-engagement-name-jp-osa-01']"
-
-- name: Determine middle node IP for each edge node
-  set_fact:
-    middle_host_ip: "{{ middle_ips_dict['middle02-engagemet-name'] }}"
-  when: "inventory_hostname in ['edge-engagemet-name-in-maa-01']"
-
-- name: Determine proxy node IP for each middle node
-  set_fact:
-    proxy_ip: "{{ proxies[0] }}"
-  when: "'middle01' in inventory_hostname"
-
-- name: Determine proxy node IP for each middle node
-  set_fact:
-    proxy_ip: "{{ proxies[1] }}"
-  when: "'middle02' in inventory_hostname"
-  
-- name: Copy ProxyProtocol to Sketch Nodes
+- name: Copy nginx configuration
   copy:
-    src: files/install_ProxyProtocol.sh
-    dest: "{{ ansible_user_dir }}/install_ProxyProtocol.sh"
-    mode: 0755  
+    src: files/nginx.conf
+    dest: /etc/nginx/nginx.conf
 
-- name: Run ProxyProtocol on Edge nodes
-  become: yes
-  shell: "./install_ProxyProtocol.sh {{ middle_host_ip }} edge"
-  when: "'edge' in inventory_hostname"
+- name: Create nginx streams directory
+  file:
+    path: /etc/nginx/streams
+    state: directory
 
-- name: Run ProxyProtocol on Middle nodes
-  become: yes
-  shell: "./install_ProxyProtocol.sh {{ proxy_ip }} middle"
-  when: "'middle' in inventory_hostname"
+- name: Configure stream for each port
+  template:
+    src: templates/proxy-template.conf.j2
+    dest: "/etc/nginx/streams/{{ next_hop }}-{{ proxy_port }}.conf"
+  loop: "{{ proxy_ports }}"
+  loop_control:
+      loop_var: proxy_port
+
+- name: Restart nginx
+  service:
+      name: nginx
+      state: restarted
+
+- name: Enable nginx
+  service:
+      name: nginx
+      enabled: yes

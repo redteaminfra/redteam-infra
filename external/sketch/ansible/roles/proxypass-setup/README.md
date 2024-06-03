@@ -1,7 +1,7 @@
 proxypass-setup
 =========
 
-This will automatically setup the proxy pass protocols on port 80, 443 and 2222 from all edge nodes to middles and middles to proxies.
+This will automatically setup the proxy pass protocols on the ports specified within the playbook from all edge nodes to middles and middles to proxies.
 
 Requirements
 ------------
@@ -13,51 +13,34 @@ Standard naming convention for edges: `edge-engagement-name-region-0X`
 Standard naming convention for middles: `middle0X-engagement-name`
 
 ## Step 1
-Collect the Proxy IPs from the OCI/AWS terraform output and populate the role variables within the playbook. Ensure the below code snippet is added to the end of your `sketch-playbook.yml` itself as Nginx is required before we can run this role.
-
-```
-- name: Deploy proxypass-setup
-  hosts: all
-  become: yes
-  roles:
-    - { role: proxypass-setup, vars: { proxies: ['10.0.0.1', '10.0.0.2'] }}
-```
+Collect the Proxy IPs from the OCI/AWS terraform output which we will use to populate the nexthop variable within the playbook. 
 
 ## Step 2
-Update role's tasks file to manage the mapping between edges <-> middles & middles <-> proxies. This will be located in the `tasks/main.yml`
+Collect the Middle IPs from the Sketch terraform output which we will use to populate the nexthop variable within the playbook. 
 
-```
-- name: Determine middle node IP for each edge node
-  set_fact:
-    middle_host_ip: "{{ middle_ips_dict['middle01-engagemet-name'] }}"
-  when: "inventory_hostname in ['edge-engagement-name-jp-osa-01']"
-
-- name: Determine middle node IP for each edge node
-  set_fact:
-    middle_host_ip: "{{ middle_ips_dict['middle02-engagemet-name'] }}"
-  when: "inventory_hostname in ['edge-engagemet-name-in-maa-01']"
-
-- name: Determine proxy node IP for each middle node
-  set_fact:
-    proxy_ip: "{{ proxies[0] }}"
-  when: "'middle01' in inventory_hostname"
-
-- name: Determine proxy node IP for each middle node
-  set_fact:
-    proxy_ip: "{{ proxies[1] }}"
-  when: "'middle02' in inventory_hostname"
-```
+## Step 3
+Determine which ports you would like to use. The original and recommended are port 80, 443, and 2222.
 
 
 Example Playbook
 ----------------
-Add the following to the end of your `sketch-playbook.yml` as Nginx is required by Middle and Edge nodes before the role can be applied.
+Add the following to your `sketch-playbook.yml` based on the number of middle and edge nodes you have created. There should be an entry for each one.
 
 ```
-- name: Deploy proxypass-setup
-  hosts: all
+- hosts: edge-engagement-name-region-0X
   become: yes
   roles:
-    - { role: proxypass-setup, vars: { proxies: ['IP1', 'IP2']}}
+    - proxypass-setup
+  vars:
+    next_hop: 7.7.7.7
+    proxy_ports: ["80", "443", "2222"]
+
+- hosts: middle0X-engagement-name
+  become: yes
+  roles:
+    - proxypass-setup
+  vars:
+    next_hop: 7.7.7.8
+    proxy_ports: ["80", "443", "2222"]
 ```
 
