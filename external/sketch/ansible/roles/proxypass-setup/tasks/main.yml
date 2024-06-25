@@ -1,0 +1,34 @@
+---
+- name: Install nginx
+  apt:
+    name:
+      - nginx
+    state: present
+
+- name: Copy nginx configuration
+  copy:
+    src: files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+
+- name: Create nginx streams directory
+  file:
+    path: /etc/nginx/streams
+    state: directory
+
+- name: Configure stream for each port
+  template:
+    src: templates/proxy-template.conf.j2
+    dest: "/etc/nginx/streams/{{ next_hop }}-{{ proxy_port }}.conf"
+  loop: "{{ proxy_ports }}"
+  loop_control:
+      loop_var: proxy_port
+
+- name: Restart nginx
+  service:
+      name: nginx
+      state: restarted
+
+- name: Enable nginx
+  service:
+      name: nginx
+      enabled: yes
