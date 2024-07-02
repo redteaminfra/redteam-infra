@@ -1,0 +1,15 @@
+%{ for middle in middles ~}
+Host ${middle.name}
+    User root
+    IdentityFile ${ssh_private_key}
+    Hostname ${middle.ipv4_address}
+    ProxyJump proxy01-${engagement_name}
+
+%{ for edge in edges ~}
+Host ${edge.name}
+    User root
+    IdentityFile ${ssh_private_key}
+    Hostname ${edge.ipv4_address}
+    ProxyJump ${middle.name}
+%{ endfor ~}
+%{ endfor ~}

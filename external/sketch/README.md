@@ -5,6 +5,7 @@ A very simple set of provision scripts for zero-trust reflector proxies.
 # Moving Parts
 
 If you are using Linode, skip `provision.sh` and use the Linode instructions
+If you are using Digital Ocean, skip `provision.sh` and use the Digital Ocean instructions
 
 ## provision.sh
 
@@ -27,6 +28,9 @@ You will need to add a SSH public key to this script.
 
 ## Linode
 See `linode/README.md`
+
+## Digital Ocean
+See `digitalocean/README.md`
 
 ### How to Play with provision.sh
 
