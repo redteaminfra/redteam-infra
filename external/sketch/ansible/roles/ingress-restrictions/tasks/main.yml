@@ -1,0 +1,33 @@
+---
+# tasks file for ingress-restrictions
+
+- name: Set fact for 'edge' hosts
+  set_fact:
+    is_edge_host: true
+  when: "'edge' in inventory_hostname"
+
+- name: Gather Edge IPs into a dictionary
+  set_fact:
+    edge_ips_dict: >-
+      {{
+        edge_ips_dict | default({}) | combine(
+          { item: hostvars[item]['host_ip_address'] }
+        )
+      }}
+  loop: "{{ groups['all'] }}"
+  when: hostvars[item]['is_edge_host'] is defined and hostvars[item]['is_edge_host']
+  delegate_to: localhost
+
+- name: Allow port 2222 from Edges to Middles
+  ufw:
+    rule: allow
+    port: 2222
+    from_ip: "{{ item.value }}"
+  with_items: "{{ edge_ips_dict | dict2items }}"
+  when: "'middle' in inventory_hostname"
+
+- name: Deny port 2222
+  ufw:
+    rule: deny
+    port: 2222
+  when: "'middle' in inventory_hostname"
