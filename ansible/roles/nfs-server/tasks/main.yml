@@ -17,14 +17,25 @@
     name: redteam
     state: present
 
-- name: Create directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: 0775
-    owner: root
-    group: redteam
-  loop: "{{ directories }}"
+- name: Create directories and set ACLs
+  block:
+    - name: Create directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0775
+        owner: root
+        group: redteam
+      loop: "{{ directories }}"
+
+    - name: Set ACLs on directories
+      acl:
+        path: "{{ item }}"
+        entity: nfsnobody
+        etype: user
+        permissions: rwx
+        state: present
+      loop: "{{ directories }}"
 
 - name: Configure export file
   template:
