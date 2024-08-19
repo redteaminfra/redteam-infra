@@ -1,0 +1,3 @@
+---
+google_chrome_gpg_key_url: "https://dl.google.com/linux/linux_signing_key.pub"
+google_chrome_repo: "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
