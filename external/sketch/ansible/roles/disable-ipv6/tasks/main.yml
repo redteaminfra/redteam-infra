@@ -1,11 +1,29 @@
 ---
 # tasks file for disable-ipv6
+
+# Check for provider, especially linode
+- name: Query metadata service
+  uri:
+    url: "http://169.254.169.254/v1/instance"
+    return_content: yes
+    status_code: 400
+  register: system_metadata
+  ignore_errors: yes
+
+- name: Set is_linode based on metadata
+  set_fact:
+    is_linode: "{{ 'errors.reason' in system_metadata.content }}" # Without token added this response appears for Linode. DO uses "not found"
+  when: system_metadata is defined
+
+# Disable ipv6 steps if Linode
+
 - name: Make iptables Dir
   file:
     path: /etc/ip6tables
     state: directory
     owner: root
     mode: 0755
+  when: is_linode
 
 - name: Copy ip6tables Rules
   copy:
@@ -13,21 +31,25 @@
     dest: /etc/ip6tables/rules.v6
     owner: root
     mode: 0755
+  when: is_linode
 
 - name: Stop resovled
   systemd:
     name: systemd-resolved.service
     state: stopped
+  when: is_linode
 
 - name: Disable resovled
   systemd:
     name: systemd-resolved.service
     enabled: false
+  when: is_linode
 
 - name: Mask resolved
   systemd:
     name: systemd-resolved.service
     masked: true
+  when: is_linode
 
 - name: Add dns server
   template:
@@ -35,12 +57,14 @@
     dest: /etc/resolv.conf
     owner: root
     mode: 0755
+  when: is_linode
 
 - name: Modify ipv6 in UFW
   lineinfile:
     path: /etc/default/ufw
     regex: '^IPV6='
     line: 'IPV6=no'
+  when: is_linode
 
 - name: Create Systemd Service to Restore IPv6 Rules
   copy:
@@ -48,9 +72,11 @@
     dest: /etc/systemd/system/restore-ip6tables.service
     owner: root
     mode: 0755
+  when: is_linode
 
 - name: Enable and start restore-ip6tables service
   systemd:
     name: restore-ip6tables
     enabled: yes  
     state: reloaded
+  when: is_linode
