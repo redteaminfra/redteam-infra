@@ -2,12 +2,15 @@
 # tasks file for google-chrome
 - name: Import Google Chrome's GPG key
   apt_key:
-    url: https://dl.google.com/linux/linux_signing_key.pub
+    url: "{{ google_chrome_gpg_key_url }}"
     state: present
+  retries: 3
+  delay: 5
+  until: result is succeeded
 
 - name: Add Google Chrome's repository
   apt_repository:
-    repo: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+    repo: "{{ google_chrome_repo }}"
     state: present
 
 - name: Update apt and install Google Chrome

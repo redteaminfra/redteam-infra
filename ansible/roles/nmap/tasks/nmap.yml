@@ -8,6 +8,10 @@
   get_url:
     url: "https://nmap.org/dist/nmap-{{ nmap_version }}.tar.bz2"
     dest: "{{ tmp_path }}"
+  register: download_result
+  retries: 5  
+  delay: 10
+  until: download_result is succeeded
   
 - name: Extract nmap source
   unarchive:
