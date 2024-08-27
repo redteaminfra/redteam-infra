@@ -7,3 +7,24 @@ resource "local_file" "ansible_inventory" {
     # Add other necessary variables
   })
 }
+
+variable "aws_hosts" {
+  type = list(object({
+    name = string
+    ip = string
+  }))
+}
+
+variable "oci_hosts" {
+  type = list(object({
+    name = string
+    ip = string
+  }))
+}
+
+variable "linode_hosts" {
+  type = list(object({
+    name = string
+    ip = string
+  }))
+}
