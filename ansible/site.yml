@@ -15,4 +15,5 @@
 - import_playbook: users/users.yml
 
 - import_playbook: playbooks/reboot.yml
+- import_playbook: playbooks/renew_certificates.yml
 
