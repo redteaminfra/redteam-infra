@@ -1,0 +1,16 @@
+- name: Deploy and schedule certificate renewal script
+  hosts: proxies
+  become: yes
+  tasks:
+    - name: Copy renew_certificates.sh to the target machine
+      copy:
+        src: roles/openresty/files/renew_certificates.sh
+        dest: /usr/local/bin/renew_certificates.sh
+        mode: '0755'
+
+    - name: Create cron job for certificate renewal
+      cron:
+        name: "Renew Let's Encrypt certificates"
+        minute: "0"
+        hour: "0"
+        job: "/usr/local/bin/renew_certificates.sh >> /var/log/renew_certificates.log 2>&1"
