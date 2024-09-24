@@ -31,9 +31,9 @@
     - name: Set ACLs on directories
       acl:
         path: "{{ item }}"
-        entity: nfsnobody
-        etype: user
-        permissions: rwx
+        entity: redteam
+        etype: group
+        permissions: rwX
         state: present
       loop: "{{ directories }}"
 
@@ -49,14 +49,3 @@
   systemd:
     name: nfs-kernel-server.service
     state: restarted
-
-- name: Set acls for directories
-  acl:
-    default: true
-    entity: redteam
-    etype: group
-    permissions: rwX
-    state: present
-    recursive: true
-    path: "{{ item }}"
-  loop: "{{ directories }}"

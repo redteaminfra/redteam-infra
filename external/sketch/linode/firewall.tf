@@ -11,7 +11,7 @@ resource "linode_firewall" "firewall" {
     content {
       label    = "allow-tcp-${inbound.value}"
       action   = "ACCEPT"
-      protocol = "tcp"
+      protocol = "TCP"
       ports    = inbound.value
       ipv4     = ["0.0.0.0/0"]
     }
@@ -19,7 +19,7 @@ resource "linode_firewall" "firewall" {
 
   dynamic "inbound" {
     // Allow engagement hosts to access each other
-    for_each = ["tcp", "udp", "icmp"]
+    for_each = ["TCP", "UDP", "ICMP"]
     content {
       label    = "allow-${var.engagement_name}-host-${inbound.value}"
       action   = "ACCEPT"
@@ -34,7 +34,7 @@ resource "linode_firewall" "firewall" {
 
   dynamic "inbound" {
     // Block all IPv6 traffic inbound
-    for_each = ["tcp", "udp", "icmp"]
+    for_each = ["TCP", "UDP", "ICMP"]
     content {
       label    = "block-ipv6-${inbound.value}"
       action   = "DROP"
@@ -45,7 +45,7 @@ resource "linode_firewall" "firewall" {
 
   dynamic "outbound" {
     // Block all IPv6 traffic outbound
-    for_each = ["tcp", "udp", "icmp"]
+    for_each = ["TCP", "UDP", "ICMP"]
     content {
       label    = "block-ipv6-${outbound.value}"
       action   = "DROP"
