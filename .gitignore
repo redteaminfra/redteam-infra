@@ -11,3 +11,5 @@ puppet/modules/cobaltstrike/files/cobaltstrike.tgz
 .terraform*
 terraform.tfstate*
 variables.tfvars
+.idea/workspace.xml
+.idea/inspectionProfiles/Project_Default.xml
