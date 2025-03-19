@@ -1,0 +1,61 @@
+---
+# tasks file for backflips-v2
+- name: Create flip group
+  group:
+    name: flip
+    state: present
+    system: true
+
+- name: Create flip user
+  user:
+    name: flip
+    group: flip
+    state: present
+    system: true
+    create_home: false
+    home: /opt/backflips
+    shell: /usr/sbin/nologin
+
+- name: Create home
+  file:
+    path: /opt/backflips
+    owner: flip
+    group: flip
+    mode: 0755
+    state: directory
+
+- name: Generate rsa keypairs
+  community.crypto.openssh_keypair:
+    path: "/opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}"
+    type: rsa
+    size: 4096
+    group: flip
+    owner: flip
+  loop: "{{ ports }}"
+
+- name: Generate ed25519 keypairs
+  community.crypto.openssh_keypair:
+    path: "/opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ item }}"
+    type: ed25519
+    owner: flip
+    group: flip
+  loop: "{{ ports }}"
+
+# For tomorrow when I pick this up, I need to make sure the below deployment inserts the proper keys into the proper container. 
+# Then I need to modify the docker compose j2 template to reflect things. After that I can modify the sshd_config j2 template to ensure
+# it uses the proper port per each container
+
+- name: Deploy Dockerized SSH Servers
+  docker_container:
+    name: "backflip_{{ item }}"
+    image: "linuxserver/openssh-server:latest"
+    state: started
+    restart_policy: always
+    published_ports:
+      - "{{ item }}:22"
+    env:
+      USERNAME: "{{ ssh_user }}"
+    volumes:
+      - "{{ ssh_public_key_path }}:/home/{{ ssh_user }}/.ssh/authorized_keys"  # Mount public key
+  loop: "{{ ports }}"
+  become: true

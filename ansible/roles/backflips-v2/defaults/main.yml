@@ -1,0 +1,5 @@
+---
+# defaults file for backflips-v2
+ports: ["2222"]
+ssh_user: flip
+
