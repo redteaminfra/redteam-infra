@@ -24,6 +24,13 @@
     mode: 0755
     state: directory
 
+- name: Copy files to host
+  copy:
+    src: files/flip_files/
+    dest: /opt/backflips/
+    owner: flip
+    group: flip
+
 - name: Generate rsa keypairs
   community.crypto.openssh_keypair:
     path: "/opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}"
@@ -41,21 +48,35 @@
     group: flip
   loop: "{{ ports }}"
 
-# For tomorrow when I pick this up, I need to make sure the below deployment inserts the proper keys into the proper container. 
-# Then I need to modify the docker compose j2 template to reflect things. After that I can modify the sshd_config j2 template to ensure
-# it uses the proper port per each container
-
-- name: Deploy Dockerized SSH Servers
-  docker_container:
-    name: "backflip_{{ item }}"
-    image: "linuxserver/openssh-server:latest"
-    state: started
-    restart_policy: always
-    published_ports:
-      - "{{ item }}:22"
-    env:
-      USERNAME: "{{ ssh_user }}"
-    volumes:
-      - "{{ ssh_public_key_path }}:/home/{{ ssh_user }}/.ssh/authorized_keys"  # Mount public key
+- name: Configure SSHd Configuration File
+  template:
+    src: sshd_config.j2
+    dest: "/opt/backflips/etc/ssh/sshd_config_{{ item }}"
+    mode: 0644
+    owner: root
   loop: "{{ ports }}"
-  become: true
+
+- name: Configure Containers
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /opt/backflips
+    mode: 0644
+    owner: root
+    
+
+#- name: Deploy Dockerized SSH Servers
+#  docker_container:
+#    name: "backflip_{{ item }}"
+#    image: "linuxserver/openssh-server:latest"
+#    state: started
+#    restart_policy: always
+#    published_ports:
+#      - "{{ item }}:22"
+#    env:
+#      USERNAME: "{{ ssh_user }}"
+#    volumes:
+#      - "/opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}:/etc/ssh/ssh_host_rsa_key"
+#      - "/opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ item }}:/etc/ssh/ssh_host_ed25519_key"
+#      - "/opt/backflips/etc/ssh/sshd_config_{{ item }}:/etc/ssh/sshd_config"
+#  loop: "{{ ports }}"
+#  become: true

@@ -1,24 +1,23 @@
 services:
-  {% for backflip in backflips %}:
+  backflip_{% for port in ports %}:
     image: lscr.io/linuxserver/openssh-server:latest
-    container_name: {{ backflip }}
-    hostname: {{ backflip }}
+    container_name: backflip_{{ port }}
+    hostname: backflip_{{ port }}
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - PUBLIC_KEY=yourpublickey #optional
-      - PUBLIC_KEY_FILE=/path/to/file #optional
-      - PUBLIC_KEY_DIR=/path/to/directory/containing/_only_/pubkeys #optional
-      - PUBLIC_KEY_URL=https://github.com/username.keys #optional
+      - PUBLIC_KEY_DIR=/etc/ssh/pubkeys #optional
       - SUDO_ACCESS=false #optional
       - PASSWORD_ACCESS=false #optional
-      - USER_PASSWORD=password #optional
-      - USER_PASSWORD_FILE=/path/to/file #optional
-      - USER_NAME=linuxserver.io #optional
-      - LOG_STDOUT= #optional
+      - USER_NAME={{ ssh_user }} #optional
+      - LOG_STDOUT=false #optional
     volumes:
-      - /path/to/openssh-server/config:/config
+      - /opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}:/etc/ssh/ssh_host_rsa_key
+      - /opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ item }}:/etc/ssh/ssh_host_ed25519_key
+      - /opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}.pub:/etc/ssh/pubkey/sssh_host_rsa_key.pub
+      - /opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ item }}.pub:/etc/ssh/pubkeys/ssh_host_ed25519_key.pub
+      - /opt/backflips/etc/ssh/sshd_config_{{ item }}:/config
     ports:
-      - 2222:2222
+      - {{ port }}:22
     restart: unless-stopped
