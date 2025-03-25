@@ -31,6 +31,21 @@
     owner: flip
     group: flip
 
+- name: Ensure backflips SSH directory exists
+  file:
+    path: "/opt/backflips/etc/ssh"
+    state: directory
+    owner: flip
+    group: flip
+    mode: '0755'
+
+- name: Copy SSHd Configure
+  copy:
+    src: files/etc/ssh/sshd_config
+    dest: /opt/backflips/etc/ssh/config
+    owner: flip
+    group: flip
+
 - name: Generate rsa keypairs
   community.crypto.openssh_keypair:
     path: "/opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}"
@@ -38,7 +53,7 @@
     size: 4096
     group: flip
     owner: flip
-  loop: "{{ ports }}"
+  loop: "{{ domain_names }}"
 
 - name: Generate ed25519 keypairs
   community.crypto.openssh_keypair:
@@ -46,37 +61,16 @@
     type: ed25519
     owner: flip
     group: flip
-  loop: "{{ ports }}"
-
-- name: Configure SSHd Configuration File
-  template:
-    src: sshd_config.j2
-    dest: "/opt/backflips/etc/ssh/sshd_config_{{ item }}"
-    mode: 0644
-    owner: root
-  loop: "{{ ports }}"
+  loop: "{{ domain_names }}"
 
 - name: Configure Containers
   template:
     src: templates/docker-compose.yml.j2
-    dest: /opt/backflips
+    dest: /opt/backflips/docker-compose.yml
     mode: 0644
     owner: root
-    
 
-#- name: Deploy Dockerized SSH Servers
-#  docker_container:
-#    name: "backflip_{{ item }}"
-#    image: "linuxserver/openssh-server:latest"
-#    state: started
-#    restart_policy: always
-#    published_ports:
-#      - "{{ item }}:22"
-#    env:
-#      USERNAME: "{{ ssh_user }}"
-#    volumes:
-#      - "/opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}:/etc/ssh/ssh_host_rsa_key"
-#      - "/opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ item }}:/etc/ssh/ssh_host_ed25519_key"
-#      - "/opt/backflips/etc/ssh/sshd_config_{{ item }}:/etc/ssh/sshd_config"
-#  loop: "{{ ports }}"
-#  become: true
+- name: Start containers
+  command: docker compose -f /opt/backflips/docker-compose.yml up -d
+  args:
+    chdir: /opt/backflips
