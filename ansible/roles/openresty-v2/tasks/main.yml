@@ -138,3 +138,14 @@
   command: docker compose -f /opt/web/docker-compose.yml up -d
   args:
     chdir: /opt/web
+
+- name: Allow 2222
+  iptables:
+    action: insert
+    chain: "INPUT"
+    jump: ACCEPT
+    protocol: tcp
+    destination_port: 2222
+
+- name: Save iptables
+  command: iptables-save -f /etc/iptables/rules.v4
