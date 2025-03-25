@@ -1,0 +1,51 @@
+{% set domain = item %}
+
+upstream {{ groups['homebase'][0] }}.infra.redteam {
+    server 192.168.0.10:443;
+}
+
+map $http_user_agent $is_my_agent {
+	default 0;
+	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36" 1;
+}
+
+map $http_authorization $is_valid_token {
+	default 0;
+	"Bearer aGVsbG9zMQo=" 1;
+}
+
+server {
+    listen 8081 ssl;        
+      
+    root /var/www/html/{{ domain }};
+    index index.html;
+    server_name {{ domain }};
+  
+    real_ip_header proxy_protocol;
+      
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+
+    if ($block_aws)   {
+        return 308 https://google.com/;
+    }
+    if ($block_lw) {
+        return 308 https://google.com/;
+    }
+    if ($block_m247) {
+        return 308 https://google.com/;
+    }
+
+    location ~ /code/bugs {
+        proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+        satisfy all;
+        if ($is_valid_token = 0) {
+            return 403;	   
+        }
+        if ($is_my_agent = 0) {
+            return 403;
+        }
+
+        proxy_pass https://{{ groups['homebase'][0] }}.infra.redteam;
+    }
+}

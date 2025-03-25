@@ -1,0 +1,14 @@
+{% set domain = item %}
+server {
+        listen 8081;
+        root /var/www/html/{{ domain }};
+        index index.html;
+        server_name {{ domain }};
+  
+        location ~ /.well-known {
+                root /var/www/certbot;
+                allow all;
+                proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+        }
+        real_ip_header proxy_protocol;
+}

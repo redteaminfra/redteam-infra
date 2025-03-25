@@ -1,0 +1,10 @@
+---
+- hosts: proxy01-aluvshis-dev
+  become: yes
+  roles:
+    - docker
+    - openresty-v2
+  vars:
+    domain_names:
+      - boxboxbox.party
+      - boxshazbot.party

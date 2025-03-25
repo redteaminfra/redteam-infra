@@ -1,0 +1,151 @@
+---
+# tasks file for openresty-v2
+- name: Create general web directory
+  file:
+    path: /opt/web
+    state: directory
+    owner: root
+    mode: 0755
+    recurse: yes
+
+- name: Create reverse-proxy site-enabled directory
+  file:
+    path: /opt/web/conf
+    state: directory
+    owner: root
+    mode: 0755
+    recurse: yes
+
+- name: Create reverse proxy streams directory
+  file:
+    path: /opt/web/streams
+    state: directory
+    owner: root
+    mode: 0755
+    recurse: yes 
+
+- name: Create sites-enabled directories for domains
+  file:
+    path: "/opt/web/{{ item }}/conf"
+    state: directory
+    mode: 0755
+  loop: "{{ domain_names }}"
+
+- name: Create HTML directories for domains
+  file:
+    path: "/opt/web/{{ item }}/html"
+    state: directory
+    mode: 0755
+  loop: "{{ domain_names }}"
+
+- name: Copy openresty config
+  copy:
+    src: files/nginx.conf
+    dest: /opt/web/nginx.conf
+    owner: root
+    mode: 0644
+
+- name: Copy aws ip-block conf
+  copy:
+    src: files/aws.conf
+    dest: /opt/web/aws.conf
+    owner: root
+    mode: 0644
+
+- name: Copy m247 ip-block conf
+  copy:
+    src: files/m247.conf
+    dest: /opt/web/m247.conf
+    owner: root
+    mode: 0644
+
+- name: Copy leaseweb ip-block conf
+  copy:
+    src: files/leaseweb.conf
+    dest: /opt/web/leaseweb.conf
+    owner: root
+    mode: 0644
+
+- name: Copy basic web page into domains HTML directories
+  copy:
+    src: files/index.html
+    dest: "/opt/web/{{ item }}/html"
+    owner: root
+    mode: 0644
+  loop: "{{ domain_names }}"
+
+- name: Configure reverse-proxy websites for certbot
+  template:
+    src: templates/rev-proxy-domain-http.conf.j2
+    dest: "/opt/web/conf/{{ item }}"
+    mode: 0644
+    owner: root
+  loop: "{{ domain_names }}"
+
+- name: Configure proxy streams
+  template:
+    src: templates/streams.conf.j2
+    dest: /opt/web/streams/streams.conf
+    mode: 0644
+    owner: root
+
+- name: Configure containers
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /opt/web/docker-compose.yml
+    mode: 0644
+    owner: root
+
+- name: Configure http domains for certbot
+  template:
+    src: templates/website-http.conf.j2
+    dest: "/opt/web/{{ item }}/conf/{{ item }}"
+    mode: 0644
+    owner: root
+  loop: "{{ domain_names }}"
+
+- name: Start containers for certbot
+  command: docker compose -f /opt/web/docker-compose.yml up -d
+  args:
+    chdir: /opt/web
+    
+- name: Run certbot for domains
+  command: "docker run --rm -v 'web_certbot-etc:/etc/letsencrypt' -v 'web_certbot-www:/var/www/certbot' certbot/certbot certonly --webroot -w /var/www/certbot -m adam.luvshis@oracle.com --agree-tos -d {{ item }} -v --non-interactive"
+  loop: "{{ domain_names }}"
+
+- name: Stop containers for HTTPS
+  command: docker compose -f /opt/web/docker-compose.yml down
+  args:
+    chdir: /opt/web
+
+- name: Overwrite config for HTTPS
+  template:
+    src: templates/website-https.conf.j2
+    dest: "/opt/web/{{ item }}/conf/{{ item }}"
+    mode: 0644
+    owner: root
+  loop: "{{ domain_names }}"
+
+- name: Overwrite reverse-proxy websites for HTTPs
+  template:
+    src: templates/rev-proxy-domain-https.conf.j2
+    dest: "/opt/web/conf/{{ item }}"
+    mode: 0644
+    owner: root
+  loop: "{{ domain_names }}"
+
+- name: Start containers again
+  command: docker compose -f /opt/web/docker-compose.yml up -d
+  args:
+    chdir: /opt/web
+
+- name: Allow 2222
+  iptables:
+    action: insert
+    chain: "INPUT"
+    jump: ACCEPT
+    protocol: tcp
+    destination_port: 2222
+
+- name: Save iptables
+  command: iptables-save -f /etc/iptables/rules.v4
