@@ -1,13 +1,32 @@
-map $ssl_preread_server_name $targetBackend {
-{% for domain in domain_names %}
-{% set stripped_domain = domain.split('.')[0] %}
-    {{ domain }}  {{ stripped_domain }}:8081;
-{% endfor %}
+http {
+    # Mapping HTTP Backends
+    map $ssl_preread_server_name $httpBackend {
+    {% for domain in domain_names %}
+    {% set stripped_domain = domain.split('.')[0] %}
+        {{ domain }}  {{ stripped_domain }}:8081;
+    {% endfor %}
+    }
+
+    server {
+        listen 443 proxy_protocol;
+        resolver 127.0.0.11;
+        ssl_preread on;
+        proxy_pass $httpBackend;
+    }
 }
 
-server {
-   listen 443 proxy_protocol;
-   resolver 127.0.0.11;
-   ssl_preread on;
-   proxy_pass $targetBackend;
+stream {
+    # Mapping SSHd Backends
+    map $ssl_preread_server_name $sshdBackend {
+    {% for domain in domain_names %}
+    {% set stripped_domain = domain.split('.')[0] %}
+        {{ domain }}  {{ stripped_domain }}:2223;
+    {% endfor %}
+    }
+
+    server {
+        listen 2222;
+        resolver 127.0.0.11;
+        ssl_preread on;
+        proxy_pass $sshdBackend;
 }
