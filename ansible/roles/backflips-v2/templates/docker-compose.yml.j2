@@ -1,11 +1,11 @@
 services:
- {% for domain in domain_names %}{% set stripped_domain = domain.split('.')[0] | trim %}backflip_{{ stripped_domain }}:
+  {% for domain in domain_names %}{% set stripped_domain = domain.split('.')[0] | trim %}backflip_{{ stripped_domain }}:
     image: lscr.io/linuxserver/openssh-server:latest
     container_name: backflip_{{ stripped_domain }}
     hostname: backflip_{{ stripped_domain }}
     environment:
       - PUID=997
-      - PGID=998
+      - PGID=997
       - TZ=Etc/UTC
       - PUBLIC_KEY_DIR=/etc/ssh/pubkeys #optional
       - SUDO_ACCESS=false #optional
@@ -13,16 +13,37 @@ services:
       - USER_NAME={{ ssh_user }} #optional
       - LOG_STDOUT=false #optional
     volumes:
-      - /opt/backflips/etc/ssh/ssh_host_rsa_key_{{ stripped_domain }}:/etc/ssh/ssh_host_rsa_key
-      - /opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ stripped_domain }}:/etc/ssh/ssh_host_ed25519_key
-      - /opt/backflips/etc/ssh/ssh_host_rsa_key_{{ stripped_domain }}.pub:/etc/ssh/pubkey/sssh_host_rsa_key.pub
-      - /opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ stripped_domain }}.pub:/etc/ssh/pubkeys/ssh_host_ed25519_key.pub
-      - /opt/backflips/etc/ssh/sshd_config_{{ stripped_domain }}:/config/sshd_config
+      - /opt/backflips/etc/ssh/ssh_host_rsa_key_{{ domain }}:/etc/ssh/ssh_host_rsa_key
+      - /opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ domain }}:/etc/ssh/ssh_host_ed25519_key
+      - /opt/backflips/etc/ssh/ssh_host_rsa_key_{{ domain }}.pub:/etc/ssh/pubkeys/ssh_host_rsa_key.pub
+      - /opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ domain }}.pub:/etc/ssh/pubkeys/ssh_host_ed25519_key.pub
+      - /opt/backflips/etc/ssh/config:/config/sshd/sshd_config
     expose:
       - "2223"
+    networks:
+      - {{ stripped_domain }}
     restart: unless-stopped
   {% endfor %}
 
+  {% for domain in domain_names %}{% set stripped_domain = domain.split('.')[0] | trim %}client_{{ stripped_domain }}:
+    build: ./Dockerfile_{{ domain }}
+    container_name: client_{{ stripped_domain }}
+    hostname: client_{{ stripped_domain }}
+    volumes:
+      - /opt/ssh-proxy/keys/sketchkey:/config/sshd/sketchkey
+    expose:
+      - "2222"
+    networks:
+      - {{ stripped_domain }}
+    tty: true
+    restart: unless-stopped
+    command: >
+      autossh -N -f -M 0 -o "ExitOnForwardFailure=yes" -o "ServerAliveInterval=30" -o "ServerAliveCountMax=3" -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -R 2222:backflip_{{ stripped_domain }}:2223 -i /config/sshd/sketchkey -o "ProxyCommand=ssh -i /config/sshd/sketchkey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null sketchssh@{{ middle_ip }} nc %h %p" sketchssh@{{ edge_ip }}
+      depends_on:
+        - backflip_{{ stripped_domain }}
+  {% endfor %}
+
 networks:
-  webnet:
+  {% for domain in domain_names %}{% set stripped_domain = domain.split('.')[0] | trim %}{{ stripped_domain }}:
     driver: bridge
+  {% endfor %}

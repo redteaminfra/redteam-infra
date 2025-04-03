@@ -31,7 +31,7 @@
     - name: Set ACLs on directories
       acl:
         path: "{{ item }}"
-        entity: nfsnobody
+        entity: nobody
         etype: user
         permissions: rwx
         state: present

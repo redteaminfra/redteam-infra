@@ -89,6 +89,12 @@
     mode: 0644
     owner: root
 
+- name: Create web_webnet docker network
+  docker_network:
+    name: web_webnet
+    driver: bridge
+    state: present
+
 - name: Configure containers
   template:
     src: templates/docker-compose.yml.j2

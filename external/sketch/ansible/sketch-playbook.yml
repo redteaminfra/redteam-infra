@@ -91,6 +91,14 @@
         line: 'ChallengeResponseAuthentication no'
       notify:
       - Reload sshd
+    - name: Enable Gateway Ports
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?GatewayPorts no'
+        line: 'GatewayPorts yes'
+      notify:
+      - Reload sshd
+      when: inventory_hostname | regex_match ('^edge-')
 
     - name: Allow all IPs in aggregated_ips to allow in ufw
       ufw:

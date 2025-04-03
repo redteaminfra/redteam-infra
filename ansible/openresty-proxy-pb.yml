@@ -1,10 +1,13 @@
 ---
-- hosts: proxy01-aluvshis-dev
+- hosts: proxy01-engagement-name
   become: yes
   roles:
     - docker
+    - backflips-v2
     - openresty-v2
   vars:
     domain_names:
-      - boxboxbox.party
+      - shazbot.party
       - boxshazbot.party
+    middle_ip: "IP"
+    edge_ip: "IP"

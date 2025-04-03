@@ -33,7 +33,7 @@ Add the following to your `sketch-playbook.yml` based on the number of middle an
     - proxypass-setup
   vars:
     next_hop: 7.7.7.7
-    proxy_ports: ["80", "443", "2222"]
+    proxy_ports: ["80", "443"]
 
 - hosts: middle0X-engagement-name
   become: yes
@@ -41,6 +41,6 @@ Add the following to your `sketch-playbook.yml` based on the number of middle an
     - proxypass-setup
   vars:
     next_hop: 7.7.7.8
-    proxy_ports: ["80", "443", "2222"]
+    proxy_ports: ["80", "443"]
 ```
 

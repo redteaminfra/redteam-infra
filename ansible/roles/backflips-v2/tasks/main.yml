@@ -63,12 +63,43 @@
     group: flip
   loop: "{{ domain_names }}"
 
+- name: Configure Dockerfiles
+  template:
+    src: templates/Dockerfile.j2
+    dest: "/opt/backflips/Dockerfile_{{ item }}"
+    owner: flip
+    mode: 0644
+  loop: "{{ domain_names }}"
+
 - name: Configure Containers
   template:
     src: templates/docker-compose.yml.j2
     dest: /opt/backflips/docker-compose.yml
     mode: 0644
-    owner: root
+    owner: flip
+
+- name: Set Ownership and Perms
+  ansible.builtin.file:
+    path: /opt/backflips
+    owner: flip
+    group: flip
+    mode: '0755'
+    recurse: yes
+
+- name: Set Key Perms
+  ansible.builtin.file:
+    path: /opt/backflips/etc/ssh
+    owner: flip
+    group: flip
+    mode: '0600'
+    recurse: yes
+
+- name: Check for OpenSSH Docker Image
+  docker_image:
+    name: lscr.io/linuxserver/openssh-server:latest
+    source: pull
+  register: docker_image_pull
+  ignore_errors: yes
 
 - name: Start containers
   command: docker compose -f /opt/backflips/docker-compose.yml up -d
