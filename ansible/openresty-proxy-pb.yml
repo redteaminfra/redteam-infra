@@ -1,5 +1,5 @@
 ---
-- hosts: proxy01-engagement-name
+- hosts: proxy01-aluvshis-dev
   become: yes
   roles:
     - docker
@@ -8,6 +8,4 @@
   vars:
     domain_names:
       - shazbot.party
-      - boxshazbot.party
     middle_ip: "IP"
-    edge_ip: "IP"

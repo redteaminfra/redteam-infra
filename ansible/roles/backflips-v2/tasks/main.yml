@@ -33,11 +33,12 @@
 
 - name: Ensure backflips SSH directory exists
   file:
-    path: "/opt/backflips/etc/ssh"
+    path: "/opt/backflips/etc/ssh/{{ item }}"
     state: directory
     owner: flip
     group: flip
     mode: '0755'
+  loop: "{{ domain_names }}"
 
 - name: Copy SSHd Configure
   copy:
@@ -45,10 +46,11 @@
     dest: /opt/backflips/etc/ssh/config
     owner: flip
     group: flip
+    mode: '0644'
 
 - name: Generate rsa keypairs
   community.crypto.openssh_keypair:
-    path: "/opt/backflips/etc/ssh/ssh_host_rsa_key_{{ item }}"
+    path: "/opt/backflips/etc/ssh/{{ item }}/ssh_host_rsa_key"
     type: rsa
     size: 4096
     group: flip
@@ -57,19 +59,18 @@
 
 - name: Generate ed25519 keypairs
   community.crypto.openssh_keypair:
-    path: "/opt/backflips/etc/ssh/ssh_host_ed25519_key_{{ item }}"
+    path: "/opt/backflips/etc/ssh/{{ item }}/ssh_host_ed25519_key"
     type: ed25519
     owner: flip
     group: flip
   loop: "{{ domain_names }}"
 
 - name: Configure Dockerfiles
-  template:
-    src: templates/Dockerfile.j2
-    dest: "/opt/backflips/Dockerfile_{{ item }}"
+  copy:
+    src: files/Dockerfile
+    dest: /opt/backflips/Dockerfile
     owner: flip
-    mode: 0644
-  loop: "{{ domain_names }}"
+    group: flip
 
 - name: Configure Containers
   template:
@@ -88,11 +89,27 @@
 
 - name: Set Key Perms
   ansible.builtin.file:
-    path: /opt/backflips/etc/ssh
+    path: "/opt/backflips/etc/ssh/{{ item }}"
     owner: flip
     group: flip
     mode: '0600'
     recurse: yes
+  loop: "{{ domain_names }}"
+
+- name: Copy SSHd Configure
+  copy:
+    src: files/etc/ssh/sshd_config
+    dest: /opt/backflips/etc/ssh/config
+    owner: flip
+    group: flip
+    mode: '0644'
+
+- name: Set SSHD Config Perms
+  ansible.builtin.file:
+    path: "/opt/backflips/etc/ssh/config"
+    owner: flip
+    group: flip
+    mode: '0755'
 
 - name: Check for OpenSSH Docker Image
   docker_image:
@@ -105,3 +122,27 @@
   command: docker compose -f /opt/backflips/docker-compose.yml up -d
   args:
     chdir: /opt/backflips
+
+- name: "Init empty dictionary for output"
+  set_fact:
+    mapping: {}
+
+- name: Grab internal backflip container IPs
+  command: "docker inspect -f '{{ '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' }}' backflip_{{ item }}"
+  loop: "{{ domain_names | map('splitext') | map('first') | list }}"
+  loop_control:
+    label: "{{ item }}"
+  register: result
+
+- name: Populate dictionary with domain names and IPs
+  set_fact:
+    mapping: "{{ mapping | combine({ (item.item | splitext)[0]: item.stdout }) }}"
+  with_items: "{{ result.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Save the dictionary to a file
+  copy:
+    content: "{{ mapping | to_nice_json }}"
+    dest: "/opt/backflips/ip_mapping.json"
+    mode: '0644'
