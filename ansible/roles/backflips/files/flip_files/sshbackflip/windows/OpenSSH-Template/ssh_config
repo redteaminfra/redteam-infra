@@ -1,0 +1,12 @@
+PermitLocalCommand Yes
+UserKnownHostsFile ~/AppData/Roaming/OpenSSH/hks
+GlobalKnownHostsFile ~/AppData/Roaming/OpenSSH/hks
+StrictHostKeyChecking no
+ServerAliveInterval=30
+ServerAliveCountMax=5
+
+Host spoofServer
+    User flipUser
+    Port backflipPort
+    Hostname backflipServer
+    IdentityFile ~/AppData/Roaming/OpenSSH/my_priv_key

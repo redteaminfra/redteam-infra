@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2024, Oracle and/or its affiliates.
 
 import logging
 import os
@@ -7,9 +7,10 @@ import subprocess
 import sys
 import time
 
-fqdn = 'FQDN_PLACEHOLDER'
-port = 'PORT_PLACEHOLDER'
+fqdn = '{{ FQDN_PLACEHOLDER }}'
+port = '{{ PORT_PLACEHOLDER }}'
 keyfile = 'KEYFILE_PLACEHOLDER'
+bport = '{{ BACKFLIP_PORT }}'
 
 if __name__ == '__main__':
     try:
@@ -52,7 +53,7 @@ if __name__ == '__main__':
 
     options = [
         '-oServerAliveInterval=30',
-        '-p2222',
+        '-p %s' % bport,
         '-oServerAliveCountMax=5',
         '-oUserKnownHostsFile=/dev/null',
         '-oStrictHostKeyChecking=no',
