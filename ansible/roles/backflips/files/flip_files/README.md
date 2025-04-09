@@ -48,6 +48,10 @@ At a minimum you should customize the "backflipServer" with the FQDN you want to
 The "backflipPath" is the base location on the server's filesystem where you have installed the SSH backflip files.
 
 ### sshbackflip.py
+The first time you run the sshbackflip.py script you should try it with the `--help` argument. This will acomplish 2 things:<br>
+1. Check and setup any necessary files that are missing
+2. Display the help and orient you on how to use the tool
+<br><br>
 #### The "new" command
 The sshbackflip python script is used to setup a **new** backflip, meaning: create a new set of keys, designate a port on the C2 server to map the SSH port forwarded by the victim, and output a script (one-liner when possible) that you can run on the victim host to infect them.The infection process should install the backflip (taking care of dropping ssh keys, starting the connection and setting up a persistence mechanism).<br> It supports outputing scripts for: linux (python2 and python3), macos and windows.<br>
 Example usage:<br>

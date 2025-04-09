@@ -11,3 +11,7 @@ puppet/modules/cobaltstrike/files/cobaltstrike.tgz
 .terraform*
 terraform.tfstate*
 variables.tfvars
+ansible/roles/backflips/.DS_Store
+ansible/roles/.DS_Store
+ansible/.DS_Store
+.DS_Store

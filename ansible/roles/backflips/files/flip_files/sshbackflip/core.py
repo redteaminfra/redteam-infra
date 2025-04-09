@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2024, Oracle and/or its affiliates.
+# Copyright (c) 2025, Oracle and/or its affiliates.
 
 import hashlib
 import random
@@ -270,6 +270,7 @@ def connect_backflip(args):
 
 
 def socks_on(backflipInstanceName):
+    print(f"Enabling SOCKS proxy for {backflipInstanceName}")
     if not exists_backflip(backflipInstanceName):
         print(f"Couldn't find a backflip instance with host name {backflipInstanceName} in the database {settings.BACKFLIPS_DB}")
         sys.exit(1)
@@ -278,7 +279,7 @@ def socks_on(backflipInstanceName):
 
     # read in backflip instance information: port and key
     bfStart, bfEnd, bfInstance =  locate_backflip(backflipInstanceName)
-    victimPort = bfInstance[4].strip().split()[1]
+    victimPort = int(bfInstance[4].strip().split()[1])
     socksPort = victimPort - 1000
     systemdUnitPath = Path(f"/etc/systemd/system/backflip-socks-{backflipInstanceName}-{victimPort}.service")
 
@@ -313,15 +314,17 @@ WantedBy=multi-user.target
 
     # Attempt to start and enable the service
     os.system("systemctl daemon-reload")
-    if not os.system(f"systemctl start {systemdUnitPath}"):
+    socksServiceName = os.path.basename(systemdUnitPath)
+    if not os.system(f"systemctl start {socksServiceName}"):
         print(f"Failed to start the autossh SOCKS service. You may need to manualy troubleshoot the service unit.")
         sys.exit(1)
-    os.system(f"systemctl enable {systemdUnitPath}")
+    os.system(f"systemctl enable {socksServiceName}")
 
     print(f"SOCKS proxy has been enabled for {backflipInstanceName} on port {socksPort}.\n Have a nice day!")
 
 
 def socks_off(backflipInstanceName):
+    print(f"Disabling SOCKS proxy for {backflipInstanceName}")
     if not exists_backflip(backflipInstanceName):
         print(f"Couldn't find a backflip instance with host name {backflipInstanceName} in the database {settings.BACKFLIPS_DB}")
         sys.exit(1)
@@ -332,14 +335,15 @@ def socks_off(backflipInstanceName):
     bfStart, bfEnd, bfInstance =  locate_backflip(backflipInstanceName)
     victimPort = bfInstance[4].strip().split()[1]
     systemdUnitPath = Path(f"/etc/systemd/system/backflip-socks-{backflipInstanceName}-{victimPort}.service")
+    socksServiceName = os.path.basename(systemdUnitPath)
 
     if not systemdUnitPath.exists():
         print(f"Couldn't find the backflip SOCKS autossh service unit file for {backflipInstanceName} at expected path: {systemdUnitPath}")
         sys.exit(1)
 
     # systemctl stop and disable unit
-    os.system(f"systemctl stop {systemdUnitPath}")
-    os.system(f"systemctl disable {systemdUnitPath}")
+    os.system(f"systemctl stop {socksServiceName}")
+    os.system(f"systemctl disable {socksServiceName}")
     # delete service unit
     systemdUnitPath.unlink()
     # systemctl daemon-reload
@@ -351,7 +355,7 @@ def manage_socks(args):
     backflipInstanceName = args.targetHost
     if args.socksToggle:
         socks_on(backflipInstanceName)
-    elif args.socksToggle:
+    elif args.socksToggle is False:
         socks_off(backflipInstanceName)
 
 
@@ -364,4 +368,3 @@ def setup_backflip(args):
     servidor = Server(bfServer, settings.BACKFLIP_PORT)
     victima= Victim(servidor, args.targetHost, args.targetUser, args.localPort)
     makeimplant(servidor, victima, args)
-
