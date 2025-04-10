@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2024, Oracle and/or its affiliates.
 
 import base64
 import os
@@ -11,11 +11,11 @@ def usage():
     sys.exit(1)
 
 name = os.path.basename(__file__)
-pubkey="PUBLIC_KEY_PLACEHOLDER"
-backflippub="BACKFLIP_PUB_PLACEHOLDER"
-payloadkeyname="PRIVATE_KEY_PATH_PLACEHOLDER"
-flockfilename="FLOCK_NAME_PLACEHOLDER"
-lagentname="LAGENT_NAME_PLACEHOLDER"
+pubkey="{{ PUBLIC_KEY_PLACEHOLDER }}"
+backflippub="{{ BACKFLIP_PUB_PLACEHOLDER }}"
+payloadkeyname="{{ PRIVATE_KEY_PATH_PLACEHOLDER }}"
+flockfilename="{{ FLOCK_NAME_PLACEHOLDER }}"
+lagentname="{{ LAGENT_NAME_PLACEHOLDER }}"
 home = os.path.expanduser('~')
 
 
@@ -28,7 +28,7 @@ def main():
         usage()
     payload = sys.argv[1]
     print("Removing plist")
-    os.system(f"launchctl unload '{home}/Library/LaunchAgents/{lagentname}.plist'")
+    os.system(f"launchctl bootout gui/$UID/ '{home}/Library/LaunchAgents/{lagentname}.plist'")
     os.system(f"rm '{home}/Library/LaunchAgents/{lagentname}.plist'")
     time.sleep(1)
     os.system(f"rm '{home}/Library/LaunchAgents/.{flockfilename}.pl'")
