@@ -14,5 +14,8 @@ xfconf-query -c xfce4-desktop --create -p /backdrop/screen0/monitorVNC-0/workspa
 # vncconfig gives cut-n-paste support as well as resizing
 vncconfig -iconic &
 
+# Enable linger so VNC windows don't die
+loginctl enable-linger $(whoami)
+
 # xfce4 is our default desktop env
 xfce4-session

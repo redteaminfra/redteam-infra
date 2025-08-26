@@ -1,5 +1,10 @@
 ---
 # tasks file for backflips-v2
+- name: Ensure wamerican is installed
+  apt:
+    name: wamerican
+    state: present
+
 - name: Create flip group
   group:
     name: flip
@@ -40,13 +45,18 @@
     mode: '0755'
   loop: "{{ domain_names }}"
 
-- name: Copy SSHd Configure
-  copy:
-    src: files/etc/ssh/sshd_config
-    dest: /opt/backflips/etc/ssh/config
+- name: Create authorized_keys dir
+  file:
+    path: /opt/backflips/etc/authorized_keys/
     owner: flip
     group: flip
-    mode: '0644'
+    mode: 0755
+    state: directory
+
+- name: Create an authorized_keys file
+  ansible.builtin.file:
+    path: /opt/backflips/etc/authorized_keys/authorized_keys
+    state: touch
 
 - name: Generate rsa keypairs
   community.crypto.openssh_keypair:
@@ -144,5 +154,5 @@
 - name: Save the dictionary to a file
   copy:
     content: "{{ mapping | to_nice_json }}"
-    dest: "/opt/backflips/ip_mapping.json"
+    dest: "/opt/backflips//etc/ip_mapping.json"
     mode: '0644'

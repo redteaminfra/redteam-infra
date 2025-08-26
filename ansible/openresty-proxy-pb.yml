@@ -8,4 +8,4 @@
   vars:
     domain_names:
       - shazbot.party
-    middle_ip: "IP_ADDR"
+    middle_ip: "172.104.186.68"
