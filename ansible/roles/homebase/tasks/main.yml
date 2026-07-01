@@ -96,3 +96,11 @@
     marker: "# {mark} ANSIBLE UTC PS1"
     create: yes
     backup: yes
+
+- name: Create /engagement directory
+  ansible.builtin.file:
+    path: /engagement
+    state: directory
+    owner: root
+    group: redteam
+    mode: "2775"
