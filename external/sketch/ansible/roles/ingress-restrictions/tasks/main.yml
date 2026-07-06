@@ -18,16 +18,16 @@
   when: hostvars[item]['is_edge_host'] is defined and hostvars[item]['is_edge_host']
   delegate_to: localhost
 
-- name: Allow port 2222 from Edges to Middles
+- name: Allow port {{ backflip_port }} from Edges to Middles
   ufw:
     rule: allow
-    port: 2222
+    port: "{{ backflip_port }}"
     from_ip: "{{ item.value }}"
   with_items: "{{ edge_ips_dict | dict2items }}"
   when: "'middle' in inventory_hostname"
 
-- name: Deny port 2222
+- name: Deny port {{ backflip_port }}
   ufw:
     rule: deny
-    port: 2222
+    port: "{{ backflip_port }}"
   when: "'middle' in inventory_hostname"
