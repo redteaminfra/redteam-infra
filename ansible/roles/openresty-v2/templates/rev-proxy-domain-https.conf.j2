@@ -1,0 +1,7 @@
+{% set domain = item %}
+{% set stripped_domain = domain.split('.')[0] %}
+server {
+    listen 80 proxy_protocol;
+    server_name $host;
+    return 301 https://$host$request_uri;
+}
