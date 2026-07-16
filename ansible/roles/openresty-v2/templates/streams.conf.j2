@@ -1,7 +1,7 @@
 # Mapping HTTP Backends
 map $ssl_preread_server_name $httpBackend {
 {% for domain in domain_names %}
-{% set stripped_domain = domain | regex_replace('^.*?([^.]+\.[^.]+)$', '\\1') %}
+{% set stripped_domain = domain | regex_replace('\\.[^.]+$', '') %}
     {{ domain }}  {{ stripped_domain }}:8081;
 {% endfor %}
 }
@@ -11,4 +11,4 @@ server {
     resolver 127.0.0.11;
     ssl_preread on;
     proxy_pass $httpBackend;
-}q
+}
