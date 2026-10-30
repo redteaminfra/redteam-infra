@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
 %{ for middle in middles ~}
 Host ${middle.name}
     User root
@@ -5,11 +6,11 @@ Host ${middle.name}
     Hostname ${middle.ipv4_address}
     ProxyJump proxy01-${engagement_name}
 
+%{ endfor ~}
 %{ for edge in edges ~}
-Host ${edge.name}
+Host ${edge.node.name}
     User root
     IdentityFile ${ssh_private_key}
-    Hostname ${edge.ipv4_address}
-    ProxyJump ${middle.name}
-%{ endfor ~}
+    Hostname ${edge.node.ipv4_address}
+    ProxyJump ${edge.middle_name}
 %{ endfor ~}

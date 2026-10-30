@@ -19,6 +19,11 @@ run "full_chain_preserves_local_artifacts" {
   command = plan
 
   assert {
+    condition     = join(",", local.edge_output_order) == "us-sea-01,us-east-01"
+    error_message = "Legacy list outputs must retain the input edge_regions order."
+  }
+
+  assert {
     condition     = length(linode_instance.middle) == 1 && length(linode_instance.edge) == 2
     error_message = "The typed multi-region input must create one middle and one edge per region."
   }
