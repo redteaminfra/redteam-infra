@@ -1,4 +1,5 @@
 ---
+# Copyright (c) 2026, Oracle and/or its affiliates.
 - hosts: all
   become: yes
   roles:
@@ -6,7 +7,7 @@
     - molly-guard
     - logstash
     - yama
-    #- oci
+    - oci
     #- aws
 
 - import_playbook: homebase.yml

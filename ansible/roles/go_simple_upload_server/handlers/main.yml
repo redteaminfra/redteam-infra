@@ -1,0 +1,8 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Restart go-simple-upload-server
+  ansible.builtin.systemd:
+    name: go-simple-upload-server
+    daemon_reload: true
+    enabled: true
+    state: restarted

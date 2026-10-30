@@ -1,0 +1,34 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# The role installs the team's established mayth/go-simple-upload-server.
+go_simple_upload_server_version: "v2.1.1"
+go_simple_upload_server_repository: "https://github.com/mayth/go-simple-upload-server.git"
+
+# Mayth v2 requires Go 1.21 or newer. Use a role-private, checksum-pinned build
+# toolchain so Ubuntu 20.04 hosts do not depend on their older system Go package.
+go_simple_upload_server_go_version: "1.27.0"
+go_simple_upload_server_go_arch_map:
+  x86_64: amd64
+  amd64: amd64
+  aarch64: arm64
+  arm64: arm64
+go_simple_upload_server_go_checksums:
+  amd64: "675c26c449cbb18fc24b74650de1eabbae6e16f64326fd85a283fb3b58280685"
+  arm64: "51798d2c42d0e1c6ed7fd9f48728b4193abac9e8aad6dbac2fe96a81f5909bda"
+
+go_simple_upload_server_install_root: "/opt/go-simple-upload-server"
+go_simple_upload_server_source_directory: "{{ go_simple_upload_server_install_root }}/source"
+go_simple_upload_server_binary_path: "{{ go_simple_upload_server_install_root }}/go-simple-upload-server"
+go_simple_upload_server_go_root: "{{ go_simple_upload_server_install_root }}/toolchains/go{{ go_simple_upload_server_go_version }}"
+go_simple_upload_server_config_directory: "/etc/go-simple-upload-server"
+go_simple_upload_server_config_path: "{{ go_simple_upload_server_config_directory }}/config.json"
+
+go_simple_upload_server_bind_address: "0.0.0.0:9999"
+go_simple_upload_server_root_directory: "/opt/go-simple-upload-server/files"
+go_simple_upload_server_token: ""
+go_simple_upload_server_enable_auth: true
+go_simple_upload_server_max_upload_size_bytes: 500000000
+go_simple_upload_server_read_timeout_seconds: -1
+go_simple_upload_server_write_timeout_seconds: 0
+go_simple_upload_server_shutdown_timeout_milliseconds: 15000
+go_simple_upload_server_file_naming_strategy: "uuid"

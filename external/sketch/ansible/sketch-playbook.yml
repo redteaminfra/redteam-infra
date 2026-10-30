@@ -1,4 +1,5 @@
 ---
+# Copyright (c) 2026, Oracle and/or its affiliates.
 - name: Gather IPs
   hosts: all
   tasks:
@@ -89,6 +90,18 @@
         path: /etc/ssh/sshd_config
         regexp: '^#?ChallengeResponseAuthentication yes'
         line: 'ChallengeResponseAuthentication no'
+      notify:
+      - Reload sshd
+    - name: Allow Backflips forwarding for the sketch transport account
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        insertafter: EOF
+        marker: '# {mark} ANSIBLE MANAGED BLOCK: Backflips sketch forwarding'
+        block: |
+          Match User sketchssh
+            AllowTcpForwarding remote
+            GatewayPorts yes
+        validate: '/usr/sbin/sshd -t -f %s'
       notify:
       - Reload sshd
 

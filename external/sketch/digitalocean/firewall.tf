@@ -1,18 +1,23 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
 resource "digitalocean_firewall" "firewall" {
   name        = "${var.engagement_name}-firewall"
   droplet_ids = flatten([digitalocean_droplet.middle.*.id, digitalocean_droplet.edge.*.id])
   tags        = [var.engagement_name]
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "1-65535"
-    source_addresses = ["0.0.0.0/0"]
-  }
-
   dynamic "inbound_rule" {
     // Allow all TCP ports specified in the allowed_tcp_ports variable from anywhere
     for_each = var.allowed_tcp_ports
     content {
       protocol         = "tcp"
+      port_range       = inbound_rule.value
+      source_addresses = ["0.0.0.0/0"]
+    }
+  }
+
+  dynamic "inbound_rule" {
+    // Allow all UDP ports specified in the allowed_udp_ports variable from anywhere
+    for_each = var.allowed_udp_ports
+    content {
+      protocol         = "udp"
       port_range       = inbound_rule.value
       source_addresses = ["0.0.0.0/0"]
     }
@@ -39,8 +44,14 @@ resource "digitalocean_firewall" "firewall" {
   }
 
   outbound_rule {
-    protocol           = "tcp"
-    port_range         = "1-65535"
+    protocol                = "tcp"
+    port_range              = "1-65535"
+    destination_addresses = ["0.0.0.0/0"]
+  }
+
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "1-65535"
     destination_addresses = ["0.0.0.0/0"]
   }
 

@@ -1,0 +1,183 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Verify the go_simple_upload_server role
+  hosts: localhost
+  become: true
+  remote_user: root
+  vars:
+    go_simple_upload_server_bind_address: "127.0.0.1:19999"
+    go_simple_upload_server_root_directory: "/tmp/go-simple-upload-server-role-test/files"
+    go_simple_upload_server_token: "role-test-token-1234"
+    # Override the normal 500,000,000-byte default with a 6 MiB test boundary.
+    # This keeps routine verification small while proving both sides of the
+    # configured limit and that the former Fiber 4 MiB ceiling is gone.
+    go_simple_upload_server_max_upload_size_bytes: 6291456
+  pre_tasks:
+    - name: Install role-test client dependency
+      ansible.builtin.apt:
+        name: curl
+        state: present
+        update_cache: true
+
+    - name: Reset the role-test document root
+      ansible.builtin.file:
+        path: /tmp/go-simple-upload-server-role-test
+        state: absent
+
+    - name: Create the role-test fixture directory
+      ansible.builtin.file:
+        path: /tmp/go-simple-upload-server-role-test
+        state: directory
+        mode: "0755"
+
+    - name: Create a 5 MiB upload fixture
+      ansible.builtin.command:
+        argv:
+          - dd
+          - if=/dev/zero
+          - of=/tmp/go-simple-upload-server-role-test/large-upload.bin
+          - bs=1048576
+          - count=5
+      changed_when: true
+
+    - name: Create a 7 MiB over-limit fixture
+      ansible.builtin.command:
+        argv:
+          - dd
+          - if=/dev/zero
+          - of=/tmp/go-simple-upload-server-role-test/over-limit.bin
+          - bs=1048576
+          - count=7
+      changed_when: true
+
+  roles:
+    - go_simple_upload_server
+
+  post_tasks:
+    - name: Inspect the private configuration directory permissions
+      ansible.builtin.stat:
+        path: /etc/go-simple-upload-server
+      register: go_simple_upload_server_config_directory
+
+    - name: Require service-group configuration directory access
+      ansible.builtin.assert:
+        that:
+          - go_simple_upload_server_config_directory.stat.gr_name == 'go-simple-upload-server'
+          - go_simple_upload_server_config_directory.stat.mode == '0750'
+
+    - name: Inspect the upload document root permissions
+      ansible.builtin.stat:
+        path: /tmp/go-simple-upload-server-role-test/files
+      register: go_simple_upload_server_upload_root
+
+    - name: Require conventional upload document root access
+      ansible.builtin.assert:
+        that:
+          - go_simple_upload_server_upload_root.stat.pw_name == 'go-simple-upload-server'
+          - go_simple_upload_server_upload_root.stat.gr_name == 'go-simple-upload-server'
+          - go_simple_upload_server_upload_root.stat.mode == '0775'
+
+    - name: Wait for the private upload listener
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: 19999
+        timeout: 20
+
+    - name: Prove unauthenticated requests are rejected
+      ansible.builtin.uri:
+        url: http://127.0.0.1:19999/files/missing
+        method: GET
+        status_code: 401
+
+    - name: Upload the fixture with the retained backend token
+      ansible.builtin.command:
+        argv:
+          - curl
+          - --silent
+          - --show-error
+          - --output
+          - /tmp/go-simple-upload-server-role-test/upload-response.json
+          - --write-out
+          - "%{http_code}"
+          - --header
+          - "Authorization: Bearer role-test-token-1234"
+          - --form
+          - "file=@/tmp/go-simple-upload-server-role-test/large-upload.bin"
+          - http://127.0.0.1:19999/upload
+      register: go_simple_upload_server_upload
+      changed_when: true
+
+    - name: Require a successful upload response
+      ansible.builtin.assert:
+        that:
+          - go_simple_upload_server_upload.stdout == "201"
+
+    - name: Inspect the retained upload
+      ansible.builtin.stat:
+        path: /tmp/go-simple-upload-server-role-test/files/large-upload.bin
+      register: go_simple_upload_server_uploaded_fixture
+
+    - name: Require exact upload retention beyond 4 MiB
+      ansible.builtin.assert:
+        that:
+          - go_simple_upload_server_uploaded_fixture.stat.exists
+          - go_simple_upload_server_uploaded_fixture.stat.size == 5242880
+          - go_simple_upload_server_uploaded_fixture.stat.mode == '0664'
+
+    - name: Prove a non-service local user can read but not change uploads or private configuration
+      become_user: nobody
+      ansible.builtin.command:
+        argv:
+          - /bin/sh
+          - -ec
+          - >-
+            test -x /tmp/go-simple-upload-server-role-test/files
+            && test -r /tmp/go-simple-upload-server-role-test/files/large-upload.bin
+            && test ! -w /tmp/go-simple-upload-server-role-test/files
+            && test ! -w /tmp/go-simple-upload-server-role-test/files/large-upload.bin
+            && test ! -x /etc/go-simple-upload-server
+            && test ! -r /etc/go-simple-upload-server/config.json
+      changed_when: false
+
+    - name: Reject an upload above the configured backend limit
+      ansible.builtin.command:
+        argv:
+          - curl
+          - --silent
+          - --show-error
+          - --output
+          - /tmp/go-simple-upload-server-role-test/over-limit-response.json
+          - --write-out
+          - "%{http_code}"
+          - --header
+          - "Authorization: Bearer role-test-token-1234"
+          - --form
+          - "file=@/tmp/go-simple-upload-server-role-test/over-limit.bin"
+          - http://127.0.0.1:19999/upload
+      register: go_simple_upload_server_over_limit_upload
+      changed_when: false
+
+    - name: Require a request-too-large response
+      ansible.builtin.assert:
+        that:
+          - go_simple_upload_server_over_limit_upload.stdout == "413"
+
+    - name: Read the retained role-test configuration
+      ansible.builtin.slurp:
+        path: /etc/go-simple-upload-server/config.json
+      register: go_simple_upload_server_role_test_config_content
+      no_log: true
+
+    - name: Decode the retained role-test configuration
+      ansible.builtin.set_fact:
+        go_simple_upload_server_role_test_config: "{{ go_simple_upload_server_role_test_config_content.content | b64decode | from_json }}"
+      no_log: true
+
+    - name: Require the retained authentication and upload policy
+      ansible.builtin.assert:
+        that:
+          - go_simple_upload_server_role_test_config.enable_auth
+          - go_simple_upload_server_role_test_config.max_upload_size == 6291456
+          - go_simple_upload_server_role_test_config.read_timeout == -1
+          - go_simple_upload_server_role_test_config.read_write_tokens == ["role-test-token-1234"]
+      no_log: true

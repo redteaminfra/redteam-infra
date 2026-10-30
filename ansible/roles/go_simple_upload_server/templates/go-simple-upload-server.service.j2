@@ -1,0 +1,21 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+[Unit]
+Description=Mayth Go Simple Upload Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=go-simple-upload-server
+Group=go-simple-upload-server
+# Files created by the Go server inherit this conventional local-access mode:
+# service owner/group can write; other local engagement users can read.
+UMask=0002
+ExecStart={{ go_simple_upload_server_binary_path }} -config {{ go_simple_upload_server_config_path }}
+Restart=on-failure
+RestartSec=2s
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
