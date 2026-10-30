@@ -231,3 +231,33 @@ def test_session_bootstrap_coalesces_exact_concurrent_startup_burst():
     assert activity_statements["protected"] == 0
     assert activity_updates["protected"] == 0
     assert commits["protected"] == 0
+
+
+def test_inference_proxy_status_start_requires_login_csrf_and_operate(monkeypatch):
+    path = '/api/engagements/missing/capabilities/inference-proxy/status'
+    body = {'bindingFingerprint': 'a' * 64}
+    calls = []
+    state = {'status': 'checking', 'configuration': None, 'bindingFingerprint': 'a' * 64,
+             'homebaseIdentity': None, 'observation': None, 'job': None, 'errors': []}
+    def start(*args, **kwargs):
+        calls.append(args)
+        return state
+    monkeypatch.setattr('app.asgi.start_inference_proxy_status', start)
+    monkeypatch.setattr('app.asgi.get_inference_proxy_status', lambda *a, **k: state)
+    for roles, expected in [(('viewer',), 403), (('operator',), 202)]:
+        app = _app_with_account(roles=roles)
+        with app.storage_context():
+            AuthenticationService.from_config(AuthTestConfig).reset_password(
+                'example_operator_three', 'long permanent password', force_password_change=False)
+        client = app.test_client()
+        before = len(calls)
+        assert client.post(path, json=body).status_code == 401
+        assert client.get(path).status_code == 401
+        assert len(calls) == before
+        login = client.post('/api/auth/login', json={'username': 'example_operator_three', 'password': 'long permanent password'}).json()
+        assert client.post(path, json=body).status_code == 401
+        assert len(calls) == before
+        response = client.post(path, headers={'X-Barragan-CSRF': login['csrfToken']}, json=body)
+        assert response.status_code == expected
+        assert len(calls) == before + (expected == 202)
+        assert client.get(path).status_code == 200  # GET is a persisted view and never invokes SSH.

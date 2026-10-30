@@ -20,6 +20,10 @@ STANDARD_RTI_ROLES = (
     "engagement-workspace",
     "homebase",
     "go_simple_upload_server",
+    "inference_proxy",
+    "c2_observer",
+    "loottool_v2",
+    "atc",
     "etherpad",
     "google-chrome",
     "firefox",
@@ -67,7 +71,7 @@ def test_standard_rti_profile_resolves_builtin_policy_and_missing_manifests(tmp_
         "keepassxc",
         "vs-code",
     ]
-    assert [entry["id"] for entry in resolution["hostClasses"]["homebase"]["optional"]] == ["go-simple-upload-server"]
+    assert [entry["id"] for entry in resolution["hostClasses"]["homebase"]["optional"]] == ["atc", "c2-observer", "go-simple-upload-server", "inference-proxy", "loottool-v2"]
     assert [entry["id"] for entry in resolution["hostClasses"]["proxy"]["essential"]] == [
         "docker",
         "nfs-client",
@@ -87,11 +91,11 @@ def test_standard_rti_profile_resolves_builtin_policy_and_missing_manifests(tmp_
     assert [entry["id"] for entry in resolution["hostClasses"]["elk"]["default"]] == ["elk", "unattended-upgrades"]
     assert resolution["hostClasses"]["elk"]["optional"] == []
     assert resolution["summary"] == {
-        "total": 26,
+        "total": 30,
         "essential": 15,
         "default": 7,
-        "optional": 4,
-        "catalog": 26,
+        "optional": 8,
+        "catalog": 30,
         "missingManifest": 0,
         "missingTemplatePath": 0,
     }

@@ -1,0 +1,237 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Require explicit artifacts and a supported existing Python
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'Ubuntu'
+      - ansible_distribution_version in ['22.04', '24.04']
+      - ansible_python_version is version('3.11', '>=')
+      - c2_observer_source_archive is match('^/')
+      - c2_observer_source_sha256 is match('^[a-f0-9]{64}$')
+      - c2_observer_source_revision is match('^[a-f0-9]{40}$')
+      - c2_observer_dependency_lock is match('^/')
+      - c2_observer_dependency_sha256 is match('^[a-f0-9]{64}$')
+    fail_msg: Supply reviewed source and hashed dependency lock; no automatic Python replacement.
+
+- name: Verify source provenance on controller before managed-host writes
+  ansible.builtin.command:
+    argv:
+      - '{{ ansible_playbook_python }}'
+      - '{{ role_path }}/files/verify_archive.py'
+      - '{{ c2_observer_source_archive }}'
+      - '{{ c2_observer_source_sha256 }}'
+      - '{{ c2_observer_source_revision }}'
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  check_mode: false
+
+- name: Verify complete dependency lock before writes
+  ansible.builtin.command:
+    argv:
+      - '{{ ansible_playbook_python }}'
+      - '{{ role_path }}/files/verify_lock.py'
+      - '{{ c2_observer_dependency_lock }}'
+      - '{{ c2_observer_dependency_sha256 }}'
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  check_mode: false
+
+- name: Fence retained install and reject implicit upgrades
+  ansible.builtin.command:
+    argv:
+      - '{{ ansible_facts.python.executable }}'
+      - -c
+      - '{{ lookup("ansible.builtin.file", role_path ~ "/files/preflight.py") }}'
+      - /opt/c2-observer
+      - '{{ c2_observer_source_revision }}'
+      - '{{ c2_observer_source_sha256 }}'
+      - '{{ c2_observer_dependency_sha256 }}'
+  register: c2_observer_preflight
+  changed_when: false
+  check_mode: false
+
+- name: Inspect retained private state root without reading receipts
+  ansible.builtin.stat:
+    path: /var/lib/c2-observer
+    follow: false
+    get_checksum: false
+    get_mime: false
+  register: c2_observer_state
+
+- name: Refuse unsafe existing state root
+  ansible.builtin.assert:
+    that:
+      - >-
+        not c2_observer_state.stat.exists or
+        (c2_observer_state.stat.isdir and not c2_observer_state.stat.islnk
+         and c2_observer_state.stat.pw_name | default('') == 'c2-observer'
+         and c2_observer_state.stat.mode in ['0700', '0750'])
+    fail_msg: Restore original protected state ownership before applying; no state migration is performed.
+
+- name: Install isolated Python prerequisites
+  ansible.builtin.apt:
+    name: [python3-venv, ca-certificates]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+    lock_timeout: 300
+
+- name: Create private worker account
+  ansible.builtin.user:
+    name: c2-observer
+    system: true
+    home: /var/lib/c2-observer
+    create_home: false
+    shell: /usr/sbin/nologin
+
+- name: Create root-owned installation directory
+  ansible.builtin.file:
+    path: /opt/c2-observer
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Record exact installation intent for safe retry after partial failure
+  ansible.builtin.copy:
+    content: '{{ c2_observer_preflight.stdout }}
+'
+    dest: /opt/c2-observer/.artifact-intent.json
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create pinned release directories
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /opt/c2-observer/releases
+    - '/opt/c2-observer/releases/{{ c2_observer_source_revision }}'
+
+- name: Deliver exact source and lock without credentials
+  ansible.builtin.copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - {src: '{{ c2_observer_source_archive }}', dest: /opt/c2-observer/source.tar.gz}
+    - {src: '{{ c2_observer_dependency_lock }}', dest: /opt/c2-observer/requirements.lock}
+  register: c2_observer_artifacts
+
+- name: Verify delivered artifact digests
+  ansible.builtin.stat:
+    path: '{{ item.path }}'
+    checksum_algorithm: sha256
+  loop:
+    - {path: /opt/c2-observer/source.tar.gz, sha256: '{{ c2_observer_source_sha256 }}'}
+    - {path: /opt/c2-observer/requirements.lock, sha256: '{{ c2_observer_dependency_sha256 }}'}
+  register: c2_observer_delivered
+
+- name: Require unchanged delivered artifacts
+  ansible.builtin.assert:
+    that:
+      - item.stat.checksum == item.item.sha256
+  loop: '{{ c2_observer_delivered.results }}'
+
+- name: Extract or repair source from validated archive
+  ansible.builtin.unarchive:
+    src: /opt/c2-observer/source.tar.gz
+    dest: '/opt/c2-observer/releases/{{ c2_observer_source_revision }}'
+    remote_src: true
+    owner: root
+    group: root
+    mode: 'u=rwX,go=rX'
+  register: c2_observer_extraction
+
+- name: Check current installed command without source or ATC access
+  ansible.builtin.command:
+    argv: [/opt/c2-observer/venv/bin/c2-observer, health]
+  changed_when: false
+  failed_when: false
+  register: c2_observer_local_health
+
+- name: Probe package manager and installed dependency consistency before repair decision
+  ansible.builtin.command:
+    argv: [/opt/c2-observer/venv/bin/pip, check]
+  changed_when: false
+  failed_when: false
+  register: c2_observer_dependency_health
+
+- name: Inspect completed installation receipt
+  ansible.builtin.stat:
+    path: /opt/c2-observer/.installed-artifact.json
+  register: c2_observer_completed
+
+- name: Create or repair the isolated environment
+  ansible.builtin.command:
+    argv: ['{{ ansible_facts.python.executable }}', -m, venv, --clear, /opt/c2-observer/venv]
+  when: c2_observer_local_health.rc | default(1) != 0 or c2_observer_dependency_health.rc | default(1) != 0 or not c2_observer_completed.stat.exists or c2_observer_artifacts.changed or c2_observer_extraction.changed
+  register: c2_observer_environment
+  changed_when: true
+
+- name: Install only the hashed dependency closure
+  ansible.builtin.command:
+    argv: [/opt/c2-observer/venv/bin/pip, install, --disable-pip-version-check, --require-hashes, '--only-binary=:all:', --force-reinstall, -r, /opt/c2-observer/requirements.lock]
+  when: c2_observer_environment is changed
+  changed_when: true
+
+- name: Install or repair the pinned application without implicit dependencies
+  ansible.builtin.command:
+    argv:
+      - /opt/c2-observer/venv/bin/pip
+      - install
+      - --disable-pip-version-check
+      - --no-deps
+      - --no-build-isolation
+      - --force-reinstall
+      - '/opt/c2-observer/releases/{{ c2_observer_source_revision }}'
+  when: c2_observer_environment is changed
+  changed_when: true
+
+- name: Require consistent installed dependencies
+  ansible.builtin.command:
+    argv: [/opt/c2-observer/venv/bin/pip, check]
+  changed_when: false
+
+- name: Create private state without changing retained contents
+  ansible.builtin.file:
+    path: /var/lib/c2-observer
+    state: directory
+    owner: c2-observer
+    group: c2-observer
+    mode: '0700'
+  when: not c2_observer_state.stat.exists
+
+- name: Check CLI process health as the worker account
+  ansible.builtin.command:
+    argv: [/opt/c2-observer/venv/bin/c2-observer, health]
+  become: true
+  become_user: c2-observer
+  register: c2_observer_final_health
+  changed_when: false
+
+- name: Require healthy process imports
+  ansible.builtin.assert:
+    that:
+      - (c2_observer_final_health.stdout | from_json).status == 'healthy'
+
+- name: Record completed exact installation
+  ansible.builtin.copy:
+    content: '{{ c2_observer_preflight.stdout }}
+'
+    dest: /opt/c2-observer/.installed-artifact.json
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Report tooling-only installation scope
+  ansible.builtin.debug:
+    msg: C2 Observer CLI installed; collection, scheduling, inference and ATC publication remain disabled. Process health is not upstream connectivity proof.

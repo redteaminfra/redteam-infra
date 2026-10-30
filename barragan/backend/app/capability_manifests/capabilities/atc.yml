@@ -1,0 +1,25 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+apiVersion: barragan/v1
+kind: AnsibleCapability
+metadata:
+  id: atc
+  name: ATC
+  category: homebase/collaboration
+  description: Install native ATC with private PostgreSQL on Ubuntu 22.04 Homebase. Requires an administrator-prepared native release; Ubuntu 24.04 and this integration are not qualified. Optional inference and graph services remain disabled.
+implementation:
+  type: role
+  role: atc
+  path: ansible/roles/atc
+placement:
+  allowedHostClasses: [homebase]
+classification: optional
+profiles:
+  standard-rti:
+    classification: optional
+operator:
+  visible: true
+  selectable: true
+lifecycle:
+  apply: supported
+  remove: manual
+  managedBy: redteam-infra

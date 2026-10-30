@@ -1,0 +1,25 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+apiVersion: barragan/v1
+kind: AnsibleCapability
+metadata:
+  id: loottool-v2
+  name: LootTool V2
+  category: homebase/analysis
+  description: Install the loopback-only LootTool search baseline on Homebase. Original loot remains read-only; ingestion, inference, Explorer and ATC delivery remain explicit operator actions.
+implementation:
+  type: role
+  role: loottool_v2
+  path: ansible/roles/loottool_v2
+placement:
+  allowedHostClasses: [homebase]
+classification: optional
+profiles:
+  standard-rti:
+    classification: optional
+operator:
+  visible: true
+  selectable: true
+lifecycle:
+  apply: supported
+  remove: manual
+  managedBy: redteam-infra

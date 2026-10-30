@@ -6,6 +6,7 @@ import json
 import os
 import re
 import subprocess
+import yaml
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -76,6 +77,7 @@ CORE_SSH_OPTIONS = (
 CONFLICTING_CORE_MUTATION_ACTIONS = frozenset(
     {
         CAPABILITY_RECONCILIATION_ACTION,
+        "inference_proxy_status_check",
         "pilot_standard_rti_guarded_execute",
         "engagement_comprehensive_teardown",
         "engagement_access_apply",
@@ -395,7 +397,7 @@ def assert_capability_reconciliation_idle(
         (
             job
             for job in (repository or SqlAlchemyJobRepository()).list_for_engagement(engagement_id)
-            if job.action in {CAPABILITY_RECONCILIATION_ACTION, "engagement_capability_apply"}
+            if job.action in {CAPABILITY_RECONCILIATION_ACTION, "engagement_capability_apply", "inference_proxy_status_check"}
             and job.status in {"queued", "running"}
         ),
         None,
@@ -404,6 +406,7 @@ def assert_capability_reconciliation_idle(
         label = (
             "optional core capability reconciliation"
             if active.action == CAPABILITY_RECONCILIATION_ACTION
+            else "service status check" if active.action == "inference_proxy_status_check"
             else "capability apply"
         )
         raise CapabilityReconciliationValidationError(
@@ -496,6 +499,30 @@ def _write_reconciliation_workspace(
     *,
     capability_lock: str,
 ) -> None:
+    if plan.inference_proxy_inputs:
+        lock = yaml.safe_load(capability_lock)
+        if not isinstance(lock, dict) or lock.get("inferenceProxy") != plan.inference_proxy_inputs:
+            raise CapabilityReconciliationValidationError(
+                ["Inference Proxy configuration/source changed while preparing Apply; save and retry"]
+            )
+    if plan.c2_observer_inputs:
+        lock = yaml.safe_load(capability_lock)
+        if not isinstance(lock, dict) or lock.get("c2Observer") != plan.c2_observer_inputs:
+            raise CapabilityReconciliationValidationError(
+                ["C2 Observer source/dependency lock changed while preparing Apply; save and retry"]
+            )
+    if plan.loottool_inputs:
+        lock = yaml.safe_load(capability_lock)
+        if not isinstance(lock, dict) or lock.get("loottool") != plan.loottool_inputs:
+            raise CapabilityReconciliationValidationError(
+                ["LootTool source/image/scope changed while preparing Apply; save and retry"]
+            )
+    if plan.atc_inputs:
+        lock = yaml.safe_load(capability_lock)
+        if not isinstance(lock, dict) or lock.get("atc") != plan.atc_inputs:
+            raise CapabilityReconciliationValidationError(
+                ["ATC configuration/context/release changed while preparing Apply; save and retry"]
+            )
     ansible_dir = workspace / "ansible"
     ansible_dir.mkdir(parents=True, exist_ok=False)
     (ansible_dir / "inventory.ini").write_text(_render_inventory(hosts), encoding="utf-8")
@@ -679,6 +706,10 @@ def _public_plan(
         "rolesByHostClass": roles,
         "targetHostClasses": target_classes,
         "availableHostClasses": available_classes,
+        **({"inferenceProxy": plan.inference_proxy_inputs} if plan.inference_proxy_inputs else {}),
+        **({"c2Observer": plan.c2_observer_inputs} if plan.c2_observer_inputs else {}),
+        **({"loottool": plan.loottool_inputs} if plan.loottool_inputs else {}),
+        **({"atc": plan.atc_inputs} if plan.atc_inputs else {}),
         "skipped": [dict(entry) for entry in plan.skipped],
         "warnings": [dict(entry) for entry in plan.warnings],
         "errors": [dict(entry) for entry in plan.errors],
@@ -715,6 +746,12 @@ def _plan_fingerprint(plan: dict[str, Any]) -> str:
         "coreDeploymentId": plan.get("coreDeploymentId"),
         "rolesByHostClass": plan.get("rolesByHostClass"),
     }
+    if "c2Observer" in plan:
+        payload["c2Observer"] = plan["c2Observer"]
+    if "atc" in plan:
+        payload["atc"] = plan["atc"]
+    if "loottool" in plan:
+        payload["loottool"] = plan["loottool"]
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 

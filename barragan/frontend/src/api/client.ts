@@ -1,4 +1,25 @@
 /* Copyright (c) 2026, Oracle and/or its affiliates. */
+export type AtcConfiguration = { operatorId: string; operatorName: string; port: number };
+export type InferenceProxyConfiguration = { region: string; compartmentId: string; port: number };
+
+export type InferenceProxyStatus = {
+  status: "blocked" | "not_checked" | "checking" | "checked" | "failed";
+  configuration: InferenceProxyConfiguration | null;
+  bindingFingerprint: string | null;
+  homebaseIdentity: { coreDeploymentId: string; instanceId: string } | null;
+  observation: {
+    checkedAt: string;
+    localReady: boolean;
+    discoveryStatus: string;
+    lastRefreshAt: string | null;
+    modelCount: number | null;
+    errorCode: string | null;
+    inferenceVerified: false;
+  } | null;
+  job: JobRunDetail | null;
+  errors: string[];
+};
+
 export type HealthResponse = {
   service: string;
   status: string;
@@ -157,6 +178,8 @@ export type EngagementCapabilityEntry = {
 };
 
 export type EngagementCapabilityWorkspace = {
+  atc?: { configuration: AtcConfiguration };
+  inferenceProxy?: { configuration: InferenceProxyConfiguration; accessStatus: "not_verified"; policyGuidance: { notes: string[]; documentationUrl: string } };
   workspace: {
     engagementId: string;
     slug: string;
@@ -209,6 +232,8 @@ export type EngagementCapabilityWorkspace = {
 };
 
 export type EngagementCapabilitySelectionRequest = {
+  atc?: AtcConfiguration;
+  inferenceProxy?: InferenceProxyConfiguration;
   deselectedDefaults: CapabilitySelectionRef[];
   selectedOptionals?: CapabilitySelectionRef[];
 };
@@ -2519,6 +2544,10 @@ export const apiClient = {
     postJson<{ workspace: EngagementWorkspaceRecord; created: boolean }>(`/api/engagements/${engagementId}/workspace`),
   engagementCapabilities: (engagementId: string) =>
     getJson<{ capabilities: EngagementCapabilityWorkspace }>(`/api/engagements/${engagementId}/capabilities`),
+  inferenceProxyStatus: (engagementId: string) =>
+    getJson<{ inferenceProxyStatus: InferenceProxyStatus }>(`/api/engagements/${engagementId}/capabilities/inference-proxy/status`),
+  checkInferenceProxyStatus: (engagementId: string, bindingFingerprint: string) =>
+    postJson<{ inferenceProxyStatus: InferenceProxyStatus }>(`/api/engagements/${engagementId}/capabilities/inference-proxy/status`, { bindingFingerprint }),
   updateEngagementCapabilities: (engagementId: string, body: EngagementCapabilitySelectionRequest) =>
     patchJson<{ capabilities: EngagementCapabilityWorkspace }>(`/api/engagements/${engagementId}/capabilities`, body),
   applyEngagementCapabilities: (engagementId: string) =>

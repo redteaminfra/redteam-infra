@@ -1,6 +1,9 @@
 # Copyright (c) 2026, Oracle and/or its affiliates.
 from __future__ import annotations
 
+import hashlib
+import os
+import stat
 from pathlib import Path
 from typing import Any
 
@@ -97,3 +100,32 @@ def ensure_known_hosts_file(path: str) -> None:
 def _safe_file_token(value: str) -> str:
     safe = "".join(character if character.isalnum() or character in {"-", "_"} else "_" for character in str(value or ""))
     return safe or "unknown"
+
+
+def retained_core_known_hosts(core: Any) -> tuple[str, str]:
+    """Read the original deployment trust file; never establish trust on refresh."""
+    directories = {event.data.get("workspaceDir") for event in core.events
+                   if isinstance(event.data, dict) and event.data.get("workspaceDir")}
+    if len(directories) != 1:
+        raise ValueError("core known-hosts workspace is unavailable or ambiguous")
+    root = Path(directories.pop())
+    path = root / "ssh" / "known_hosts"
+    if not root.is_absolute():
+        raise ValueError("core workspace path differs")
+    for directory in (root, root / "ssh"):
+        if directory.is_symlink() or directory.resolve(strict=True) != directory:
+            raise ValueError("core workspace path differs")
+        st = directory.stat()
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid not in (os.getuid(), 0) or st.st_mode & 0o022:
+            raise ValueError("core workspace path is unsafe")
+    if path.is_symlink() or path.resolve(strict=True) != path:
+        raise ValueError("known-hosts path is unsafe")
+    fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    try:
+        st = os.fstat(fd)
+        if not stat.S_ISREG(st.st_mode) or st.st_uid not in (os.getuid(), 0) or st.st_nlink != 1 or st.st_mode & 0o022 or st.st_size == 0 or st.st_size > 1048576:
+            raise ValueError("known-hosts file is unsafe")
+        content = os.read(fd, 1048577)
+        return str(path), hashlib.sha256(content).hexdigest()
+    finally:
+        os.close(fd)

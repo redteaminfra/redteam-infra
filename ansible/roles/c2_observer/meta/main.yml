@@ -1,0 +1,12 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+dependencies: []
+galaxy_info:
+  role_name: c2_observer
+  author: Red Team Infrastructure contributors
+  description: Install pinned C2 Observer CLI tooling without enabling collection
+  license: Apache-2.0
+  min_ansible_version: '2.14'
+  platforms:
+    - name: Ubuntu
+      versions: [jammy, noble]

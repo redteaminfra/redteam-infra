@@ -1,0 +1,7 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Restart inference-proxy
+  ansible.builtin.systemd:
+    name: inference-proxy.service
+    daemon_reload: true
+    state: restarted

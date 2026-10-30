@@ -6248,6 +6248,110 @@ describe("App", () => {
     expect(screen.queryByRole("region", { name: "Desktop service workflow" })).not.toBeInTheDocument();
   });
 
+  it("saves Homebase inference configuration without requesting IAM changes", async () => {
+    let savedBody: Record<string, unknown> | null = null;
+    let sourceUnavailable = true;
+    const configuration = { region: "", compartmentId: "", port: 8787 };
+    const base = JSON.parse(JSON.stringify(optionalRoleCapabilityWorkspace())
+      .replaceAll("go-simple-upload-server", "inference-proxy")
+      .replaceAll("go_simple_upload_server", "inference_proxy")
+      .replaceAll("Go Simple Upload Server", "Inference Proxy"));
+    let currentWorkspace = { ...base, inferenceProxy: { configuration, accessStatus: "not_verified", policyGuidance: { notes: [], documentationUrl: "" } } };
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith("/api/templates")) return Promise.resolve(jsonResponse({ templates: [] }));
+      if (url.endsWith("/api/engagements?scope=all")) return Promise.resolve(jsonResponse({ engagements: [engagementSummary()] }));
+      if (url.endsWith("/api/jobs")) return Promise.resolve(jsonResponse({ jobs: [] }));
+      if (url.endsWith("/api/engagements/eng-zy01/capabilities") && init?.method === "PATCH") {
+        if (sourceUnavailable) {
+          sourceUnavailable = false;
+          return Promise.resolve(errorResponse(400, { error: "Inference Proxy source checkout is unavailable" }));
+        }
+        savedBody = JSON.parse(String(init.body));
+        currentWorkspace = { ...currentWorkspace, overrides: { ...base.overrides, selectedOptionals: savedBody?.selectedOptionals },
+          applyState: capabilityApplyState("saved_ready"), inferenceProxy: { ...currentWorkspace.inferenceProxy, configuration: savedBody?.inferenceProxy as typeof configuration } };
+        return Promise.resolve(jsonResponse({ capabilities: currentWorkspace }));
+      }
+      if (url.endsWith("/api/engagements/eng-zy01/capabilities")) return Promise.resolve(jsonResponse({ capabilities: currentWorkspace }));
+      if (url.endsWith("/api/engagements/eng-zy01/operations")) return Promise.resolve(jsonResponse({ operations: operationsOverview("") }));
+      return Promise.resolve(jsonResponse({}));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<App />);
+    await waitFor(() => expect(screen.getByText("ready")).toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Capabilities" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Inference Proxy/i }));
+    const dialog = screen.getByRole("region", { name: "Configure Inference Proxy" });
+    fireEvent.change(within(dialog).getByLabelText("OCI inference region"), { target: { value: "us-chicago-1" } });
+    fireEvent.change(within(dialog).getByLabelText("Model compartment OCID"), { target: { value: "ocid1.compartment.oc1..fixture" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Select Inference Proxy" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save capability changes" }));
+    expect(await screen.findByText("Inference Proxy source checkout is unavailable")).toBeInTheDocument();
+    expect(within(dialog).getByLabelText("OCI inference region")).toHaveValue("us-chicago-1");
+    expect(within(dialog).getByLabelText("Model compartment OCID")).toHaveValue("ocid1.compartment.oc1..fixture");
+    expect(within(dialog).getByRole("button", { name: "Deselect Inference Proxy" })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save capability changes" }));
+    await waitFor(() => expect(savedBody).toMatchObject({
+      selectedOptionals: [{ id: "inference-proxy", hostClass: "homebase" }],
+      inferenceProxy: { region: "us-chicago-1", compartmentId: "ocid1.compartment.oc1..fixture", port: 8787 }
+    }));
+    expect(dialog).toHaveTextContent("never changes IAM policies");
+    expect(dialog).toHaveTextContent("not verified by service installation");
+    expect(fetchMock.mock.calls.some(([input]) => /iam|dynamic-group|policies/.test(String(input)))).toBe(false);
+  });
+
+  it("checks inference discovery without overwriting a draft changed during the request", async () => {
+    const configuration = { region: "us-chicago-1", compartmentId: "ocid1.compartment.oc1..fixture", port: 8787 };
+    const base = JSON.parse(JSON.stringify(optionalRoleCapabilityWorkspace())
+      .split("go-simple-upload-server").join("inference-proxy")
+      .split("go_simple_upload_server").join("inference_proxy")
+      .split("Go Simple Upload Server").join("Inference Proxy"));
+    base.overrides.selectedOptionals = [{ id: "inference-proxy", hostClass: "homebase" }];
+    const workspace = { ...base, inferenceProxy: { configuration, accessStatus: "not_verified", policyGuidance: { notes: [], documentationUrl: "" } } };
+    const noAccess = { configuration, status: "checked", bindingFingerprint: "a".repeat(64),
+      homebaseIdentity: { coreDeploymentId: "job-current", instanceId: "ocid1.instance.oc1.us-sanjose-1.fixture" },
+      observation: { checkedAt: "2026-10-30T15:00:00Z", localReady: true, discoveryStatus: "discovery_unavailable",
+        lastRefreshAt: null, modelCount: 0, errorCode: "oci_not_authorized_or_not_found", inferenceVerified: false }, job: null, errors: [] };
+    let finishCheck: (() => void) | undefined;
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith("/api/templates")) return Promise.resolve(jsonResponse({ templates: [] }));
+      if (url.endsWith("/api/engagements?scope=all")) return Promise.resolve(jsonResponse({ engagements: [engagementSummary()] }));
+      if (url.endsWith("/api/jobs")) return Promise.resolve(jsonResponse({ jobs: [] }));
+      if (url.endsWith("/api/engagements/eng-zy01/capabilities")) return Promise.resolve(jsonResponse({ capabilities: workspace }));
+      if (url.endsWith("/api/engagements/eng-zy01/operations")) return Promise.resolve(jsonResponse({ operations: operationsOverview("") }));
+      if (url.endsWith("/capabilities/inference-proxy/status")) {
+        if (init?.method === "POST") return new Promise<ReturnType<typeof jsonResponse>>((resolve) => {
+          finishCheck = () => resolve(jsonResponse({ inferenceProxyStatus: { ...noAccess, observation: { ...noAccess.observation,
+            discoveryStatus: "catalog_available", modelCount: 2, errorCode: null } } }));
+        });
+        return Promise.resolve(jsonResponse({ inferenceProxyStatus: noAccess }));
+      }
+      return Promise.resolve(jsonResponse({}));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<App />);
+    await waitFor(() => expect(screen.getByText("ready")).toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Capabilities" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Inference Proxy/i }));
+    const panel = screen.getByRole("region", { name: "Configure Inference Proxy" });
+    expect(await within(panel).findByText(/OCI reported not authorized or not found/)).toBeInTheDocument();
+    const check = within(panel).getByRole("button", { name: "Check service and OCI discovery" });
+    fireEvent.click(check);
+    await waitFor(() => expect(finishCheck).toBeTypeOf("function"));
+    fireEvent.change(within(panel).getByLabelText("Inference Proxy loopback port"), { target: { value: "8788" } });
+    await act(async () => { finishCheck?.(); });
+    expect(within(panel).getByLabelText("Inference Proxy loopback port")).toHaveValue(8788);
+    expect(within(panel).queryByText(/Model catalog available/)).not.toBeInTheDocument();
+    expect(check).toBeDisabled();
+    fireEvent.change(within(panel).getByLabelText("Inference Proxy loopback port"), { target: { value: "8787" } });
+    expect(await within(panel).findByText(/Model catalog available \(2 models\)/)).toBeInTheDocument();
+    expect(panel).toHaveTextContent("Inference access: Not verified");
+    const posts = fetchMock.mock.calls.filter(([url, init]) => String(url).endsWith("/capabilities/inference-proxy/status") && init?.method === "POST");
+    expect(posts).toHaveLength(1);
+    expect(JSON.parse(String(posts[0][1]?.body))).toEqual({ bindingFingerprint: "a".repeat(64) });
+  });
+
   it("saves and reconciles selected optional roles against running core hosts", async () => {
     const writeText = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, "clipboard", {

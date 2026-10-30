@@ -1,0 +1,6 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- hosts: all
+  become: true
+  roles:
+    - c2_observer

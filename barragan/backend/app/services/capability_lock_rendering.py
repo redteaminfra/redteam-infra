@@ -8,6 +8,10 @@ from typing import Any
 
 import yaml
 
+from app.services import inference_proxy_capability as inference_proxy
+from app.services import c2_observer_capability as c2_observer
+from app.services import loottool_capability as loottool
+from app.services import atc_capability as atc
 from app.services.capability_profile_resolution import resolve_standard_rti_profile
 from app.services.engagement_capabilities import (
     apply_capability_overrides_to_resolution,
@@ -91,6 +95,29 @@ def render_capability_lock(
     )
     resolution = apply_capability_overrides_to_resolution(resolution, overrides)
     lock = _capability_lock_payload(workspace, resolution)
+    if inference_proxy.is_selected(overrides):
+        try:
+            lock["inferenceProxy"] = inference_proxy.execution_inputs(workspace_root, workspace.metadata)
+        except inference_proxy.InferenceProxyConfigurationError as exc:
+            raise EngagementWorkspaceValidationError([str(exc)]) from exc
+    if c2_observer.is_selected(overrides):
+        try:
+            lock["c2Observer"] = c2_observer.execution_inputs(workspace_root, workspace.metadata)
+        except c2_observer.C2ObserverArtifactError as exc:
+            raise EngagementWorkspaceValidationError([str(exc)]) from exc
+    if loottool.is_selected(overrides):
+        try:
+            lock["loottool"] = loottool.execution_inputs(workspace_root, workspace.metadata, engagement_id=engagement_id)
+        except loottool.LootToolArtifactError as exc:
+            raise EngagementWorkspaceValidationError([str(exc)]) from exc
+    if atc.is_selected(overrides):
+        try:
+            inputs = atc.execution_inputs(workspace_root, workspace.metadata)
+            if inputs["engagement"] != atc.engagement_context(get_engagement(engagement_id)):
+                raise atc.ATCCapabilityError("ATC engagement context changed; save configuration again")
+            lock["atc"] = inputs
+        except atc.ATCCapabilityError as exc:
+            raise EngagementWorkspaceValidationError([str(exc)]) from exc
     content = yaml.safe_dump(lock, sort_keys=False, allow_unicode=True)
     _assert_no_secret_material(content)
 

@@ -74,6 +74,8 @@ class ApiContractTests(unittest.TestCase):
             ("POST", "/api/engagements/{engagement_id}/services/backflips/apply"),
             ("POST", "/api/engagements/{engagement_id}/capabilities/backflips/apply-preview"),
             ("POST", "/api/engagements/{engagement_id}/capabilities/backflips/apply"),
+            ("GET", "/api/engagements/{engagement_id}/capabilities/inference-proxy/status"),
+            ("POST", "/api/engagements/{engagement_id}/capabilities/inference-proxy/status"),
             ("GET", "/api/engagements/{engagement_id}/capabilities/reconciliation"),
             ("POST", "/api/engagements/{engagement_id}/capabilities/reconciliation"),
             ("POST", "/api/engagements/{engagement_id}/capabilities/apply"),

@@ -1,0 +1,17 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# App-built, flat native release bundle. A Git source archive is not sufficient.
+atc_release_archive: ""
+atc_release_sha256: ""
+atc_source_revision: ""
+atc_release_version: ""
+atc_postgres_image: ""
+atc_install_root: /opt/atc
+atc_python_executable: /usr/bin/python3
+atc_port: 8790
+atc_operator_os_user: ""
+atc_engagement_id: ""
+atc_engagement_codename: ""
+atc_engagement_status: active
+atc_operator_id: ""
+atc_operator_name: ""

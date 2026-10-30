@@ -1,12 +1,19 @@
 # Copyright (c) 2026, Oracle and/or its affiliates.
 from __future__ import annotations
 
+import os
+import stat
 import re
+import yaml
 import shutil
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
+from app.services import inference_proxy_capability as inference_proxy
+from app.services import c2_observer_capability as c2_observer
+from app.services import loottool_capability as loottool
+from app.services import atc_capability as atc
 from app.services.capability_profile_resolution import resolve_standard_rti_profile
 from app.services.engagement_capabilities import (
     DESKTOP_CAPABILITY_IDS,
@@ -107,6 +114,11 @@ class CapabilityRoleApplyPlan:
     skipped: list[dict[str, str]]
     warnings: list[dict[str, str]]
     errors: list[dict[str, str]]
+    inference_proxy_inputs: dict[str, Any] = field(default_factory=dict)
+    c2_observer_inputs: dict[str, Any] = field(default_factory=dict)
+    loottool_inputs: dict[str, Any] = field(default_factory=dict)
+    engagement_id: str = ""
+    atc_inputs: dict[str, Any] = field(default_factory=dict)
 
     @property
     def role_names(self) -> list[str]:
@@ -137,6 +149,10 @@ class CapabilityRoleApplyPlan:
             "skipped": [dict(entry) for entry in self.skipped],
             "warnings": [dict(entry) for entry in self.warnings],
             "errors": [dict(entry) for entry in self.errors],
+            **({"inferenceProxy": self.inference_proxy_inputs} if self.inference_proxy_inputs else {}),
+            **({"c2Observer": self.c2_observer_inputs} if self.c2_observer_inputs else {}),
+            **({"loottool": self.loottool_inputs} if self.loottool_inputs else {}),
+            **({"atc": self.atc_inputs} if self.atc_inputs else {}),
         }
 
 
@@ -188,6 +204,11 @@ def build_core_capability_role_apply_plan(
     if not elk_enabled:
         resolution.get("hostClasses", {}).pop("elk", None)
     plan = _plan_from_resolution(source, resolution)
+    plan = replace(plan, engagement_id=engagement_id or "")
+    _attach_atc_inputs(plan, workspace)
+    _attach_loottool_inputs(plan, workspace)
+    _attach_inference_proxy_inputs(plan, workspace)
+    _attach_c2_observer_inputs(plan, workspace)
     if validate_selected_core_capabilities and plan.errors:
         raise CapabilityRoleApplyPlanValidationError(plan.errors, source=source)
     return plan
@@ -235,6 +256,11 @@ def build_optional_core_capability_role_apply_plan(
         selected_classifications={"optional"},
         excluded_capability_ids=OPTIONAL_RECONCILIATION_EXCLUDED_CAPABILITY_IDS,
     )
+    plan = replace(plan, engagement_id=engagement_id or "")
+    _attach_atc_inputs(plan, workspace)
+    _attach_loottool_inputs(plan, workspace)
+    _attach_inference_proxy_inputs(plan, workspace)
+    _attach_c2_observer_inputs(plan, workspace)
     if plan.errors:
         raise CapabilityRoleApplyPlanValidationError(plan.errors, source=source)
     return plan
@@ -314,6 +340,30 @@ def render_core_capability_apply_playbook(plan: CapabilityRoleApplyPlan) -> str:
                     f"        name: {entry['role']}",
                 ]
             )
+            if entry["id"] == inference_proxy.CAPABILITY_ID:
+                if not plan.inference_proxy_inputs:
+                    raise ValueError("Inference Proxy execution inputs were not prepared")
+                rendered_vars = yaml.safe_dump(inference_proxy.role_variables(plan.inference_proxy_inputs), sort_keys=False).rstrip()
+                plays.append("      vars:")
+                plays.extend("        " + line for line in rendered_vars.splitlines())
+            if entry["id"] == c2_observer.CAPABILITY_ID:
+                if not plan.c2_observer_inputs:
+                    raise ValueError("C2 Observer execution inputs were not prepared")
+                rendered_vars = yaml.safe_dump(c2_observer.role_variables(plan.c2_observer_inputs), sort_keys=False).rstrip()
+                plays.append("      vars:")
+                plays.extend("        " + line for line in rendered_vars.splitlines())
+            if entry["id"] == loottool.CAPABILITY_ID:
+                if not plan.loottool_inputs:
+                    raise ValueError("LootTool execution inputs were not prepared")
+                rendered_vars = yaml.safe_dump(loottool.role_variables(plan.loottool_inputs), sort_keys=False).rstrip()
+                plays.append("      vars:")
+                plays.extend("        " + line for line in rendered_vars.splitlines())
+            if entry["id"] == atc.CAPABILITY_ID:
+                if not plan.atc_inputs:
+                    raise ValueError("ATC execution inputs were not prepared")
+                rendered_vars = yaml.safe_dump(atc.role_variables(plan.atc_inputs), sort_keys=False).rstrip()
+                plays.append("      vars:")
+                plays.extend("        " + line for line in rendered_vars.splitlines())
         if host_class == "homebase" and any(entry["role"] == "homebase" for entry in entries):
             plays.extend(_HOMEBASE_POST_BASELINE_PROFILE_CANONICALIZATION)
     return "\n".join(plays) + "\n"
@@ -349,7 +399,40 @@ _HOMEBASE_POST_BASELINE_PROFILE_CANONICALIZATION = (
 
 
 def copy_core_capability_roles(destination: Path, plan: CapabilityRoleApplyPlan) -> None:
-    for role in _role_names_with_dependencies(plan.source, plan.role_names):
+    roles = _role_names_with_dependencies(plan.source, plan.role_names)
+    if plan.atc_inputs:
+        lock_path = plan.source.root / "barragan" / "capability-lock.yml"
+        try:
+            if any(path.is_symlink() for path in (lock_path, lock_path.parent)) or lock_path.stat().st_size > 1024 * 1024:
+                raise atc.ATCCapabilityError("ATC retained capability lock is unsafe")
+            retained_lock = yaml.safe_load(lock_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, yaml.YAMLError) as exc:
+            raise atc.ATCCapabilityError("ATC retained capability lock is unavailable; save and retry") from exc
+        if not isinstance(retained_lock, dict) or retained_lock.get("atc") != plan.atc_inputs:
+            raise atc.ATCCapabilityError("ATC saved configuration/release changed; save and retry")
+        if plan.atc_inputs["engagement"] != atc.engagement_context(get_engagement(plan.engagement_id)):
+            raise atc.ATCCapabilityError("ATC engagement context changed; save configuration again")
+        atc.copy_artifacts(destination, plan.source.root, plan.atc_inputs)
+    if plan.loottool_inputs:
+        loottool.copy_artifacts(destination, plan.source.root, plan.loottool_inputs, engagement_id=plan.engagement_id)
+    if plan.c2_observer_inputs:
+        c2_observer.copy_artifacts(destination, plan.source.root, plan.c2_observer_inputs)
+    if plan.inference_proxy_inputs:
+        # Verify the exact retained bytes immediately before copying to the
+        # disposable execution workspace, not merely when Save rendered a lock.
+        metadata = {
+            inference_proxy.CONFIGURATION_KEY: plan.inference_proxy_inputs["configuration"],
+            inference_proxy.SOURCE_KEY: plan.inference_proxy_inputs["source"],
+        }
+        checked = inference_proxy.execution_inputs(plan.source.root, metadata)
+        relative = checked["source"]["relativePath"]
+        target = inference_proxy._safe_artifact(destination, relative)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.resolve() != (plan.source.root / relative).resolve():
+            shutil.copyfile(plan.source.root / relative, target)
+            target.chmod(0o600)
+        inference_proxy.execution_inputs(destination, metadata)
+    for role in roles:
         _copy_role(plan.source.ansible_role_path(role), destination / "ansible" / "roles" / role)
 
 
@@ -357,6 +440,53 @@ def copy_capability_role_for_runtime(source: Path, destination: Path) -> None:
     """Copy one upstream role into a disposable Barragan runtime workspace."""
 
     _copy_role(source, destination)
+
+
+def _attach_inference_proxy_inputs(plan: CapabilityRoleApplyPlan, workspace: Any) -> None:
+    if inference_proxy.CAPABILITY_ID not in {entry["id"] for entries in plan.roles_by_host_class.values() for entry in entries}:
+        return
+    try:
+        if workspace is None:
+            raise inference_proxy.InferenceProxyConfigurationError("Save Inference Proxy configuration before applying it")
+        plan.inference_proxy_inputs.update(inference_proxy.execution_inputs(Path(workspace.path), workspace.metadata))
+    except inference_proxy.InferenceProxyConfigurationError as exc:
+        plan.errors.append({"id": inference_proxy.CAPABILITY_ID, "hostClass": "homebase", "reason": str(exc)})
+
+
+def _attach_atc_inputs(plan: CapabilityRoleApplyPlan, workspace: Any) -> None:
+    if atc.CAPABILITY_ID not in {entry["id"] for entries in plan.roles_by_host_class.values() for entry in entries}:
+        return
+    try:
+        if workspace is None:
+            raise atc.ATCCapabilityError("Save ATC configuration before applying it")
+        inputs = atc.execution_inputs(Path(workspace.path), workspace.metadata)
+        if inputs["engagement"] != atc.engagement_context(get_engagement(plan.engagement_id)):
+            raise atc.ATCCapabilityError("ATC engagement context changed; save configuration again")
+        plan.atc_inputs.update(inputs)
+    except atc.ATCCapabilityError as exc:
+        plan.errors.append({"id": atc.CAPABILITY_ID, "hostClass": "homebase", "reason": str(exc)})
+
+
+def _attach_loottool_inputs(plan: CapabilityRoleApplyPlan, workspace: Any) -> None:
+    if loottool.CAPABILITY_ID not in {entry["id"] for entries in plan.roles_by_host_class.values() for entry in entries}:
+        return
+    try:
+        if workspace is None:
+            raise loottool.LootToolArtifactError("Save LootTool selection before applying it")
+        plan.loottool_inputs.update(loottool.execution_inputs(Path(workspace.path), workspace.metadata, engagement_id=plan.engagement_id))
+    except loottool.LootToolArtifactError as exc:
+        plan.errors.append({"id": loottool.CAPABILITY_ID, "hostClass": "homebase", "reason": str(exc)})
+
+
+def _attach_c2_observer_inputs(plan: CapabilityRoleApplyPlan, workspace: Any) -> None:
+    if c2_observer.CAPABILITY_ID not in {entry["id"] for entries in plan.roles_by_host_class.values() for entry in entries}:
+        return
+    try:
+        if workspace is None:
+            raise c2_observer.C2ObserverArtifactError("Save C2 Observer selection before applying it")
+        plan.c2_observer_inputs.update(c2_observer.execution_inputs(Path(workspace.path), workspace.metadata))
+    except c2_observer.C2ObserverArtifactError as exc:
+        plan.errors.append({"id": c2_observer.CAPABILITY_ID, "hostClass": "homebase", "reason": str(exc)})
 
 
 def _plan_from_resolution(
@@ -465,6 +595,8 @@ def _role_names_with_dependencies(source: RedteamInfraTemplateSource, roles: lis
     seen: set[str] = set()
 
     def visit(role: str) -> None:
+        if not isinstance(role, str) or not ROLE_NAME_PATTERN.fullmatch(role) or role in {".", ".."}:
+            raise ValueError("Ansible role dependency must be a safe role name without paths")
         if role in seen:
             return
         seen.add(role)
@@ -478,24 +610,102 @@ def _role_names_with_dependencies(source: RedteamInfraTemplateSource, roles: lis
 
 
 def _role_dependencies(role_path: Path) -> list[str]:
-    meta_path = role_path / "meta" / "main.yml"
-    if not meta_path.is_file():
-        return []
-    try:
-        content = meta_path.read_text(encoding="utf-8")
-    except OSError:
-        return []
-    if "dependencies" not in content:
-        return []
+    # Keep the existing meta dependency interpretation; task discovery adds only
+    # literal includes and never evaluates Ansible conditions or Jinja.
     dependencies: list[str] = []
-    dependency_section = content.split("dependencies:", 1)[1]
-    for match in re.finditer(r"\brole:\s*([A-Za-z0-9_.-]+)\b", dependency_section):
-        dependencies.append(match.group(1))
-    for line in dependency_section.splitlines():
-        match = re.match(r"^\s*-\s*([A-Za-z0-9_.-]+)\s*$", line)
-        if match:
-            dependencies.append(match.group(1))
+    meta_path = role_path / "meta" / "main.yml"
+    if meta_path.is_file():
+        try:
+            content = meta_path.read_text(encoding="utf-8")
+        except OSError:
+            content = ""
+        if "dependencies" in content:
+            dependency_section = content.split("dependencies:", 1)[1]
+            # The legacy word-boundary matcher omits dot-only mapping values;
+            # retain them so the shared role-name boundary can reject them.
+            dependencies.extend(re.findall(r"\brole:\s*(\.{1,2})(?=\s|[,}\]]|$)", dependency_section))
+            for match in re.finditer(r"\brole:\s*([A-Za-z0-9_.-]+)\b", dependency_section):
+                dependencies.append(match.group(1))
+            for line in dependency_section.splitlines():
+                match = re.match(r"^\s*-\s*([A-Za-z0-9_.-]+)\s*$", line)
+                if match:
+                    dependencies.append(match.group(1))
+    dependencies.extend(_literal_task_role_dependencies(role_path))
     return [role for role in dict.fromkeys(dependencies) if ROLE_NAME_PATTERN.fullmatch(role)]
+
+
+def _literal_task_role_dependencies(role_path: Path) -> list[str]:
+    tasks_root = role_path / "tasks"
+    if role_path.is_symlink() or tasks_root.is_symlink():
+        raise ValueError("Ansible role task dependency paths must not use symlinks")
+    if not tasks_root.exists():
+        return []
+    if not tasks_root.is_dir():
+        raise ValueError("Ansible role tasks must be a directory")
+    root = tasks_root.resolve()
+    dependencies: list[str] = []
+    count = total = 0
+    actions = {"include_role", "import_role", "ansible.builtin.include_role", "ansible.builtin.import_role"}
+
+    def fail_walk(error: OSError) -> None:
+        raise ValueError("Ansible role task dependencies could not be inspected safely") from error
+
+    for directory, directories, files in os.walk(tasks_root, followlinks=False, onerror=fail_walk):
+        directories.sort()
+        for name in [*directories, *files]:
+            path = Path(directory) / name
+            if path.is_symlink() or root not in path.resolve().parents:
+                raise ValueError("Ansible role task dependency paths must stay inside tasks without symlinks")
+        for name in sorted(files):
+            if Path(name).suffix not in {".yml", ".yaml"}:
+                continue
+            count += 1
+            if count > 128:
+                raise ValueError("Ansible role task dependency scan exceeds 128 YAML files")
+            path = Path(directory) / name
+            descriptor = None
+            try:
+                descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+                info = os.fstat(descriptor)
+                if not stat.S_ISREG(info.st_mode) or info.st_size > 1024 * 1024:
+                    raise ValueError("Ansible role task dependency YAML must be a regular file of at most 1 MiB")
+                with os.fdopen(descriptor, "rb") as stream:
+                    descriptor = None
+                    content = stream.read(1024 * 1024 + 1)
+                total += len(content)
+                if len(content) > 1024 * 1024 or total > 8 * 1024 * 1024:
+                    raise ValueError("Ansible role task dependency YAML exceeds its 1 MiB file or 8 MiB total bound")
+                tasks = yaml.safe_load(content.decode("utf-8"))
+            except (OSError, UnicodeError, yaml.YAMLError, RecursionError) as exc:
+                raise ValueError("Ansible role task dependency YAML is unavailable, unsafe or malformed") from exc
+            finally:
+                if descriptor is not None:
+                    os.close(descriptor)
+            if tasks is None:
+                continue
+            if not isinstance(tasks, list):
+                raise ValueError("Ansible role task dependency YAML must contain a task list")
+            pending, seen = [tasks], set()
+            while pending:
+                sequence = pending.pop()
+                if id(sequence) in seen:
+                    continue
+                seen.add(id(sequence))
+                for task in sequence:
+                    if not isinstance(task, dict):
+                        continue
+                    for action in sorted(actions & task.keys()):
+                        specification = task[action]
+                        name = specification.get("name") if isinstance(specification, dict) else None
+                        if not isinstance(name, str) or any(marker in name for marker in ("{{", "{%", "{#")):
+                            continue
+                        if not ROLE_NAME_PATTERN.fullmatch(name) or name in {".", ".."}:
+                            raise ValueError("Ansible literal role dependency must be a safe role name without paths")
+                        dependencies.append(name)
+                    for key in ("always", "rescue", "block"):
+                        if isinstance(task.get(key), list):
+                            pending.append(task[key])
+    return dependencies
 
 
 def _copy_role(source: Path, destination: Path) -> None:

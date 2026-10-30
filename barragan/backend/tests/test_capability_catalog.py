@@ -174,6 +174,10 @@ def test_capability_catalog_reports_no_manifests_as_warning(tmp_path: Path) -> N
 def test_capability_catalog_loads_packaged_go_simple_upload_server_manifest_against_stock_role(tmp_path: Path) -> None:
     root = tmp_path / "redteam-infra"
     (root / "ansible" / "roles" / "go_simple_upload_server").mkdir(parents=True)
+    (root / "ansible" / "roles" / "inference_proxy").mkdir(parents=True)
+    (root / "ansible" / "roles" / "c2_observer").mkdir(parents=True)
+    (root / "ansible" / "roles" / "loottool_v2").mkdir(parents=True)
+    (root / "ansible" / "roles" / "atc").mkdir(parents=True)
 
     catalog = discover_capability_catalog(source=RedteamInfraTemplateSource(root, "stock")).to_dict()
 
@@ -368,3 +372,17 @@ operator:
   visible: true
   selectable: false
 """
+
+
+def test_inference_proxy_manifest_is_optional_homebase_only_without_automatic_ingress(tmp_path):
+    root = tmp_path / "source"
+    for role in ("inference_proxy", "go_simple_upload_server", "c2_observer", "loottool_v2", "atc"):
+        (root / "ansible/roles" / role).mkdir(parents=True)
+    catalog = discover_capability_catalog(source=RedteamInfraTemplateSource(root, "test")).to_dict()
+    entry = next(capability for capability in catalog["capabilities"] if capability["id"] == "inference-proxy")
+    assert catalog["status"] == "passed"
+    assert entry["placement"]["allowedHostClasses"] == ["homebase"]
+    assert entry["classification"] == "optional"
+    assert entry["lifecycle"]["remove"] == "manual"
+    assert "integration" not in entry
+    assert entry["implementation"]["role"] == "inference_proxy"

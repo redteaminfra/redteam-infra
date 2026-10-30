@@ -1,4 +1,7 @@
 /* Copyright (c) 2026, Oracle and/or its affiliates. */
+import { AtcSettings, defaultAtcConfiguration } from "./AtcSettings";
+import type { AtcConfiguration } from "../api/client";
+import { InferenceProxySettings, defaultInferenceProxyConfiguration } from "./InferenceProxySettings";
 import { ProviderInventoryPanel } from "./ProviderInventoryPanel";
 import { Activity, Boxes, ChevronDown, ClipboardList, Copy, Globe2, KeyRound, LaptopMinimalCheck, LayoutDashboard, ListChecks, Moon, PocketKnife, Route, Settings, Sun, Swords, Users } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -31,6 +34,8 @@ import {
   EngagementDnsWorkspace,
   EngagementWorkspaceRecord,
   EngagementCapabilityWorkspace,
+  InferenceProxyConfiguration,
+  InferenceProxyStatus,
   EngagementCapabilityEntry,
   CapabilitySelectionRef,
   CapabilityApplyState,
@@ -8209,6 +8214,8 @@ type CapabilityPanelState = {
   workspace: EngagementCapabilityWorkspace | null;
   draftDeselectedDefaults: CapabilitySelectionRef[];
   draftSelectedOptionals: CapabilitySelectionRef[];
+  draftInferenceProxy: InferenceProxyConfiguration;
+  draftAtc: AtcConfiguration;
 };
 
 type OpsecCapabilityPanelState = {
@@ -8224,6 +8231,7 @@ const staticWebCapabilityId = "barragan.static-web-site";
 const customListenerCapabilityId = "barragan.custom-listener";
 const backflipsCapabilityId = "barragan.backflips-v2";
 const opsecCapabilityId = "opsec";
+const inferenceProxyCapabilityId = "inference-proxy";
 
 function CapabilitiesPage({
   engagementId,
@@ -8245,7 +8253,9 @@ function CapabilitiesPage({
     message: "",
     workspace: null,
     draftDeselectedDefaults: [],
-    draftSelectedOptionals: []
+    draftSelectedOptionals: [],
+    draftInferenceProxy: defaultInferenceProxyConfiguration(),
+    draftAtc: defaultAtcConfiguration()
   });
   const [activeCapability, setActiveCapability] = useState<EngagementCapabilityEntry | null>(null);
   const [opsecState, setOpsecState] = useState<OpsecCapabilityPanelState>({
@@ -8260,6 +8270,66 @@ function CapabilitiesPage({
   const [capabilityApplyJob, setCapabilityApplyJob] = useState<JobRunDetail | null>(null);
   const [capabilityApplyConsoleOpen, setCapabilityApplyConsoleOpen] = useState(false);
   const [capabilityApplyConsoleCopied, setCapabilityApplyConsoleCopied] = useState(false);
+  const [inferenceStatus, setInferenceStatus] = useState<InferenceProxyStatus | null>(null);
+  const [inferenceStatusLoading, setInferenceStatusLoading] = useState(false);
+  const [inferenceStatusError, setInferenceStatusError] = useState("");
+  const inferenceRequestVersion = useRef(0);
+
+  useEffect(() => {
+    const version = ++inferenceRequestVersion.current;
+    setInferenceStatus(null);
+    setInferenceStatusError("");
+    if (!engagementId || activeCapability?.id !== inferenceProxyCapabilityId) {
+      setInferenceStatusLoading(false);
+      return;
+    }
+    setInferenceStatusLoading(true);
+    apiClient.inferenceProxyStatus(engagementId).then((response) => {
+      if (version !== inferenceRequestVersion.current) return;
+      setInferenceStatus(response.inferenceProxyStatus);
+    }).catch((error) => {
+      if (version !== inferenceRequestVersion.current) return;
+      setInferenceStatusError(error instanceof BarraganApiError ? error.message : "Could not load Inference Proxy status.");
+    }).finally(() => {
+      if (version === inferenceRequestVersion.current) setInferenceStatusLoading(false);
+    });
+    return () => { ++inferenceRequestVersion.current; };
+  }, [engagementId, activeCapability?.id, JSON.stringify(state.workspace?.inferenceProxy?.configuration), JSON.stringify(state.workspace?.overrides.selectedOptionals)]);
+
+  useEffect(() => {
+    if (!engagementId || activeCapability?.id !== inferenceProxyCapabilityId || !inferenceStatus || inferenceStatusLoading) return;
+    const version = inferenceRequestVersion.current;
+    let cancelled = false;
+    let pending = false;
+    const handle = window.setInterval(() => {
+      if (pending) return;
+      pending = true;
+      apiClient.inferenceProxyStatus(engagementId).then((response) => {
+        if (cancelled || version !== inferenceRequestVersion.current) return;
+        setInferenceStatus(response.inferenceProxyStatus);
+        setInferenceStatusError("");
+      }).catch((error) => {
+        if (cancelled || version !== inferenceRequestVersion.current) return;
+        setInferenceStatusError(error instanceof BarraganApiError ? error.message : "Could not refresh Inference Proxy status.");
+      }).finally(() => { pending = false; });
+    }, inferenceStatus.status === "checking" ? 3000 : 15000);
+    return () => { cancelled = true; window.clearInterval(handle); };
+  }, [engagementId, activeCapability?.id, inferenceStatus?.status, inferenceStatus?.job?.id, inferenceStatusLoading]);
+
+  const checkInferenceStatus = async () => {
+    if (!engagementId || !inferenceStatus?.bindingFingerprint) return;
+    const version = ++inferenceRequestVersion.current;
+    setInferenceStatusLoading(true);
+    setInferenceStatusError("");
+    try {
+      const response = await apiClient.checkInferenceProxyStatus(engagementId, inferenceStatus.bindingFingerprint);
+      if (version === inferenceRequestVersion.current) setInferenceStatus(response.inferenceProxyStatus);
+    } catch (error) {
+      if (version === inferenceRequestVersion.current) setInferenceStatusError(error instanceof BarraganApiError ? error.message : "Could not check Inference Proxy status.");
+    } finally {
+      if (version === inferenceRequestVersion.current) setInferenceStatusLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!engagementId) {
@@ -8268,7 +8338,9 @@ function CapabilitiesPage({
         message: "Select or create an engagement before configuring capabilities.",
         workspace: null,
         draftDeselectedDefaults: [],
-        draftSelectedOptionals: []
+        draftSelectedOptionals: [],
+    draftInferenceProxy: defaultInferenceProxyConfiguration(),
+    draftAtc: defaultAtcConfiguration()
       });
       setCapabilityApplyJob(null);
       return;
@@ -8285,7 +8357,9 @@ function CapabilitiesPage({
           message: applyState.status === "unsaved" ? "" : capabilityApplyStateMessage(applyState),
           workspace: response.capabilities,
           draftDeselectedDefaults: response.capabilities.overrides.deselectedDefaults ?? [],
-          draftSelectedOptionals: response.capabilities.overrides.selectedOptionals ?? []
+          draftSelectedOptionals: response.capabilities.overrides.selectedOptionals ?? [],
+          draftInferenceProxy: response.capabilities.inferenceProxy?.configuration ?? defaultInferenceProxyConfiguration(),
+          draftAtc: response.capabilities.atc?.configuration ?? defaultAtcConfiguration()
         });
       })
       .catch((error) => {
@@ -8367,7 +8441,9 @@ function CapabilitiesPage({
       message,
       workspace,
       draftDeselectedDefaults: workspace.overrides.deselectedDefaults ?? [],
-      draftSelectedOptionals: workspace.overrides.selectedOptionals ?? []
+      draftSelectedOptionals: workspace.overrides.selectedOptionals ?? [],
+      draftInferenceProxy: workspace.inferenceProxy?.configuration ?? defaultInferenceProxyConfiguration(),
+      draftAtc: workspace.atc?.configuration ?? defaultAtcConfiguration()
     });
   };
 
@@ -8377,13 +8453,20 @@ function CapabilitiesPage({
     try {
       const response = await apiClient.updateEngagementCapabilities(engagementId, {
         deselectedDefaults: state.draftDeselectedDefaults,
-        selectedOptionals: state.draftSelectedOptionals
+        selectedOptionals: state.draftSelectedOptionals,
+        inferenceProxy: state.draftInferenceProxy,
+        atc: state.draftAtc
       });
       setCapabilityWorkspace(response.capabilities, capabilityApplyStateMessage(capabilityApplyStateOf(response.capabilities)));
     } catch (error) {
       try {
         const refreshed = await apiClient.engagementCapabilities(engagementId);
-        setCapabilityWorkspace(refreshed.capabilities, capabilityApplyStateMessage(capabilityApplyStateOf(refreshed.capabilities)));
+        setState((current) => ({
+          ...current,
+          status: "error",
+          workspace: refreshed.capabilities,
+          message: error instanceof BarraganApiError ? error.message : "Could not save capability selection."
+        }));
       } catch {
         setState((current) => ({
           ...current,
@@ -8488,7 +8571,9 @@ function CapabilitiesPage({
   const profile = workspace?.profileResolution;
   const hostClasses = profile?.hostClasses ?? {};
   const changed = !sameSelectionRows(state.draftDeselectedDefaults, workspace?.overrides.deselectedDefaults ?? []) ||
-    !sameSelectionRows(state.draftSelectedOptionals, workspace?.overrides.selectedOptionals ?? []);
+    !sameSelectionRows(state.draftSelectedOptionals, workspace?.overrides.selectedOptionals ?? []) ||
+    JSON.stringify(state.draftInferenceProxy) !== JSON.stringify(workspace?.inferenceProxy?.configuration ?? defaultInferenceProxyConfiguration()) ||
+    JSON.stringify(state.draftAtc) !== JSON.stringify(workspace?.atc?.configuration ?? defaultAtcConfiguration());
   const applyState = capabilityApplyStateOf(workspace);
   const busy = ["loading", "saving"].includes(state.status);
   const opsecBusy = ["loading", "applying"].includes(opsecState.status);
@@ -8804,11 +8889,43 @@ function CapabilitiesPage({
                   </button>
                 </div>
               </>
+            ) : activeCapability.id === "atc" ? (
+              <AtcSettings
+                configuration={state.draftAtc}
+                onChange={(configuration) => setState((current) => ({ ...current, draftAtc: configuration }))}
+                disabled={busy || capabilityApplyBusy}
+                selected={capabilityEntrySelected(activeCapability, state.draftDeselectedDefaults, state.draftSelectedOptionals)}
+                onToggle={() => toggleCapability(activeCapability)}
+                onSave={() => void saveSelection()}
+                saving={state.status === "saving"}
+                changed={changed}
+              />
+            ) : activeCapability.id === inferenceProxyCapabilityId ? (
+              <InferenceProxySettings
+                configuration={state.draftInferenceProxy}
+                onChange={(configuration) => setState((current) => ({ ...current, draftInferenceProxy: configuration }))}
+                disabled={busy || capabilityApplyBusy}
+                selected={capabilityEntrySelected(activeCapability, state.draftDeselectedDefaults, state.draftSelectedOptionals)}
+                onToggle={() => toggleCapability(activeCapability)}
+                onSave={() => void saveSelection()}
+                saving={state.status === "saving"}
+                changed={changed}
+                serviceStatus={inferenceStatus}
+                statusLoading={inferenceStatusLoading}
+                statusError={inferenceStatusError}
+                onCheck={() => void checkInferenceStatus()}
+              />
             ) : (
               <>
                 <p>
                   Manage this role from its selection in the capability list. Select it to include it in saved capability changes, then apply those changes to running infrastructure.
                 </p>
+                {activeCapability.id === "c2-observer" ? (
+                  <div className="notice-panel">
+                    <p>Installs C2 Observer command-line tools on Homebase. It does not start collection, schedule a worker, or send evidence to ATC.</p>
+                    <p>After Apply, use the Homebase CLI with protected source credentials when you are ready. Local health checks verify the installation, not connectivity to your C2 server or ATC. Disabling this selection does not remove installed tools or saved evidence.</p>
+                  </div>
+                ) : null}
                 {activeCapability.operator?.selectable && !activeCapability.locked ? (
                   <div className="form-actions">
                     <button

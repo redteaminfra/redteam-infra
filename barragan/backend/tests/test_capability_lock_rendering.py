@@ -75,11 +75,11 @@ def test_render_capability_lock_writes_execution_aware_lock(tmp_path: Path, monk
     assert payload["metadata"]["workspaceSlug"] == "demo-01-engabc123"
     assert payload["status"] == "passed"
     assert payload["summary"] == {
-        "total": 26,
+        "total": 30,
         "essential": 15,
         "default": 7,
-        "optional": 4,
-        "catalog": 26,
+        "optional": 8,
+        "catalog": 30,
         "missingManifest": 0,
         "missingTemplatePath": 0,
     }

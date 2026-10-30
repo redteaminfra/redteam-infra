@@ -1,0 +1,339 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Require the app-supported native platform and reviewed release inputs
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'Ubuntu'
+      - ansible_distribution_version == '22.04'
+      - ansible_architecture == 'x86_64'
+      - ansible_service_mgr == 'systemd'
+      - atc_release_archive is string
+      - atc_release_archive is match('^/')
+      - atc_release_sha256 is match('^[0-9a-f]{64}$')
+      - atc_source_revision is match('^[0-9a-f]{40}$')
+      - atc_release_version is string
+      - atc_postgres_image is string
+      - atc_port is integer
+      - atc_port >= 1024
+      - atc_port <= 65535
+    fail_msg: >-
+      ATC requires Ubuntu22.04 amd64/systemd with Python3.10 and an exact app-built native bundle/checksum/source revision.
+      Ubuntu24.04 is not supported by this app release; no downgrade is attempted.
+
+- name: Validate the complete reviewed release on the controller before target writes
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_playbook_python }}"
+      - "{{ role_path }}/files/verify_release.py"
+      - "{{ atc_release_archive }}"
+      - "{{ atc_release_sha256 }}"
+      - "{{ atc_source_revision }}"
+      - "{{ atc_release_version }}"
+      - "{{ atc_postgres_image }}"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  check_mode: false
+  register: atc_verified_release
+
+- name: Bind explicit native installation settings to the reviewed bundle
+  ansible.builtin.set_fact:
+    atc_role_configuration:
+      root: "{{ atc_install_root }}"
+      python: "{{ atc_python_executable }}"
+      port: "{{ atc_port }}"
+      operatorUser: "{{ atc_operator_os_user }}"
+      engagementId: "{{ atc_engagement_id }}"
+      codename: "{{ atc_engagement_codename }}"
+      engagementStatus: "{{ atc_engagement_status }}"
+      operatorId: "{{ atc_operator_id }}"
+      operatorName: "{{ atc_operator_name }}"
+      version: "{{ atc_release_version }}"
+      revision: "{{ atc_source_revision }}"
+      sha256: "{{ atc_release_sha256 }}"
+      postgresImage: "{{ atc_postgres_image }}"
+      migrationLevel: "{{ (atc_verified_release.stdout | from_json).migrationLevel }}"
+
+- name: Check non-Docker prerequisites and retained identity before dependency changes
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - -c
+      - "{{ lookup('ansible.builtin.file', role_path ~ '/files/host_state.py') }}"
+      - "{{ atc_role_configuration | to_json }}"
+      - --before-docker
+  register: atc_before_docker
+  changed_when: false
+  check_mode: false
+
+- name: Assess genuine Docker absence without changing the host
+  ansible.builtin.script:
+    cmd: '{{ role_path }}/files/docker_presence.py'
+    executable: python3
+  register: atc_docker_presence
+  changed_when: false
+  check_mode: false
+
+- name: Refuse to recreate missing Docker beneath a retained ATC installation
+  ansible.builtin.assert:
+    that:
+      - (atc_docker_presence.stdout | from_json).mode != 'absent' or (atc_before_docker.stdout | from_json).mode == 'install'
+    fail_msg: Retained ATC with missing Docker requires operator recovery; automatic daemon recreation is refused.
+
+- name: Check complete Python venv support without changing the host
+  ansible.builtin.command:
+    argv:
+      - "{{ atc_python_executable }}"
+      - -c
+      - import venv, ensurepip
+  register: atc_venv_support
+  failed_when: false
+  changed_when: false
+  check_mode: false
+
+- name: Supply only a fresh host's missing Ubuntu Python venv prerequisite
+  when: atc_venv_support.rc != 0
+  block:
+    - name: Refuse package repair beneath retained ATC or during check mode
+      ansible.builtin.assert:
+        that:
+          - (atc_before_docker.stdout | from_json).mode == 'install'
+          - not ansible_check_mode
+        fail_msg: Missing Python venv support requires a normal fresh install; retained ATC requires operator recovery.
+
+    - name: Require the supported Ubuntu distro interpreter before package installation
+      ansible.builtin.command:
+        argv:
+          - "{{ atc_python_executable }}"
+          - -c
+          - "import os, sys; assert os.path.realpath(sys.executable) == '/usr/bin/python3.10' and sys.version_info[:2] == (3, 10)"
+      changed_when: false
+
+    - name: Install the supported distro Python venv package without replacing the interpreter
+      ansible.builtin.apt:
+        name: python3.10-venv
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+- name: Prove private venv and pip bootstrap before Docker dependency changes
+  ansible.builtin.command:
+    argv:
+      - "{{ atc_python_executable }}"
+      - -c
+      - |
+        import os, subprocess, sys, tempfile
+        with tempfile.TemporaryDirectory(prefix='atc-venv-check-') as temporary:
+            os.chmod(temporary, 0o700)
+            subprocess.run([sys.executable, '-m', 'venv', temporary], check=True,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60,
+                           env={**os.environ, 'PIP_CONFIG_FILE': os.devnull,
+                                'PIP_DISABLE_PIP_VERSION_CHECK': '1'})
+            subprocess.run([temporary + '/bin/python', '-m', 'pip', '--version'],
+                           check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           timeout=30, env={**os.environ, 'PIP_CONFIG_FILE': os.devnull,
+                                            'PIP_DISABLE_PIP_VERSION_CHECK': '1'})
+  changed_when: false
+  check_mode: false
+
+- name: Require normal apply before installing a missing Docker prerequisite
+  ansible.builtin.assert:
+    that:
+      - not ansible_check_mode or (atc_docker_presence.stdout | from_json).mode == 'existing'
+    fail_msg: Missing Docker requires a normal apply after preflight; check mode does not install prerequisites.
+
+- name: Install Docker through the existing upstream role only when genuinely absent
+  ansible.builtin.include_role:
+    name: docker
+  when: (atc_docker_presence.stdout | from_json).mode == 'absent'
+
+- name: Check the local Docker server without starting or upgrading it
+  ansible.builtin.command: docker version --format '{{ "{{.Server.Version}}" }}'
+  register: atc_docker_version
+  changed_when: false
+  check_mode: false
+
+- name: Check the existing Compose plugin
+  ansible.builtin.command: docker compose version --short
+  register: atc_compose_version
+  changed_when: false
+  check_mode: false
+
+- name: Require supported Docker and Compose versions
+  ansible.builtin.assert:
+    that:
+      - atc_docker_version.stdout is version('24.0', '>=')
+      - atc_compose_version.stdout | regex_replace('^v', '') is version('2.20', '>=')
+
+- name: Check prerequisites and retained identity without changing the host
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - -c
+      - "{{ lookup('ansible.builtin.file', role_path ~ '/files/host_state.py') }}"
+      - "{{ atc_role_configuration | to_json }}"
+  changed_when: false
+  check_mode: false
+  register: atc_current_state
+
+- name: Refuse misleading dry-run installation claims
+  ansible.builtin.assert:
+    that:
+      - not ansible_check_mode or (atc_current_state.stdout | from_json).mode == 'none'
+    fail_msg: ATC requires a normal apply for native install or repair; check mode only verifies an unchanged installation.
+
+- name: Cache only the exact PostgreSQL dependency for a fresh installation
+  when: (atc_current_state.stdout | from_json).mode == 'install'
+  block:
+    - name: Inspect the exact reviewed PostgreSQL image reference locally
+      ansible.builtin.command:
+        argv: [docker, image, inspect, --format, '{{ "{{.Id}}" }}', "{{ atc_postgres_image }}"]
+      register: atc_postgres_cached
+      failed_when: false
+      changed_when: false
+      check_mode: false
+
+    - name: Refuse a missing PostgreSQL cache during check mode
+      ansible.builtin.assert:
+        that:
+          - not ansible_check_mode or atc_postgres_cached.rc == 0
+        fail_msg: The exact PostgreSQL image is not cached; a normal fresh apply must pull the pinned dependency.
+
+    - name: Pull only the exact reviewed PostgreSQL digest when not cached
+      ansible.builtin.command:
+        argv: [docker, image, pull, "{{ atc_postgres_image }}"]
+      when: atc_postgres_cached.rc != 0
+
+- name: Converge through the app-owned noninteractive install or same-release repair
+  when: (atc_current_state.stdout | from_json).mode != 'none'
+  block:
+    - name: Create private role staging parent after all preflight checks
+      ansible.builtin.file:
+        path: /var/cache/atc
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Allocate an isolated native release staging directory
+      ansible.builtin.tempfile:
+        state: directory
+        path: /var/cache/atc
+        prefix: release-
+      register: atc_staging
+
+    - name: Deliver the reviewed native release
+      ansible.builtin.copy:
+        src: "{{ atc_release_archive }}"
+        dest: "{{ atc_staging.path }}/release.tar.gz"
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Verify delivered release checksum before extraction
+      ansible.builtin.stat:
+        path: "{{ atc_staging.path }}/release.tar.gz"
+        checksum_algorithm: sha256
+      register: atc_delivered_release
+
+    - name: Require controller and target release identity to match
+      ansible.builtin.assert:
+        that:
+          - atc_delivered_release.stat.checksum == atc_release_sha256
+
+    - name: Create the fresh extraction directory
+      ansible.builtin.file:
+        path: "{{ atc_staging.path }}/bundle"
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Extract only the verified native release into isolated staging
+      ansible.builtin.unarchive:
+        src: "{{ atc_staging.path }}/release.tar.gz"
+        dest: "{{ atc_staging.path }}/bundle"
+        remote_src: true
+        owner: root
+        group: root
+
+    - name: Render protected non-secret bootstrap answers
+      ansible.builtin.template:
+        src: install.conf.j2
+        dest: "{{ atc_staging.path }}/install.conf"
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Run only the supported noninteractive installation or repair entrypoint
+      ansible.builtin.command:
+        argv: >-
+          {{ ['/bin/bash', atc_staging.path ~ '/bundle/install.sh',
+              '--config', atc_staging.path ~ '/install.conf', '--non-interactive']
+             + (['--repair'] if (atc_current_state.stdout | from_json).mode == 'repair' else []) }}
+      register: atc_install_result
+      failed_when: false
+      changed_when: atc_install_result.rc == 0
+      no_log: true
+
+    - name: Retain bounded installer diagnostics outside disposable staging
+      ansible.builtin.copy:
+        content: >-
+          {{ {'rc': atc_install_result.rc | default(-1),
+              'sourceRevision': atc_source_revision, 'sha256': atc_release_sha256,
+              'stdout': (atc_install_result.stdout | default(''))[:16384],
+              'stderr': (atc_install_result.stderr | default(''))[:16384],
+              'stdoutTruncated': (atc_install_result.stdout | default('') | length) > 16384,
+              'stderrTruncated': (atc_install_result.stderr | default('') | length) > 16384} | to_nice_json }}
+        dest: /var/cache/atc/last-install-result.json
+        owner: root
+        group: root
+        mode: '0600'
+      no_log: true
+
+    - name: Require successful native convergence without erasing failure evidence
+      ansible.builtin.assert:
+        that:
+          - atc_install_result.rc | default(1) == 0
+        fail_msg: >-
+          ATC native installation or repair failed. Preserve /opt/atc state and
+          recovery journals; inspect the root-private /var/cache/atc/last-install-result.json
+          and local ATC service journal, then follow the app-owned recovery procedure. No reset or fallback was attempted.
+
+    - name: Verify exact installed identity and owned local service readiness
+      ansible.builtin.command:
+        argv:
+          - "{{ ansible_facts.python.executable }}"
+          - -c
+          - "{{ lookup('ansible.builtin.file', role_path ~ '/files/host_state.py') }}"
+          - "{{ atc_role_configuration | to_json }}"
+      changed_when: false
+      register: atc_final_state
+
+    - name: Require the exact native API and private PostgreSQL to be locally ready
+      ansible.builtin.assert:
+        that:
+          - (atc_final_state.stdout | from_json).localReady | bool
+        fail_msg: ATC local readiness could not be verified; installation is not reported ready.
+
+    - name: Record the successfully installed reviewed artifact without secrets
+      ansible.builtin.copy:
+        content: "{{ {'sha256': atc_release_sha256, 'sourceRevision': atc_source_revision, 'version': atc_release_version} | to_nice_json }}\n"
+        dest: "{{ atc_install_root }}/.ansible-release.json"
+        owner: root
+        group: root
+        mode: '0600'
+  always:
+    - name: Remove only this role invocation's isolated staging files
+      ansible.builtin.file:
+        path: "{{ atc_staging.path }}"
+        state: absent
+      when: atc_staging is defined and atc_staging.path is defined
+
+- name: Report the deliberately limited capability outcome
+  ansible.builtin.debug:
+    msg: >-
+      ATC native API is locally ready on loopback:{{ atc_port }}; PostgreSQL
+      remains loopback:15432. Graph and inference were not configured.
+      The app installer manages the first human's protected client file.
+      Separate agent credentials and application functional acceptance are manual.

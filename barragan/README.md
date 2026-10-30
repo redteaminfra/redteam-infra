@@ -4,9 +4,8 @@ Copyright (c) 2026, Oracle and/or its affiliates.
 
 Barragan is a FastAPI and React control plane for Red Team Infrastructure. It
 manages engagement-scoped infrastructure, connection paths, DNS, certificates,
-operator access, and optional host capabilities. This source export includes the
-core control plane and Go Simple Upload Server support. ATC, LootTool, C2 Observer
-and Inference Proxy are delivered in a separate, dependent publication branch.
+operator access, and optional host capabilities. This branch includes the core control plane and optional ATC, LootTool v2,
+C2 Observer and Inference Proxy adapters, alongside Go Simple Upload Server support.
 
 The provider-keyed workflow remains an opt-in pilot. Existing engagements retain
 their recorded source identity; this export does not migrate their state.
@@ -110,3 +109,10 @@ engagements, distribute optional application binaries, or establish new runtime
 acceptance for the public source identity. Existing functional qualification is
 separate from the source export. See `COPYRIGHT` and `LICENSE-2.0.txt` for
 copyright and licensing; preserve third-party notices.
+
+## Optional AI applications
+
+See [AI application setup](docs/ai-applications.md). Point
+`BARRAGAN_REDTEAM_INFRA_TEMPLATE_ROOT` at the clean checkout containing these
+roles. Keep `BARRAGAN_PROVIDER_KEYED_TEMPLATE_ROOT` at the separate pinned
+provider snapshot documented above.

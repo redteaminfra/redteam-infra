@@ -1,0 +1,8 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Syntax only. No credentials, IAM resources or live target are declared.
+- name: Check inference_proxy role syntax
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - inference_proxy

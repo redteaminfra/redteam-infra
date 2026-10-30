@@ -4,8 +4,13 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from dataclasses import replace
 from typing import Any
 
+from app.services import inference_proxy_capability as inference_proxy
+from app.services import c2_observer_capability as c2_observer
+from app.services import loottool_capability as loottool
+from app.services import atc_capability as atc
 from app.services.capability_profile_resolution import resolve_standard_rti_profile
 from app.services.core_ssh import active_core_connection_details, core_proxy_identity
 from app.services.engagements import get_engagement
@@ -91,11 +96,47 @@ def update_engagement_capability_selection(
     template_source: RedteamInfraTemplateSource | None = None,
 ) -> dict[str, Any] | None:
     repo = repository or SqlAlchemyEngagementWorkspaceRepository()
+    requested = _normalize_overrides(body)
+    existing = repo.get(engagement_id)
+    try:
+        configuration = inference_proxy.normalize_configuration(
+            body.get("inferenceProxy", existing.metadata.get(inference_proxy.CONFIGURATION_KEY) if existing else None),
+            required=inference_proxy.is_selected(requested),
+        )
+        atc_configuration = atc.normalize_configuration(
+            body.get("atc", existing.metadata.get(atc.CONFIGURATION_KEY) if existing else None),
+            required=atc.is_selected(requested),
+        )
+        atc_context = atc.engagement_context(get_engagement(engagement_id)) if atc.is_selected(requested) else None
+        atc_release = atc.controller_release() if atc.is_selected(requested) else None
+        archive = inference_proxy.source_archive() if inference_proxy.is_selected(requested) else None
+        c2_artifacts = c2_observer.controller_artifacts() if c2_observer.is_selected(requested) else None
+        loot_artifacts = loottool.controller_artifacts() if loottool.is_selected(requested) else None
+    except (inference_proxy.InferenceProxyConfigurationError, c2_observer.C2ObserverArtifactError, loottool.LootToolArtifactError, atc.ATCCapabilityError) as exc:
+        raise EngagementCapabilityValidationError([str(exc)]) from exc
     prepared = prepare_engagement_workspace(engagement_id, root=root, profile_id=DEFAULT_PROFILE_ID, repository=repo)
     if prepared is None:
         return None
     workspace = prepared.workspace
-    requested = _normalize_overrides(body)
+    try:
+        source = (
+            inference_proxy.prepare_source(Path(workspace.path), archive)
+            if archive is not None else workspace.metadata.get(inference_proxy.SOURCE_KEY)
+        )
+        prepared_c2_artifacts = (
+            c2_observer.prepare_artifacts(Path(workspace.path), c2_artifacts)
+            if c2_artifacts is not None else workspace.metadata.get(c2_observer.ARTIFACTS_KEY)
+        )
+        prepared_atc_release = (
+            atc.prepare_release(Path(workspace.path), atc_release)
+            if atc_release is not None else workspace.metadata.get(atc.RELEASE_KEY)
+        )
+        prepared_loot_artifacts = (
+            loottool.prepare_artifacts(Path(workspace.path), loot_artifacts, engagement_id=engagement_id)
+            if loot_artifacts is not None else workspace.metadata.get(loottool.ARTIFACTS_KEY)
+        )
+    except (inference_proxy.InferenceProxyConfigurationError, c2_observer.C2ObserverArtifactError, loottool.LootToolArtifactError, atc.ATCCapabilityError) as exc:
+        raise EngagementCapabilityValidationError([str(exc)]) from exc
     current = _workspace_overrides(workspace)
     static_state = static_web_capability_state(engagement_id, repository=service_repository)
     if static_state["claimed"] and static_web_is_selected(current) and not static_web_is_selected(requested):
@@ -116,6 +157,16 @@ def update_engagement_capability_selection(
     errors = _selection_errors(resolution, requested)
     if errors:
         raise EngagementCapabilityValidationError(errors)
+    workspace = replace(workspace, metadata={
+        **workspace.metadata,
+        inference_proxy.CONFIGURATION_KEY: configuration,
+        atc.CONFIGURATION_KEY: atc_configuration,
+        **({atc.CONTEXT_KEY: atc_context} if atc_context is not None else {}),
+        **({atc.RELEASE_KEY: prepared_atc_release} if prepared_atc_release is not None else {}),
+        **({inference_proxy.SOURCE_KEY: source} if source is not None else {}),
+        **({c2_observer.ARTIFACTS_KEY: prepared_c2_artifacts} if prepared_c2_artifacts is not None else {}),
+        **({loottool.ARTIFACTS_KEY: prepared_loot_artifacts} if prepared_loot_artifacts is not None else {}),
+    })
     prior_apply_state = capability_apply_state_for_workspace(workspace)
     stored = _save_overrides(repo, workspace, requested)
     prepared_state = _preparing_apply_state(stored, resolution, requested)
@@ -335,6 +386,8 @@ def _workspace_payload(
         "overrides": resolved["selection"],
         "nativeState": native_state or {},
         "applyState": capability_apply_state_for_workspace(workspace),
+        "inferenceProxy": inference_proxy.public_state(workspace.metadata if workspace else {}),
+        "atc": atc.public_state(workspace.metadata if workspace else {}),
         "executionPolicy": {
             "terraform": False,
             "ansible": True,
@@ -535,6 +588,17 @@ def _preparing_apply_state(
         "templateSource": workspace.template_source,
         "selection": apply_capability_overrides_to_resolution(dict(resolution), overrides).get("selection", {}),
     }
+    if inference_proxy.is_selected(overrides):
+        fingerprint_payload["inferenceProxy"] = inference_proxy.execution_inputs(Path(workspace.path), workspace.metadata)
+    if c2_observer.is_selected(overrides):
+        fingerprint_payload["c2Observer"] = c2_observer.execution_inputs(Path(workspace.path), workspace.metadata)
+    if loottool.is_selected(overrides):
+        fingerprint_payload["loottool"] = loottool.execution_inputs(Path(workspace.path), workspace.metadata, engagement_id=workspace.engagement_id)
+    if atc.is_selected(overrides):
+        inputs = atc.execution_inputs(Path(workspace.path), workspace.metadata)
+        if inputs["engagement"] != atc.engagement_context(get_engagement(workspace.engagement_id)):
+            raise atc.ATCCapabilityError("ATC engagement context changed; save configuration again")
+        fingerprint_payload["atc"] = inputs
     fingerprint = hashlib.sha256(
         json.dumps(fingerprint_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
@@ -562,6 +626,14 @@ def _rendered_input_fingerprint(lock: dict[str, Any]) -> str:
         "capabilities": lock.get("capabilities"),
         "templateSource": lock.get("templateSource"),
     }
+    if "inferenceProxy" in lock:
+        payload["inferenceProxy"] = lock["inferenceProxy"]
+    if "c2Observer" in lock:
+        payload["c2Observer"] = lock["c2Observer"]
+    if "atc" in lock:
+        payload["atc"] = lock["atc"]
+    if "loottool" in lock:
+        payload["loottool"] = lock["loottool"]
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()

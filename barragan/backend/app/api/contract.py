@@ -304,6 +304,18 @@ API_CONTRACT = {
         },
         {
             "method": "GET",
+            "path": "/api/engagements/{engagement_id}/capabilities/inference-proxy/status",
+            "summary": "Get the current bound Homebase service and discovery observation",
+            "responseKeys": ["inferenceProxyStatus"],
+        },
+        {
+            "method": "POST",
+            "path": "/api/engagements/{engagement_id}/capabilities/inference-proxy/status",
+            "summary": "Start a bounded read-only Homebase service and discovery check",
+            "responseKeys": ["inferenceProxyStatus"],
+        },
+        {
+            "method": "GET",
             "path": "/api/engagements/{engagement_id}/capabilities/reconciliation",
             "summary": "Get active-core optional capability reconciliation state",
             "responseKeys": ["reconciliation"],

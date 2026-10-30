@@ -204,6 +204,7 @@ def test_core_capability_apply_plan_applies_selected_go_simple_upload_server_onl
 
 
 def test_optional_core_reconciliation_plan_excludes_defaults_and_desktop(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr("app.services.capability_lock_rendering.get_engagement", lambda _id: SimpleNamespace(id="eng-abc123", name="Demo 01", input_parameters={}))
     repo = _FakeWorkspaceRepository()
     template = _template_source_without_manifests(tmp_path)
     engagement = SimpleNamespace(id="eng-abc123", name="Demo 01", input_parameters={})
@@ -667,3 +668,188 @@ class _FakeWorkspaceRepository:
 class _FakeServiceRepository:
     def list_for_engagement(self, _engagement_id: str):
         return []
+
+
+@pytest.mark.parametrize('action', ['include_role','import_role','ansible.builtin.include_role','ansible.builtin.import_role'])
+def test_literal_task_dependency_is_copied_without_unconditional_execution(tmp_path, action):
+    from app.services.capability_execution import CapabilityRoleApplyPlan
+    source = RedteamInfraTemplateSource(tmp_path/'source','test')
+    for role in ('application','docker'):
+        tasks = source.ansible_role_path(role)/'tasks'
+        tasks.mkdir(parents=True)
+        (tasks/'main.yml').write_text('---\n[]\n')
+    original = '- name: Conditional prerequisite\n  '+action+':\n    name: docker\n  when: false\n'
+    (source.ansible_role_path('application')/'tasks/main.yml').write_text(original)
+    plan = CapabilityRoleApplyPlan(source,{'homebase':[{'id':'application','role':'application'}]},1,1,[],[],[])
+    destination = tmp_path/'runtime'
+    copy_core_capability_roles(destination,plan)
+    assert (destination/'ansible/roles/docker/tasks/main.yml').is_file()
+    assert (destination/'ansible/roles/application/tasks/main.yml').read_text() == original
+    playbook = render_core_capability_apply_playbook(plan)
+    assert 'name: docker' not in playbook
+
+
+def test_literal_task_dependencies_union_meta_nested_yaml_transitive_and_cycles(tmp_path):
+    from app.services.capability_execution import _role_names_with_dependencies
+    source = RedteamInfraTemplateSource(tmp_path/'source','test')
+    for role in ('application','docker','base','rescue-role','always-role'):
+        tasks=source.ansible_role_path(role)/'tasks'
+        tasks.mkdir(parents=True)
+        (tasks/'main.yml').write_text('[]\n')
+    meta=source.ansible_role_path('application')/'meta'
+    meta.mkdir()
+    (meta/'main.yml').write_text('dependencies:\n  - base\n  - {role: docker}\n')
+    extra=source.ansible_role_path('application')/'tasks/nested'
+    extra.mkdir()
+    (extra/'prerequisites.yaml').write_text('''- block:
+    - ansible.builtin.include_role: {name: docker}
+  rescue:
+    - import_role: {name: rescue-role}
+  always:
+    - include_role: {name: always-role}
+''')
+    (source.ansible_role_path('docker')/'tasks/main.yml').write_text('- include_role: {name: application}\n')
+    assert _role_names_with_dependencies(source,['application']) == ['application','docker','base','rescue-role','always-role']
+
+
+def test_literal_task_dependencies_ignore_dynamic_names_comments_vars_and_yaml_alias_cycles(tmp_path):
+    from app.services.capability_execution import _role_dependencies
+    role=tmp_path/'application'
+    (role/'tasks').mkdir(parents=True)
+    (role/'tasks/main.yml').write_text('''# include_role: {name: comment-role}
+- name: include_role name=string-role
+  debug: {msg: harmless}
+  vars:
+    include_role: {name: variable-role}
+- include_role: {name: '{{ chosen_role }}'}
+- import_role: {name: '{% if condition %}docker{% endif %}'}
+- include_role: {name: '{# comment #}docker'}
+- &recursive
+  block: [*recursive]
+- include_role: {name: docker}
+''')
+    assert _role_dependencies(role) == ['docker']
+
+
+@pytest.mark.parametrize('name',['.','..','../outside','nested/docker','/tmp/docker','docker role'])
+def test_unsafe_literal_task_dependency_fails_before_any_runtime_writes(tmp_path,name):
+    from app.services.capability_execution import CapabilityRoleApplyPlan
+    import yaml
+    source=RedteamInfraTemplateSource(tmp_path/'source','test')
+    tasks=source.ansible_role_path('application')/'tasks'
+    tasks.mkdir(parents=True)
+    (tasks/'main.yml').write_text(yaml.safe_dump([{'include_role':{'name':name}}]))
+    plan=CapabilityRoleApplyPlan(source,{'homebase':[{'id':'application','role':'application'}]},1,1,[],[],[])
+    destination=tmp_path/'runtime'
+    with pytest.raises(ValueError,match='safe role name'):
+        copy_core_capability_roles(destination,plan)
+    assert not destination.exists()
+    assert not (tmp_path/'outside').exists()
+
+
+@pytest.mark.parametrize('kind',['root','directory','file'])
+def test_task_dependency_scan_rejects_symlinks(tmp_path,kind):
+    from app.services.capability_execution import _role_dependencies
+    role=tmp_path/'application'
+    role.mkdir()
+    outside=tmp_path/'outside'
+    outside.mkdir()
+    (outside/'main.yml').write_text('- include_role: {name: external}\n')
+    if kind=='root':
+        (role/'tasks').symlink_to(outside,target_is_directory=True)
+    else:
+        (role/'tasks').mkdir()
+        (role/'tasks'/('nested' if kind=='directory' else 'main.yml')).symlink_to(outside if kind=='directory' else outside/'main.yml')
+    with pytest.raises(ValueError,match='symlinks'):
+        _role_dependencies(role)
+
+
+@pytest.mark.parametrize('kind',['malformed','wrong-root','file-size','file-count','total-size','fifo'])
+def test_task_dependency_scan_is_bounded_and_fails_unsafe_inputs(tmp_path,kind):
+    import os
+    from app.services.capability_execution import _role_dependencies
+    role=tmp_path/'application'
+    tasks=role/'tasks'
+    tasks.mkdir(parents=True)
+    if kind=='malformed':
+        (tasks/'main.yml').write_text('- include_role: [unterminated')
+    elif kind=='wrong-root':
+        (tasks/'main.yml').write_text('include_role: {name: docker}\n')
+    elif kind=='file-size':
+        (tasks/'main.yml').write_bytes(b'#'*(1024*1024+1))
+    elif kind=='file-count':
+        for index in range(129): (tasks/f'{index:03}.yml').write_text('[]\n')
+    elif kind=='total-size':
+        for index in range(9): (tasks/f'{index:03}.yml').write_bytes(b'#'*(1024*1024))
+    else:
+        os.mkfifo(tasks/'main.yml')
+    with pytest.raises(ValueError):
+        _role_dependencies(role)
+
+
+@pytest.mark.parametrize('unsafe', ['transitive-name','role-symlink'])
+def test_transitive_task_dependency_failure_precedes_all_role_copy_writes(tmp_path, unsafe):
+    from app.services.capability_execution import CapabilityRoleApplyPlan
+    source=RedteamInfraTemplateSource(tmp_path/'source','test')
+    tasks=source.ansible_role_path('application')/'tasks'
+    tasks.mkdir(parents=True)
+    (tasks/'main.yml').write_text('- include_role: {name: docker}\n')
+    outside=tmp_path/'outside'
+    outside.mkdir()
+    (outside/'sentinel').write_text('preserve')
+    dependency=source.ansible_role_path('docker')
+    if unsafe=='role-symlink':
+        dependency.symlink_to(outside,target_is_directory=True)
+    else:
+        (dependency/'tasks').mkdir(parents=True)
+        (dependency/'tasks/main.yml').write_text('- import_role: {name: ../outside}\n')
+    plan=CapabilityRoleApplyPlan(source,{'homebase':[{'id':'application','role':'application'}]},1,1,[],[],[])
+    with pytest.raises(ValueError):
+        copy_core_capability_roles(tmp_path/'runtime',plan)
+    assert not (tmp_path/'runtime').exists()
+    assert (outside/'sentinel').read_text()=='preserve'
+
+
+@pytest.mark.parametrize('name', ['.','..','../outside','/tmp/outside','nested/role'])
+def test_selected_role_boundary_rejects_unsafe_names_before_runtime_writes(tmp_path, name):
+    from app.services.capability_execution import CapabilityRoleApplyPlan
+    source=RedteamInfraTemplateSource(tmp_path/'source','test')
+    source.root.mkdir()
+    destination=tmp_path/'runtime'
+    destination.mkdir()
+    sentinel=destination/'sentinel'
+    sentinel.write_text('preserve existing runtime')
+    plan=CapabilityRoleApplyPlan(source,{'homebase':[{'id':'application','role':name}]},1,1,[],[],[])
+    with pytest.raises(ValueError,match='safe role name'):
+        copy_core_capability_roles(destination,plan)
+    assert sorted(path.name for path in destination.iterdir())==['sentinel']
+    assert sentinel.read_text()=='preserve existing runtime'
+
+
+@pytest.mark.parametrize('name',['.','..'])
+@pytest.mark.parametrize('mapping',[True,False])
+def test_metadata_role_boundary_rejects_dot_names_before_any_copy(tmp_path,name,mapping):
+    from app.services.capability_execution import CapabilityRoleApplyPlan
+    source=RedteamInfraTemplateSource(tmp_path/'source','test')
+    for role in ('safe-first','application'):
+        (source.ansible_role_path(role)/'tasks').mkdir(parents=True)
+        (source.ansible_role_path(role)/'tasks/main.yml').write_text('[]\n')
+    meta=source.ansible_role_path('application')/'meta'
+    meta.mkdir()
+    dependency='{role: '+name+'}' if mapping else name
+    (meta/'main.yml').write_text('dependencies:\n  - '+dependency+'\n')
+    plan=CapabilityRoleApplyPlan(source,{'homebase':[{'id':role,'role':role} for role in ('safe-first','application')]},2,2,[],[],[])
+    destination=tmp_path/'runtime'
+    with pytest.raises(ValueError,match='safe role name'):
+        copy_core_capability_roles(destination,plan)
+    assert not destination.exists()
+
+
+def test_role_boundary_preflight_runs_before_capability_artifact_copy(tmp_path,monkeypatch):
+    from app.services.capability_execution import CapabilityRoleApplyPlan
+    source=RedteamInfraTemplateSource(tmp_path/'source','test')
+    monkeypatch.setattr('app.services.capability_execution.loottool.copy_artifacts',lambda *a,**k:pytest.fail('role-name validation must precede artifact copy'))
+    plan=CapabilityRoleApplyPlan(source,{'homebase':[{'id':'unsafe','role':'..'}]},1,1,[],[],[],loottool_inputs={'configured':True},engagement_id='eng-one')
+    with pytest.raises(ValueError,match='safe role name'):
+        copy_core_capability_roles(tmp_path/'runtime',plan)
+    assert not (tmp_path/'runtime').exists()

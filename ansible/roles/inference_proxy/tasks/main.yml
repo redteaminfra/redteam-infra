@@ -1,0 +1,416 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Require the supported host and explicit non-secret configuration
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'Ubuntu'
+      - ansible_distribution_version in ['22.04', '24.04']
+      - ansible_service_mgr == 'systemd'
+      - ansible_python_version is version('3.10', '>=')
+      - inference_proxy_source_archive | length > 0
+      - inference_proxy_source_archive is match('^/')
+      - inference_proxy_source_sha256 is match('^[0-9a-f]{64}$')
+      - inference_proxy_source_revision is match('^[0-9a-f]{40}$')
+      - inference_proxy_region is match('^[a-z][a-z0-9-]{1,62}$')
+      - inference_proxy_compartment_id is match('^ocid1\.compartment\.[a-z0-9-]+\.[a-z0-9.-]+$')
+      - inference_proxy_port | string is match('^[0-9]+$')
+      - inference_proxy_port | int >= 1024
+      - inference_proxy_port | int <= 65535
+    fail_msg: >-
+      inference_proxy requires Ubuntu 22.04/24.04 with systemd/Python >=3.10,
+      a reviewed controller archive and exact checksum/revision, OCI inference
+      region/model compartment, and an unprivileged loopback port.
+
+- name: Validate the reviewed source archive on the controller
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_playbook_python }}"
+      - "{{ role_path }}/files/verify_archive.py"
+      - "{{ inference_proxy_source_archive }}"
+      - "{{ inference_proxy_source_sha256 }}"
+      - "{{ inference_proxy_source_revision }}"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  check_mode: false
+
+- name: Inspect existing configuration before any installation changes
+  ansible.builtin.stat:
+    path: /etc/inference-proxy/config.toml
+    follow: false
+    get_checksum: false
+    get_mime: false
+  register: inference_proxy_existing_config
+
+- name: Require a regular protected configuration if present
+  ansible.builtin.assert:
+    that:
+      - >-
+        not inference_proxy_existing_config.stat.exists
+        or (inference_proxy_existing_config.stat.isreg
+            and not inference_proxy_existing_config.stat.islnk)
+
+- name: Reject implicit configuration migration before any installation changes
+  ansible.builtin.command:
+    argv:
+      - "{{ '/opt/inference-proxy/venv/bin/python' if inference_proxy_existing_config.stat.exists else ansible_facts.python.executable }}"
+      - -c
+      - "{{ lookup('ansible.builtin.file', role_path ~ '/files/configure.py') }}"
+      - --check
+      - /etc/inference-proxy/config.toml
+      - /dev/null
+      - "{{ inference_proxy_region }}"
+      - "{{ inference_proxy_compartment_id }}"
+      - "{{ inference_proxy_port | string }}"
+  register: inference_proxy_configuration_preflight
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  no_log: true
+
+- name: Require existing inputs to match without implicit migration
+  ansible.builtin.assert:
+    that:
+      - inference_proxy_configuration_preflight.rc | default(1) == 0
+    fail_msg: >-
+      Existing listener, inference region, model compartment, authentication or
+      storage settings must match. Preserve the original configuration and
+      perform any migration separately. An existing configuration also requires
+      its readable runtime Python/TOML support; repair that manually if missing.
+
+- name: Verify requested listener is idle or bound to the canonical service before writes
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - -c
+      - "{{ lookup('ansible.builtin.file', role_path ~ '/files/check_listener.py') }}"
+      - "{{ inference_proxy_port | string }}"
+  changed_when: false
+  check_mode: false
+
+- name: Inspect retained authentication and metering state before changes
+  ansible.builtin.stat:
+    path: "{{ item }}"
+    follow: false
+    get_checksum: false
+    get_mime: false
+  loop: [/etc/inference-proxy/pepper, /var/lib/inference-proxy/proxy.db]
+  register: inference_proxy_retained_state
+
+- name: Refuse unsafe existing pepper even without a database
+  ansible.builtin.assert:
+    that:
+      - >-
+        not inference_proxy_retained_state.results[0].stat.exists
+        or (inference_proxy_retained_state.results[0].stat.isreg
+            and not inference_proxy_retained_state.results[0].stat.islnk
+            and inference_proxy_retained_state.results[0].stat.size >= 32)
+    fail_msg: >-
+      Any existing pepper must be a regular non-symlink file of at least 32
+      bytes, even without a database. Preserve it and resolve manually before
+      applying; this role will not follow or replace an unsafe credential path.
+
+- name: Refuse to replace missing credentials or configuration for an existing database
+  ansible.builtin.assert:
+    that:
+      - >-
+        not inference_proxy_retained_state.results[1].stat.exists
+        or (inference_proxy_retained_state.results[1].stat.isreg
+            and not inference_proxy_retained_state.results[1].stat.islnk
+            and inference_proxy_existing_config.stat.exists
+            and inference_proxy_retained_state.results[0].stat.exists
+            and inference_proxy_retained_state.results[0].stat.isreg
+            and not inference_proxy_retained_state.results[0].stat.islnk
+            and inference_proxy_retained_state.results[0].stat.size >= 32)
+    fail_msg: >-
+      An existing database needs its original configuration and pepper. Restore
+      them with operator approval; this role will not silently invalidate keys.
+
+- name: Define the pinned source installation paths
+  ansible.builtin.set_fact:
+    inference_proxy_release_path: "/opt/inference-proxy/releases/{{ inference_proxy_source_revision }}"
+    inference_proxy_remote_archive: "/opt/inference-proxy/source-{{ inference_proxy_source_sha256 }}.tar.gz"
+
+- name: Install native prerequisites
+  ansible.builtin.apt:
+    name: [python3, python3-pip, python3-venv, ca-certificates, util-linux, iproute2]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+    lock_timeout: 300
+
+- name: Create the dedicated service group
+  ansible.builtin.group:
+    name: inference-proxy
+    system: true
+
+- name: Create the dedicated service user
+  ansible.builtin.user:
+    name: inference-proxy
+    group: inference-proxy
+    home: /var/lib/inference-proxy
+    create_home: false
+    shell: /usr/sbin/nologin
+    system: true
+
+- name: Create protected installation and state directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: /opt/inference-proxy, mode: '0755'}
+    - {path: /opt/inference-proxy/releases, mode: '0755'}
+    - {path: '{{ inference_proxy_release_path }}', mode: '0755'}
+    - {path: /etc/inference-proxy, group: inference-proxy, mode: '0750'}
+    - {path: /var/lib/inference-proxy, owner: inference-proxy, group: inference-proxy, mode: '0750'}
+
+- name: Deliver the reviewed application artifact without SCM credentials
+  ansible.builtin.copy:
+    src: "{{ inference_proxy_source_archive }}"
+    dest: "{{ inference_proxy_remote_archive }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Verify the delivered archive checksum before extraction
+  ansible.builtin.stat:
+    path: "{{ inference_proxy_remote_archive }}"
+    checksum_algorithm: sha256
+  register: inference_proxy_delivered_archive
+
+- name: Require the delivered artifact to match the review
+  ansible.builtin.assert:
+    that:
+      - inference_proxy_delivered_archive.stat.checksum == inference_proxy_source_sha256
+
+- name: Extract or repair the pinned application source
+  ansible.builtin.unarchive:
+    src: "{{ inference_proxy_remote_archive }}"
+    dest: "{{ inference_proxy_release_path }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: 'u=rwX,go=rX'
+  register: inference_proxy_source_extract
+
+- name: Inspect existing Python installation health
+  ansible.builtin.command:
+    argv:
+      - /opt/inference-proxy/venv/bin/python
+      - -c
+      - >-
+        from importlib.metadata import version;
+        import fastapi, httpx, oci, uvicorn, pip;
+        import oci_inference_proxy.server, oci_inference_proxy.admin;
+        print(version('oci-inference-proxy'))
+  register: inference_proxy_python_health
+  changed_when: false
+  failed_when: false
+
+- name: Inspect installed application command paths
+  ansible.builtin.stat:
+    path: "/opt/inference-proxy/venv/bin/{{ item }}"
+  loop: [inference-proxy-server, inference-proxy-admin, inference-proxy-check, pip]
+  register: inference_proxy_commands
+
+- name: Read the retained installed-artifact fingerprint
+  ansible.builtin.slurp:
+    src: /opt/inference-proxy/.installed-artifact
+  register: inference_proxy_installed_fingerprint
+  failed_when: false
+
+- name: Determine whether installation or repair is required
+  ansible.builtin.set_fact:
+    inference_proxy_install_required: >-
+      {{ inference_proxy_python_health.rc | default(1) != 0
+         or (inference_proxy_commands.results | selectattr('stat.exists', 'equalto', false) | list | length > 0)
+         or (inference_proxy_commands.results | selectattr('stat.exists') | selectattr('stat.executable', 'equalto', false) | list | length > 0)
+         or (inference_proxy_installed_fingerprint.content | default('') | b64decode | trim != inference_proxy_source_sha256)
+         or inference_proxy_source_extract.changed }}
+
+- name: Create or repair the private Python environment
+  ansible.builtin.command:
+    argv: [python3, -m, venv, /opt/inference-proxy/venv]
+  when: inference_proxy_install_required | bool
+  changed_when: true
+
+- name: Install or repair the reviewed application
+  ansible.builtin.command:
+    argv:
+      - /opt/inference-proxy/venv/bin/pip
+      - install
+      - --disable-pip-version-check
+      - --force-reinstall
+      - --no-deps
+      - "{{ inference_proxy_release_path }}"
+  when: inference_proxy_install_required | bool
+  changed_when: true
+  notify: Restart inference-proxy
+
+- name: Resolve application dependencies on installation or repair
+  ansible.builtin.command:
+    argv:
+      - /opt/inference-proxy/venv/bin/pip
+      - install
+      - --disable-pip-version-check
+      - "{{ inference_proxy_release_path }}"
+  when: inference_proxy_install_required | bool
+  changed_when: true
+  notify: Restart inference-proxy
+
+- name: Ensure the service can traverse and read its non-secret Python environment
+  ansible.builtin.command:
+    argv: [chmod, -R, a+rX, /opt/inference-proxy/venv]
+  when: inference_proxy_install_required | bool
+  changed_when: true
+
+- name: Require consistent installed dependencies
+  ansible.builtin.command:
+    argv: [/opt/inference-proxy/venv/bin/pip, check]
+  changed_when: false
+
+- name: Capture installed dependency provenance
+  ansible.builtin.command:
+    argv: [/opt/inference-proxy/venv/bin/pip, freeze, --all]
+  register: inference_proxy_dependency_versions
+  changed_when: false
+
+- name: Retain installed dependency provenance
+  ansible.builtin.copy:
+    content: "{{ inference_proxy_dependency_versions.stdout }}\n"
+    dest: /opt/inference-proxy/installed-dependencies.txt
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install the role configuration updater
+  ansible.builtin.copy:
+    src: configure.py
+    dest: /opt/inference-proxy/configure-role.py
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Update required configuration while retaining operator settings
+  ansible.builtin.command:
+    argv:
+      - /opt/inference-proxy/venv/bin/python
+      - /opt/inference-proxy/configure-role.py
+      - /etc/inference-proxy/config.toml
+      - "{{ inference_proxy_release_path }}/config.example.toml"
+      - "{{ inference_proxy_region }}"
+      - "{{ inference_proxy_compartment_id }}"
+      - "{{ inference_proxy_port | string }}"
+  register: inference_proxy_configuration_update
+  changed_when: (inference_proxy_configuration_update.stdout | from_json).changed
+  no_log: true
+  notify: Restart inference-proxy
+
+- name: Protect service configuration
+  ansible.builtin.file:
+    path: /etc/inference-proxy/config.toml
+    owner: root
+    group: inference-proxy
+    mode: '0640'
+
+- name: Generate pepper only on first installation
+  ansible.builtin.shell: |
+    set -eu
+    umask 0077
+    /opt/inference-proxy/venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(48))' > /etc/inference-proxy/pepper
+  args:
+    creates: /etc/inference-proxy/pepper
+  no_log: true
+
+- name: Protect the retained pepper
+  ansible.builtin.file:
+    path: /etc/inference-proxy/pepper
+    owner: root
+    group: inference-proxy
+    mode: '0640'
+
+- name: Install upstream systemd units
+  ansible.builtin.copy:
+    src: "{{ inference_proxy_release_path }}/systemd/{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0644'
+  loop: [inference-proxy.service, inference-proxy-purge.service, inference-proxy-purge.timer]
+  notify: Restart inference-proxy
+
+- name: Validate configuration without calling OCI
+  ansible.builtin.command:
+    argv: [/opt/inference-proxy/venv/bin/inference-proxy-check]
+  changed_when: false
+
+- name: Validate local state as the service account without calling OCI
+  ansible.builtin.command:
+    argv: [/opt/inference-proxy/venv/bin/inference-proxy-admin, doctor]
+  become: true
+  become_user: inference-proxy
+  environment:
+    INFERENCE_PROXY_ADMIN_ALLOW_NONROOT: '1'
+    INFERENCE_PROXY_CONFIG: /etc/inference-proxy/config.toml
+  changed_when: false
+
+- name: Enable and start the service and metering purge timer
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    daemon_reload: true
+    enabled: true
+    state: started
+  loop: [inference-proxy.service, inference-proxy-purge.timer]
+
+- name: Apply required service changes
+  ansible.builtin.meta: flush_handlers
+
+- name: Require local database and listener readiness
+  ansible.builtin.command:
+    argv:
+      - /opt/inference-proxy/venv/bin/inference-proxy-check
+      - --wait-ready
+      - "{{ inference_proxy_health_timeout | string }}"
+  changed_when: false
+
+- name: Read the service process identity after local readiness
+  ansible.builtin.command:
+    argv: [systemctl, show, inference-proxy.service, --property=MainPID, --value]
+  register: inference_proxy_main_pid
+  changed_when: false
+
+- name: Inspect the installed service listener
+  ansible.builtin.command:
+    argv: [ss, -H, -ltnp, 'sport = :{{ inference_proxy_port }}']
+  register: inference_proxy_listener
+  changed_when: false
+
+- name: Require the configured loopback socket to belong to this service
+  ansible.builtin.assert:
+    that:
+      - inference_proxy_main_pid.stdout | trim | int > 0
+      - inference_proxy_listener.stdout_lines | length == 1
+      - "('127.0.0.1:' ~ inference_proxy_port | string) in inference_proxy_listener.stdout"
+      - "('pid=' ~ inference_proxy_main_pid.stdout | trim ~ ',') in inference_proxy_listener.stdout"
+    fail_msg: The expected loopback listener must be owned by inference-proxy.service.
+
+- name: Record the successfully installed artifact fingerprint
+  ansible.builtin.copy:
+    content: "{{ inference_proxy_source_sha256 }}\n"
+    dest: /opt/inference-proxy/.installed-artifact
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Report installation separately from upstream authorization
+  ansible.builtin.debug:
+    msg: >-
+      Inference Proxy installed on 127.0.0.1:{{ inference_proxy_port }}.
+      Local readiness passed; OCI access is not verified. Configure the
+      instance-principal dynamic group and model-compartment policies in OCI,
+      then verify authenticated discovery and an approved bounded inference call.
+      This role creates no IAM resources, agent keys, or public ingress.

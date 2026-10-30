@@ -45,6 +45,10 @@ from app.services.catalog import get_template, list_templates, validate_template
 from app.services.capability_catalog import discover_capability_catalog
 from app.services.capability_execution import CapabilityRoleApplyPlanValidationError
 from app.services.capability_lock_rendering import render_capability_lock
+from app.services.inference_proxy_status import (
+    InferenceProxyStatusError, get_inference_proxy_status, start_inference_proxy_status,
+    recover_interrupted_inference_proxy_status,
+)
 from app.services.capability_reconciliation import (
     CapabilityReconciliationValidationError,
     assert_capability_reconciliation_idle,
@@ -439,6 +443,7 @@ def create_app(config_object: type[Config] | None = None) -> BarraganFastAPI:
                     task, name="barragan-mixed-append-apply-recovery",
                 ),
             )
+        recover_interrupted_inference_proxy_status()
         recover_interrupted_capability_reconciliations()
         recover_interrupted_capability_applies()
         recover_interrupted_inbound_channel_batches()
@@ -1672,6 +1677,30 @@ def create_app(config_object: type[Config] | None = None) -> BarraganFastAPI:
             if result is None:
                 raise HTTPException(status_code=404, detail="engagement not found")
             return {"capabilities": result}
+
+    @app.get("/api/engagements/{engagement_id}/capabilities/inference-proxy/status")
+    def engagements_inference_proxy_status(engagement_id: str) -> Any:
+        with _storage_context(app):
+            result = get_inference_proxy_status(
+                engagement_id, root=Path(getattr(app.state.config, "ENGAGEMENT_REPOS_ROOT", "/opt/engagements")),
+            )
+            if result is None:
+                raise HTTPException(status_code=404, detail="engagement not found")
+            return {"inferenceProxyStatus": result}
+
+    @app.post("/api/engagements/{engagement_id}/capabilities/inference-proxy/status")
+    async def engagements_inference_proxy_status_start(engagement_id: str, request: Request) -> Any:
+        body = await _json_body(request)
+        with _storage_context(app):
+            try:
+                result = start_inference_proxy_status(
+                    engagement_id, body, root=Path(getattr(app.state.config, "ENGAGEMENT_REPOS_ROOT", "/opt/engagements")),
+                )
+            except (InferenceProxyStatusError, EngagementWorkspaceValidationError, ValueError) as exc:
+                return JSONResponse({"errors": getattr(exc, "errors", ["Current status inputs are unavailable; reload and retry."])}, status_code=400)
+            if result is None:
+                raise HTTPException(status_code=404, detail="engagement not found")
+            return JSONResponse({"inferenceProxyStatus": result}, status_code=202)
 
     @app.get("/api/engagements/{engagement_id}/capabilities/reconciliation")
     def engagements_capabilities_reconciliation_show(engagement_id: str) -> Any:
