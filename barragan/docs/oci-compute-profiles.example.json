@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "profiles": {
+    "standard-rti": {
+      "templateId": "standard-rti",
+      "homebase": {"shape": "BM.Standard3.64", "ocpus": 64, "memoryInGbs": 1024},
+      "proxy": {"shape": "VM.Standard.E4.Flex", "ocpus": 2, "memoryInGbs": 32},
+      "elk": {"shape": "VM.Standard.E4.Flex", "ocpus": 2, "memoryInGbs": 32},
+      "bootVolumeSizeInGbs": 512
+    },
+    "dev-infra": {
+      "templateId": "dev-infra",
+      "homebase": {"shape": "VM.Standard.E4.Flex", "ocpus": 16, "memoryInGbs": 512},
+      "proxy": {"shape": "VM.Standard.E4.Flex", "ocpus": 2, "memoryInGbs": 32},
+      "elk": {"shape": "VM.Standard.E4.Flex", "ocpus": 2, "memoryInGbs": 32},
+      "bootVolumeSizeInGbs": 512
+    },
+    "small-dev-infra": {
+      "templateId": "small-dev-infra",
+      "homebase": {"shape": "VM.Standard.E4.Flex", "ocpus": 4, "memoryInGbs": 64},
+      "proxy": {"shape": "VM.Standard.E4.Flex", "ocpus": 1, "memoryInGbs": 8},
+      "elk": {"shape": "VM.Standard.E4.Flex", "ocpus": 1, "memoryInGbs": 8},
+      "bootVolumeSizeInGbs": 128
+    }
+  }
+}

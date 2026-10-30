@@ -1,0 +1,20 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+[Unit]
+Description=Barragan dev/test Vite frontend
+After=network-online.target barragan-api-devtest.service
+Wants=barragan-api-devtest.service
+
+[Service]
+EnvironmentFile=-/etc/barragan/barragan.env
+Type=simple
+User=barragan
+Group=barragan
+WorkingDirectory=/opt/redteam-infra/barragan/frontend
+Environment=VITE_API_BASE_URL=
+Environment=VITE_DEV_API_TARGET=http://127.0.0.1:5001
+ExecStart=/usr/bin/env npm run dev -- --port 5174
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

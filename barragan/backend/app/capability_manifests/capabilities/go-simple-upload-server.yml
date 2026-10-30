@@ -1,0 +1,39 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+apiVersion: barragan/v1
+kind: AnsibleCapability
+metadata:
+  id: go-simple-upload-server
+  name: Go Simple Upload Server
+  category: homebase/file-transfer
+  description: Install and run Go Simple Upload Server on homebase using the stock Red Team Infrastructure role.
+implementation:
+  type: role
+  role: go_simple_upload_server
+  path: ansible/roles/go_simple_upload_server
+placement:
+  allowedHostClasses:
+    - homebase
+classification: optional
+profiles:
+  standard-rti:
+    classification: optional
+operator:
+  visible: true
+  selectable: true
+lifecycle:
+  apply: supported
+  remove: manual
+  managedBy: redteam-infra
+integration:
+  inboundHttpBackend:
+    hostClass: homebase
+    port: 9999
+    maxRequestBodyBytes: 500000000
+    authorization:
+      headerName: Authorization
+      scheme: Bearer
+      source:
+        type: json-file
+        path: /etc/go-simple-upload-server/config.json
+        arrayField: read_write_tokens
+        index: 0

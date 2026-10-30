@@ -1,0 +1,734 @@
+{
+  "applyable": true,
+  "complete": true,
+  "errored": false,
+  "format_version": "1.2",
+  "prior_state": {
+    "values": {
+      "outputs": {},
+      "root_module": {}
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "digitalocean_droplet.edge[\"nyc3-01\"]",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "backup_policy": [],
+          "backups": false,
+          "droplet_agent": null,
+          "gpu_partition_mode": null,
+          "graceful_shutdown": false,
+          "image": "ubuntu-22-04-x64",
+          "ipv6": false,
+          "monitoring": false,
+          "name": "edge-e7c9a4d2-nyc3-01",
+          "region": "nyc3",
+          "resize_disk": true,
+          "size": "s-1vcpu-1gb",
+          "tags": [
+            "a3d9c7e1f4b6"
+          ],
+          "timeouts": null,
+          "user_data": null
+        },
+        "after_sensitive": {
+          "backup_policy": [],
+          "ssh_keys": [],
+          "tags": [
+            false
+          ],
+          "volume_ids": []
+        },
+        "after_unknown": {
+          "backup_policy": [],
+          "created_at": true,
+          "disk": true,
+          "id": true,
+          "ipv4_address": true,
+          "ipv4_address_private": true,
+          "ipv6_address": true,
+          "locked": true,
+          "memory": true,
+          "price_hourly": true,
+          "price_monthly": true,
+          "private_networking": true,
+          "public_networking": true,
+          "ssh_keys": true,
+          "status": true,
+          "tags": [
+            false
+          ],
+          "urn": true,
+          "vcpus": true,
+          "volume_ids": true,
+          "vpc_uuid": true
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "index": "nyc3-01",
+      "mode": "managed",
+      "name": "edge",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_droplet"
+    },
+    {
+      "address": "digitalocean_droplet.edge[\"sfo3-01\"]",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "backup_policy": [],
+          "backups": false,
+          "droplet_agent": null,
+          "gpu_partition_mode": null,
+          "graceful_shutdown": false,
+          "image": "ubuntu-22-04-x64",
+          "ipv6": false,
+          "monitoring": false,
+          "name": "edge-e7c9a4d2-sfo3-01",
+          "region": "sfo3",
+          "resize_disk": true,
+          "size": "s-1vcpu-1gb",
+          "tags": [
+            "a3d9c7e1f4b6"
+          ],
+          "timeouts": null,
+          "user_data": null
+        },
+        "after_sensitive": {
+          "backup_policy": [],
+          "ssh_keys": [],
+          "tags": [
+            false
+          ],
+          "volume_ids": []
+        },
+        "after_unknown": {
+          "backup_policy": [],
+          "created_at": true,
+          "disk": true,
+          "id": true,
+          "ipv4_address": true,
+          "ipv4_address_private": true,
+          "ipv6_address": true,
+          "locked": true,
+          "memory": true,
+          "price_hourly": true,
+          "price_monthly": true,
+          "private_networking": true,
+          "public_networking": true,
+          "ssh_keys": true,
+          "status": true,
+          "tags": [
+            false
+          ],
+          "urn": true,
+          "vcpus": true,
+          "volume_ids": true,
+          "vpc_uuid": true
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "index": "sfo3-01",
+      "mode": "managed",
+      "name": "edge",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_droplet"
+    },
+    {
+      "address": "digitalocean_droplet.middle[\"primary\"]",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "backup_policy": [],
+          "backups": false,
+          "droplet_agent": null,
+          "gpu_partition_mode": null,
+          "graceful_shutdown": false,
+          "image": "ubuntu-22-04-x64",
+          "ipv6": false,
+          "monitoring": false,
+          "name": "middle01-e7c9a4d2",
+          "region": "nyc3",
+          "resize_disk": true,
+          "size": "s-1vcpu-1gb",
+          "tags": [
+            "a3d9c7e1f4b6"
+          ],
+          "timeouts": null,
+          "user_data": null
+        },
+        "after_sensitive": {
+          "backup_policy": [],
+          "ssh_keys": [],
+          "tags": [
+            false
+          ],
+          "volume_ids": []
+        },
+        "after_unknown": {
+          "backup_policy": [],
+          "created_at": true,
+          "disk": true,
+          "id": true,
+          "ipv4_address": true,
+          "ipv4_address_private": true,
+          "ipv6_address": true,
+          "locked": true,
+          "memory": true,
+          "price_hourly": true,
+          "price_monthly": true,
+          "private_networking": true,
+          "public_networking": true,
+          "ssh_keys": true,
+          "status": true,
+          "tags": [
+            false
+          ],
+          "urn": true,
+          "vcpus": true,
+          "volume_ids": true,
+          "vpc_uuid": true
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "index": "primary",
+      "mode": "managed",
+      "name": "middle",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_droplet"
+    },
+    {
+      "address": "digitalocean_droplet.middle[\"secondary\"]",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "backup_policy": [],
+          "backups": false,
+          "droplet_agent": null,
+          "gpu_partition_mode": null,
+          "graceful_shutdown": false,
+          "image": "ubuntu-22-04-x64",
+          "ipv6": false,
+          "monitoring": false,
+          "name": "middle02-e7c9a4d2",
+          "region": "sfo3",
+          "resize_disk": true,
+          "size": "s-1vcpu-1gb",
+          "tags": [
+            "a3d9c7e1f4b6"
+          ],
+          "timeouts": null,
+          "user_data": null
+        },
+        "after_sensitive": {
+          "backup_policy": [],
+          "ssh_keys": [],
+          "tags": [
+            false
+          ],
+          "volume_ids": []
+        },
+        "after_unknown": {
+          "backup_policy": [],
+          "created_at": true,
+          "disk": true,
+          "id": true,
+          "ipv4_address": true,
+          "ipv4_address_private": true,
+          "ipv6_address": true,
+          "locked": true,
+          "memory": true,
+          "price_hourly": true,
+          "price_monthly": true,
+          "private_networking": true,
+          "public_networking": true,
+          "ssh_keys": true,
+          "status": true,
+          "tags": [
+            false
+          ],
+          "urn": true,
+          "vcpus": true,
+          "volume_ids": true,
+          "vpc_uuid": true
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "index": "secondary",
+      "mode": "managed",
+      "name": "middle",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_droplet"
+    },
+    {
+      "address": "digitalocean_firewall.firewall",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "droplet_ids": null,
+          "inbound_rule": [
+            {
+              "action": "allow",
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "action": "allow",
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "action": "allow",
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "action": "allow",
+              "port_range": "22",
+              "protocol": "tcp",
+              "source_addresses": [
+                "192.0.2.10/32"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "action": "allow",
+              "port_range": "2222",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "action": "allow",
+              "port_range": "443",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "action": "allow",
+              "port_range": "80",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "name": "e7c9a4d2-firewall",
+          "outbound_rule": [
+            {
+              "action": "allow",
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "",
+              "protocol": "icmp"
+            },
+            {
+              "action": "allow",
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "action": "allow",
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            }
+          ],
+          "tags": [
+            "a3d9c7e1f4b6"
+          ]
+        },
+        "after_sensitive": {
+          "inbound_rule": [
+            {
+              "source_addresses": [],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            }
+          ],
+          "pending_changes": [],
+          "tags": [
+            false
+          ]
+        },
+        "after_unknown": {
+          "created_at": true,
+          "id": true,
+          "inbound_rule": [
+            {
+              "source_addresses": true,
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": true,
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": true,
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            }
+          ],
+          "pending_changes": true,
+          "status": true,
+          "tags": [
+            false
+          ]
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "mode": "managed",
+      "name": "firewall",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_firewall"
+    },
+    {
+      "address": "digitalocean_ssh_key.key",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "do-key",
+          "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFixture",
+          "timeouts": null
+        },
+        "after_sensitive": {},
+        "after_unknown": {
+          "fingerprint": true,
+          "id": true
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "mode": "managed",
+      "name": "key",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_ssh_key"
+    },
+    {
+      "address": "local_file.ansible_inventory[0]",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "content": "two-chain inventory fixture",
+          "content_base64": null,
+          "directory_permission": "0777",
+          "file_permission": "0600",
+          "filename": "inventory.ini",
+          "sensitive_content": null,
+          "source": null
+        },
+        "after_sensitive": {
+          "sensitive_content": true
+        },
+        "after_unknown": {
+          "content_base64sha256": true,
+          "content_base64sha512": true,
+          "content_md5": true,
+          "content_sha1": true,
+          "content_sha256": true,
+          "content_sha512": true,
+          "id": true
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "index": 0,
+      "mode": "managed",
+      "name": "ansible_inventory",
+      "provider_name": "registry.terraform.io/hashicorp/local",
+      "type": "local_file"
+    },
+    {
+      "address": "local_file.ssh_stanza[0]",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "content_base64": null,
+          "directory_permission": "0777",
+          "file_permission": "0600",
+          "filename": "/tmp/opaque-sketch",
+          "sensitive_content": null,
+          "source": null
+        },
+        "after_sensitive": {
+          "sensitive_content": true
+        },
+        "after_unknown": {
+          "content": true,
+          "content_base64sha256": true,
+          "content_base64sha512": true,
+          "content_md5": true,
+          "content_sha1": true,
+          "content_sha256": true,
+          "content_sha512": true,
+          "id": true
+        },
+        "before": null,
+        "before_sensitive": false
+      },
+      "index": 0,
+      "mode": "managed",
+      "name": "ssh_stanza",
+      "provider_name": "registry.terraform.io/hashicorp/local",
+      "type": "local_file"
+    }
+  ],
+  "terraform_version": "1.15.5",
+  "variables": {
+    "edge_groups": {
+      "value": {
+        "nyc3-01": {
+          "middle_node": "primary",
+          "ordinals": [
+            1
+          ],
+          "region": "nyc3"
+        },
+        "sfo3-01": {
+          "middle_node": "secondary",
+          "ordinals": [
+            1
+          ],
+          "region": "sfo3"
+        }
+      }
+    },
+    "middles": {
+      "value": {
+        "primary": {
+          "ordinal": 1,
+          "region": "nyc3"
+        },
+        "secondary": {
+          "ordinal": 2,
+          "region": "sfo3"
+        }
+      }
+    }
+  }
+}

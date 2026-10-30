@@ -1,0 +1,12 @@
+[all:vars]
+infra_user=ubuntu
+ansible_connection=ssh
+ansible_ssh_user=root
+ansible_ssh_host_key_checking=no
+ansible_ssh_common_args=-o UserKnownHostsFile=/dev/null -o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /tmp/admin-private -W %h:%p {{ infra_user }}@homebase-opaque'
+
+[middle]
+middle01-opaque
+
+[edge]
+edge-opaque-sfo3-01

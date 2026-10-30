@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/usr/bin/ss",
+    "-H",
+    "-lntuap"
+  ],
+  "version": "ss utility, iproute2-5.15.0",
+  "scope": "temporary IPv4 loopback sockets only; no managed engagement contacts",
+  "provenance": "Captured from temporary IPv4 loopback Python sockets; shutdown(SHUT_WR), then close client while accepted server stays open; all sockets closed in finally.",
+  "rows": [
+    "tcp CLOSE-WAIT 0      0      127.0.0.1:36285 127.0.0.1:54244 users:((\"python3\",pid=923909,fd=5))\n",
+    "tcp FIN-WAIT-2 0      0      127.0.0.1:54244 127.0.0.1:36285 users:((\"python3\",pid=923909,fd=4))\n",
+    "tcp FIN-WAIT-2 0      0      127.0.0.1:54244 127.0.0.1:36285                                    \n",
+    "tcp TIME-WAIT 0      0      127.0.0.1:54244 127.0.0.1:36285                                    \n"
+  ]
+}
