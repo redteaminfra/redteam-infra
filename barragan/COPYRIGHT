@@ -1,0 +1,10 @@
+Copyright (c) 2026, Oracle and/or its affiliates.
+
+This notice applies to first-party Barragan source, tests, configuration and
+documentation, including files whose formats do not support comments. Barragan
+is licensed under the Apache License, Version 2.0; see LICENSE-2.0.txt.
+
+Existing third-party copyright, license and attribution notices remain in
+effect. This notice does not replace them or claim ownership of third-party
+material, dependencies, generated dependency lockfiles or captured provider
+data. In particular, spec/ssh retains its upstream license and attribution.

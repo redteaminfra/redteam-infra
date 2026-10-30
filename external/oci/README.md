@@ -30,19 +30,36 @@ ad_number      = "1"
 # The engagement's name, infrastructure will be named after this
 engagement_name = ""
 
-# define the shape for homebase
-homebase_shape = "VM.Standard2.1"
-# define the shape for proxies
-proxy_shape    = "VM.Standard2.1"
-proxy_count    = 2
-# define the shape for elk
-elk_shape      = "VM.Standard2.1"
+# Standard RTI production homebase. Set is_production=false for Dev Infra.
+is_production             = true
+production_homebase_shape = "BM.Standard3.64"
+homebase_shape            = "VM.Standard.E4.Flex"
+homebase_ocpus            = 16
+homebase_memory_in_gbs    = 512
+
+# Production-capable proxy containers.
+proxy_shape         = "VM.Standard.E4.Flex"
+proxy_ocpus         = 2
+proxy_memory_in_gbs = 32
+proxy_count         = 2
+
+# Optional ELK capacity.
+elk_shape         = "VM.Standard.E4.Flex"
+elk_ocpus         = 2
+elk_memory_in_gbs = 32
+
+boot_volume_size_in_gbs = 512
 
 # Set to IP's and/or IP ranges you would like to have SSH access to the infrastructure
 # Each item in range should be an address range in cidr formate
 # e.g. ssh_allowed_cidr_ranges = ["192.168.32.0/25", "172.16.0.0/16"]
 ssh_allowed_cidr_ranges = []
 ```
+
+Flex shapes require both the matching OCPU and memory variables. Fixed shapes
+continue to use only the shape name. When `is_production` is true, homebase uses
+`production_homebase_shape` and does not render a Flex `shape_config`; proxy and
+ELK sizing remains independently configurable.
 
 ## Spin up Instances
 

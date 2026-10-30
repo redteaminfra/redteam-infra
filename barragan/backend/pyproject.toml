@@ -1,0 +1,40 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+[project]
+name = "barragan-backend"
+version = "0.1.0"
+description = "Barragan API"
+requires-python = ">=3.10"
+dependencies = [
+  "SQLAlchemy>=2.0,<3",
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+  "cryptography>=42,<46",
+  "certbot>=4,<6",
+  "dnspython>=2.6,<3",
+  "argon2-cffi>=23.1,<26",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "httpx2>=2,<3",
+]
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+app = [
+  "provider_contracts/sketch/manifest.json",
+  "provider_contracts/sketch/digitalocean/.terraform.lock.hcl",
+  "provider_contracts/sketch/linode/.terraform.lock.hcl",
+  "provider_contracts/sketch/projections/no-op/digitalocean-edge.terraform-show.json",
+  "provider_contracts/sketch/projections/no-op/linode-middle.terraform-show.json",
+  "provider_contracts/sketch/projections/remove/digitalocean-edge.terraform-show.json",
+  "provider_contracts/sketch/projections/remove/linode-middle.terraform-show.json",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

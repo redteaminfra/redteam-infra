@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2026, Oracle and/or its affiliates.
 
 resource "oci_core_instance" "elk" {
   depends_on          = [oci_core_instance.homebase]
@@ -7,6 +7,14 @@ resource "oci_core_instance" "elk" {
   display_name        = "elk-${var.engagement_name}"
   shape               = var.elk_shape
   freeform_tags       = local.tags
+
+  dynamic "shape_config" {
+    for_each = can(regex("Flex", var.elk_shape)) && var.elk_ocpus != null && var.elk_memory_in_gbs != null ? [1] : []
+    content {
+      ocpus         = var.elk_ocpus
+      memory_in_gbs = var.elk_memory_in_gbs
+    }
+  }
 
   instance_options {
     are_legacy_imds_endpoints_disabled = true
@@ -19,7 +27,7 @@ resource "oci_core_instance" "elk" {
   }
 
   create_vnic_details {
-    subnet_id      = oci_core_subnet.utility.id
+    subnet_id = oci_core_subnet.utility.id
 
     private_ip       = cidrhost(var.subnet_cidr_blocks["utility"], 13)
     assign_public_ip = false
@@ -39,4 +47,14 @@ resource "oci_core_instance" "elk" {
   }
 
   preserve_boot_volume = var.preserve_boot_volume
+
+  lifecycle {
+    precondition {
+      condition = (
+        !can(regex("Flex", var.elk_shape)) ||
+        (var.elk_ocpus != null && var.elk_memory_in_gbs != null)
+      )
+      error_message = "Flex ELK shapes require elk_ocpus and elk_memory_in_gbs."
+    }
+  }
 }

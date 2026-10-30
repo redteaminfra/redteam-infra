@@ -150,8 +150,8 @@ The differences in the new json data and the puppet json are as follows:
 Is this is what you want, please copy the new json file to the puppet module and commit it:
 
 
-cp example.json /home/ttimzen/Documents/OCI/redTeam/infra/redteam-infra-internal/puppet/modules/sketchopsec/files/sketch.json
-cd to the /home/ttimzen/Documents/OCI/redTeam/infra/redteam-infra-internal/puppet/modules/sketchopsec/files/sketch.json directory
+cp example.json /path/to/redteam-infra/puppet/modules/sketchopsec/files/sketch.json
+cd to the /path/to/redteam-infra/puppet/modules/sketchopsec/files/sketch.json directory
 git commit -m 'new sketch config' sketch.json
 git push homebase-<ENGAGEMENT>:/var/lib/git/infra -f
 

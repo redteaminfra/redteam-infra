@@ -1,6 +1,63 @@
 ---
+# Copyright (c) 2026, Oracle and/or its affiliates.
 # tasks file for keepassxc
 - name: Install KeepassXC
-  apt:
-    name: keepassxc
+  ansible.builtin.apt:
+    name:
+      - keepassxc
+      - openssl
     state: present
+
+- name: Check the shared engagement directory
+  ansible.builtin.stat:
+    path: /engagement
+  register: keepassxc_engagement_directory
+
+- name: Require the Homebase engagement directory
+  ansible.builtin.assert:
+    that:
+      - keepassxc_engagement_directory.stat.exists
+      - keepassxc_engagement_directory.stat.isdir
+      - keepassxc_engagement_directory.stat.pw_name == 'root'
+      - keepassxc_engagement_directory.stat.gr_name == 'redteam'
+    fail_msg: >-
+      keepassxc requires the root:redteam /engagement directory created by the
+      Homebase role.
+
+- name: Check shared KeePass files
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - "{{ keepassxc_database_path }}"
+    - "{{ keepassxc_password_path }}"
+  register: keepassxc_files
+
+- name: Require both shared KeePass files or neither
+  ansible.builtin.assert:
+    that:
+      - >-
+        (keepassxc_files.results[0].stat.exists and keepassxc_files.results[1].stat.exists)
+        or
+        (not keepassxc_files.results[0].stat.exists and not keepassxc_files.results[1].stat.exists)
+    fail_msg: >-
+      Refusing to create a KeePass database when only one of the database or
+      password file exists.
+
+- name: Create shared KeePass database and password
+  ansible.builtin.shell: |
+    set -euo pipefail
+    password_file="$(mktemp /engagement/.keepass.txt.XXXXXX)"
+    trap 'rm -f "$password_file"' EXIT
+    openssl rand -base64 48 > "$password_file"
+    chown root:redteam "$password_file"
+    chmod 0640 "$password_file"
+    password="$(cat "$password_file")"
+    printf '%s\n%s\n' "$password" "$password" | keepassxc-cli db-create --set-password "{{ keepassxc_database_path }}"
+    chown root:redteam "{{ keepassxc_database_path }}"
+    chmod 0660 "{{ keepassxc_database_path }}"
+    mv "$password_file" "{{ keepassxc_password_path }}"
+    trap - EXIT
+  args:
+    executable: /bin/bash
+    creates: "{{ keepassxc_database_path }}"
+  no_log: true

@@ -1,0 +1,14 @@
+{# Copyright (c) 2026, Oracle and/or its affiliates. #}
+{{ {
+  'addr': go_simple_upload_server_bind_address,
+  'document_root': go_simple_upload_server_root_directory,
+  'enable_cors': false,
+  'max_upload_size': go_simple_upload_server_max_upload_size_bytes | int,
+  'file_naming_strategy': go_simple_upload_server_file_naming_strategy,
+  'shutdown_timeout': go_simple_upload_server_shutdown_timeout_milliseconds | int,
+  'enable_auth': go_simple_upload_server_enable_auth | bool,
+  'read_only_tokens': [],
+  'read_write_tokens': ([go_simple_upload_server_effective_token] if go_simple_upload_server_enable_auth | bool else []),
+  'read_timeout': go_simple_upload_server_read_timeout_seconds | int,
+  'write_timeout': go_simple_upload_server_write_timeout_seconds | int
+} | to_nice_json }}

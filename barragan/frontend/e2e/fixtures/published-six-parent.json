@@ -1,0 +1,390 @@
+{
+  "id": "job-provider-keyed-mixed-published-cleanup-core",
+  "status": "queued",
+  "targetType": "engagement",
+  "targetId": "eng-test",
+  "input": {
+    "sourceKind": "published-six-node-v1",
+    "publishedSource": {
+      "six_node_source": {
+        "parent_id": "job-provider-keyed-mixed-append-core",
+        "engagement_id": "eng-test",
+        "core_job_id": "job-core",
+        "core_plan_id": "plan-core",
+        "provider_order": [
+          "linode",
+          "digitalocean"
+        ],
+        "chain_ids": [
+          "chain-d",
+          "chain-l"
+        ],
+        "before_chains": [
+          {
+            "chain_id": "chain-d",
+            "engagement_id": "eng-test",
+            "assigned_proxy": "proxy02",
+            "middle_provider": "digitalocean",
+            "middle_region": "test-1",
+            "middle_size": "small",
+            "edge_provider": "digitalocean",
+            "edge_region": "test-1",
+            "edge_size": "small",
+            "status": "deployed",
+            "burned": false,
+            "burned_note": "",
+            "deploy_job_id": "job-core",
+            "teardown_job_id": "",
+            "terraform_working_directory": "/example-fixture/linode",
+            "nodes": [
+              {
+                "chainId": "chain-d",
+                "role": "middle",
+                "provider": "digitalocean",
+                "hostname": "middle-41",
+                "terraformAddress": "digitalocean_droplet.middle[\"41\"]",
+                "providerInstanceId": "41",
+                "publicIp": "192.0.2.41",
+                "region": "test-1",
+                "assignedProxy": "proxy02",
+                "edgeCount": "1",
+                "componentId": "middle"
+              },
+              {
+                "chainId": "chain-d",
+                "role": "edge",
+                "provider": "digitalocean",
+                "hostname": "edge-41",
+                "terraformAddress": "digitalocean_droplet.edge[\"41\"]",
+                "providerInstanceId": "51",
+                "publicIp": "192.0.2.51",
+                "region": "test-1",
+                "assignedProxy": "proxy02",
+                "edgeCount": "1",
+                "componentId": "edge-01"
+              }
+            ],
+            "created_at": "2026-10-27T04:55:54.810360",
+            "updated_at": "2026-10-27T04:55:54.810361",
+            "edge_count": 1,
+            "edge_intents": [
+              {
+                "id": "edge-01",
+                "provider": "digitalocean",
+                "region": "test-1",
+                "size": "small"
+              }
+            ]
+          },
+          {
+            "chain_id": "chain-l",
+            "engagement_id": "eng-test",
+            "assigned_proxy": "proxy01",
+            "middle_provider": "linode",
+            "middle_region": "test-1",
+            "middle_size": "small",
+            "edge_provider": "linode",
+            "edge_region": "test-1",
+            "edge_size": "small",
+            "status": "deployed",
+            "burned": false,
+            "burned_note": "",
+            "deploy_job_id": "job-core",
+            "teardown_job_id": "",
+            "terraform_working_directory": "/example-fixture/do",
+            "nodes": [
+              {
+                "chainId": "chain-l",
+                "role": "middle",
+                "provider": "linode",
+                "hostname": "middle-21",
+                "terraformAddress": "linode_instance.middle[\"21\"]",
+                "providerInstanceId": "21",
+                "publicIp": "192.0.2.21",
+                "region": "test-1",
+                "assignedProxy": "proxy01",
+                "edgeCount": "1",
+                "componentId": "middle"
+              },
+              {
+                "chainId": "chain-l",
+                "role": "edge",
+                "provider": "linode",
+                "hostname": "edge-21",
+                "terraformAddress": "linode_instance.edge[\"21\"]",
+                "providerInstanceId": "31",
+                "publicIp": "192.0.2.31",
+                "region": "test-1",
+                "assignedProxy": "proxy01",
+                "edgeCount": "1",
+                "componentId": "edge-01"
+              }
+            ],
+            "created_at": "2026-10-27T04:55:54.810817",
+            "updated_at": "2026-10-27T04:55:54.810818",
+            "edge_count": 1,
+            "edge_intents": [
+              {
+                "id": "edge-01",
+                "provider": "linode",
+                "region": "test-1",
+                "size": "small"
+              }
+            ]
+          }
+        ],
+        "chains": [
+          {
+            "chain_id": "chain-d",
+            "engagement_id": "eng-test",
+            "assigned_proxy": "proxy02",
+            "middle_provider": "digitalocean",
+            "middle_region": "test-1",
+            "middle_size": "small",
+            "edge_provider": "digitalocean",
+            "edge_region": "test-1",
+            "edge_size": "small",
+            "status": "deployed",
+            "burned": false,
+            "burned_note": "",
+            "deploy_job_id": "job-core",
+            "teardown_job_id": "",
+            "terraform_working_directory": "/example-fixture/linode",
+            "nodes": [
+              {
+                "chainId": "chain-d",
+                "role": "middle",
+                "provider": "digitalocean",
+                "hostname": "middle-41",
+                "terraformAddress": "digitalocean_droplet.middle[\"41\"]",
+                "providerInstanceId": "41",
+                "publicIp": "192.0.2.41",
+                "region": "test-1",
+                "assignedProxy": "proxy02",
+                "edgeCount": "1",
+                "componentId": "middle"
+              },
+              {
+                "chainId": "chain-d",
+                "role": "edge",
+                "provider": "digitalocean",
+                "hostname": "edge-41",
+                "terraformAddress": "digitalocean_droplet.edge[\"41\"]",
+                "providerInstanceId": "51",
+                "publicIp": "192.0.2.51",
+                "region": "test-1",
+                "assignedProxy": "proxy02",
+                "edgeCount": "2",
+                "componentId": "edge-01"
+              },
+              {
+                "chainId": "chain-d",
+                "role": "edge",
+                "provider": "linode",
+                "hostname": "edge-new-1",
+                "terraformAddress": "linode_instance.edge[\"new-1\"]",
+                "providerInstanceId": "102",
+                "publicIp": "198.51.100.22",
+                "region": "test-2",
+                "assignedProxy": "proxy02",
+                "edgeCount": "2",
+                "componentId": "edge-02",
+                "edgeId": "edge-02",
+                "edgeIndex": "2",
+                "status": "deployed",
+                "proxy": "proxy02"
+              }
+            ],
+            "created_at": "2026-10-27T04:55:54.810360",
+            "updated_at": "2026-10-27T04:55:54.811014+00:00",
+            "edge_count": 2,
+            "edge_intents": [
+              {
+                "id": "edge-01",
+                "provider": "digitalocean",
+                "region": "test-1",
+                "size": "small"
+              },
+              {
+                "id": "edge-02",
+                "provider": "linode",
+                "region": "test-2",
+                "size": "small"
+              }
+            ]
+          },
+          {
+            "chain_id": "chain-l",
+            "engagement_id": "eng-test",
+            "assigned_proxy": "proxy01",
+            "middle_provider": "linode",
+            "middle_region": "test-1",
+            "middle_size": "small",
+            "edge_provider": "linode",
+            "edge_region": "test-1",
+            "edge_size": "small",
+            "status": "deployed",
+            "burned": false,
+            "burned_note": "",
+            "deploy_job_id": "job-core",
+            "teardown_job_id": "",
+            "terraform_working_directory": "/example-fixture/do",
+            "nodes": [
+              {
+                "chainId": "chain-l",
+                "role": "middle",
+                "provider": "linode",
+                "hostname": "middle-21",
+                "terraformAddress": "linode_instance.middle[\"21\"]",
+                "providerInstanceId": "21",
+                "publicIp": "192.0.2.21",
+                "region": "test-1",
+                "assignedProxy": "proxy01",
+                "edgeCount": "1",
+                "componentId": "middle"
+              },
+              {
+                "chainId": "chain-l",
+                "role": "edge",
+                "provider": "linode",
+                "hostname": "edge-21",
+                "terraformAddress": "linode_instance.edge[\"21\"]",
+                "providerInstanceId": "31",
+                "publicIp": "192.0.2.31",
+                "region": "test-1",
+                "assignedProxy": "proxy01",
+                "edgeCount": "2",
+                "componentId": "edge-01"
+              },
+              {
+                "chainId": "chain-l",
+                "role": "edge",
+                "provider": "digitalocean",
+                "hostname": "edge-new-0",
+                "terraformAddress": "digitalocean_droplet.edge[\"new-0\"]",
+                "providerInstanceId": "101",
+                "publicIp": "198.51.100.21",
+                "region": "test-2",
+                "assignedProxy": "proxy01",
+                "edgeCount": "2",
+                "componentId": "edge-02",
+                "edgeId": "edge-02",
+                "edgeIndex": "2",
+                "status": "deployed",
+                "proxy": "proxy01"
+              }
+            ],
+            "created_at": "2026-10-27T04:55:54.810817",
+            "updated_at": "2026-10-27T04:55:54.811021+00:00",
+            "edge_count": 2,
+            "edge_intents": [
+              {
+                "id": "edge-01",
+                "provider": "linode",
+                "region": "test-1",
+                "size": "small"
+              },
+              {
+                "id": "edge-02",
+                "provider": "digitalocean",
+                "region": "test-2",
+                "size": "small"
+              }
+            ]
+          }
+        ],
+        "new_edge_addresses": [
+          "linode_instance.edge[\"new-1\"]",
+          "digitalocean_droplet.edge[\"new-0\"]"
+        ],
+        "provider_proof_digests": [
+          "7f75b1666ecef4addd3300aaf14238c3cbb1479410d69c667d003f991f92d9ea",
+          "08b9a01fc8fb20c788abb2131087d1e8dfc0baf470376e149e0138efd7c9a380"
+        ],
+        "state_sha256s": [
+          "a1b212a6657f77e36cdc3eef6c456fa2f0ea18590a85b1f4806f44ca9dd13996",
+          "99abe85dbe260ebbb31af7c2983510e219c4e0c9c1ae4d738eaa0f1a83757e94"
+        ],
+        "workspace_paths": [
+          "/example-fixture/do",
+          "/example-fixture/linode"
+        ],
+        "source_revisions": [
+          "rev",
+          "rev"
+        ],
+        "proxy_egress_ips": [
+          "203.0.113.22",
+          "203.0.113.21"
+        ],
+        "core_known_hosts_path": "/example-fixture/core-known-hosts",
+        "core_known_hosts_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "parent_job_id": "job-provider-keyed-mixed-initial-core",
+      "provider_states": [
+        {
+          "provider": "linode",
+          "state_sha256": "a1b212a6657f77e36cdc3eef6c456fa2f0ea18590a85b1f4806f44ca9dd13996",
+          "lineage": "30884813-6e06-470b-aee9-ab9cc38a317e",
+          "serial": 2,
+          "resource_ids": [
+            [
+              "linode_firewall.firewall",
+              "shared-linode-1"
+            ],
+            [
+              "linode_instance.edge[\"21\"]",
+              "31"
+            ],
+            [
+              "linode_instance.edge[\"new-1\"]",
+              "102"
+            ],
+            [
+              "linode_instance.middle[\"21\"]",
+              "21"
+            ]
+          ],
+          "terminal_journal_sha256": "7f75b1666ecef4addd3300aaf14238c3cbb1479410d69c667d003f991f92d9ea"
+        },
+        {
+          "provider": "digitalocean",
+          "state_sha256": "99abe85dbe260ebbb31af7c2983510e219c4e0c9c1ae4d738eaa0f1a83757e94",
+          "lineage": "7e2d875c-9a4a-4dce-aaf2-dd55dcd598db",
+          "serial": 2,
+          "resource_ids": [
+            [
+              "digitalocean_droplet.edge[\"41\"]",
+              "51"
+            ],
+            [
+              "digitalocean_droplet.edge[\"new-0\"]",
+              "101"
+            ],
+            [
+              "digitalocean_droplet.middle[\"41\"]",
+              "41"
+            ],
+            [
+              "digitalocean_firewall.firewall",
+              "shared-digitalocean-1"
+            ],
+            [
+              "digitalocean_ssh_key.key",
+              "shared-digitalocean-2"
+            ]
+          ],
+          "terminal_journal_sha256": "08b9a01fc8fb20c788abb2131087d1e8dfc0baf470376e149e0138efd7c9a380"
+        }
+      ]
+    },
+    "engagementId": "eng-test",
+    "coreJobId": "job-core",
+    "corePlanId": "plan-core",
+    "publishedParentId": "job-provider-keyed-mixed-initial-core",
+    "orderedProviders": [
+      "linode",
+      "digitalocean"
+    ]
+  }
+}

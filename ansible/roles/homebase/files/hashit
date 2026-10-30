@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2026, Oracle and/or its affiliates.
 
 
 import sys
@@ -9,9 +9,10 @@ import datetime
 import hashlib
 
 def usage():
-    sys.stderr.write(f"usage: {sys.argv[0]} <file>\n")
+    sys.stderr.write(f"usage: {sys.argv[0]} <file 1> [file 2] ... [file n] \n")
     sys.stderr.write("\n")
-    sys.stderr.write("\t <file>: filename to hash\n")
+    sys.stderr.write("\t <file 1>: single filename to hash\n")
+    sys.stderr.write("\t [file n]: multiple files to hash\n")
     sys.stderr.write("\n")
     sys.exit(1)
 
@@ -41,12 +42,15 @@ def printIoC(filename, prefix):
 def main():
     if (len(sys.argv) < 2):
         usage()
-    ioc_file = sys.argv[1]
-    if not os.path.exists(ioc_file):
-        usage()
+    filenames = sys.argv[1:]
+    for filename in filenames:
+        if not os.path.exists(filename):
+            usage()
     print(f"hashit @ {datetime.datetime.now().isoformat()}")
-    print(f"[*] input: '{ioc_file}'")
-    printIoC(ioc_file, ioc_file)
+    for filename in filenames:
+        print(f"[*] input: '{filename}'")
+        printIoC(filename, filename)
+        print()
     print("Have a nice day!")
 
 if __name__ == "__main__":

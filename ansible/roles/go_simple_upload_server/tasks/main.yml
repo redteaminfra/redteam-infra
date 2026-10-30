@@ -1,0 +1,236 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Resolve the Go build architecture
+  ansible.builtin.set_fact:
+    go_simple_upload_server_go_arch: "{{ go_simple_upload_server_go_arch_map.get(ansible_architecture, '') }}"
+
+- name: Require a supported Go build architecture
+  ansible.builtin.assert:
+    that:
+      - go_simple_upload_server_go_arch | length > 0
+      - go_simple_upload_server_go_arch in go_simple_upload_server_go_checksums
+    fail_msg: "go-simple-upload-server supports x86_64/amd64 and aarch64/arm64 hosts"
+
+- name: Install source-build prerequisites
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - git
+    state: present
+    update_cache: true
+
+- name: Create the go-simple-upload-server system group
+  ansible.builtin.group:
+    name: go-simple-upload-server
+    system: true
+
+- name: Create the go-simple-upload-server system user
+  ansible.builtin.user:
+    name: go-simple-upload-server
+    group: go-simple-upload-server
+    home: "{{ go_simple_upload_server_root_directory }}"
+    create_home: false
+    shell: /usr/sbin/nologin
+    system: true
+
+- name: Create installation and configuration directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - path: "{{ go_simple_upload_server_install_root }}"
+      mode: "0755"
+    - path: "{{ go_simple_upload_server_config_directory }}"
+      # The service runs as this group and must traverse the directory to read
+      # its group-readable, token-bearing configuration file.
+      group: go-simple-upload-server
+      mode: "0750"
+    - path: "{{ go_simple_upload_server_install_root }}/toolchains"
+      mode: "0755"
+    - path: "{{ go_simple_upload_server_go_root }}"
+      mode: "0755"
+
+- name: Create the upload document root
+  ansible.builtin.file:
+    path: "{{ go_simple_upload_server_root_directory }}"
+    state: directory
+    owner: go-simple-upload-server
+    group: go-simple-upload-server
+    # GoSUS is the only writer. Local engagement users must be able to
+    # traverse the upload root and read the files that GoSUS creates.
+    mode: "0775"
+
+- name: Download the checksum-pinned Go build toolchain
+  ansible.builtin.get_url:
+    url: "https://go.dev/dl/go{{ go_simple_upload_server_go_version }}.linux-{{ go_simple_upload_server_go_arch }}.tar.gz"
+    dest: "/var/cache/go{{ go_simple_upload_server_go_version }}.linux-{{ go_simple_upload_server_go_arch }}.tar.gz"
+    checksum: "sha256:{{ go_simple_upload_server_go_checksums[go_simple_upload_server_go_arch] }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install the role-private Go build toolchain
+  ansible.builtin.unarchive:
+    src: "/var/cache/go{{ go_simple_upload_server_go_version }}.linux-{{ go_simple_upload_server_go_arch }}.tar.gz"
+    dest: "{{ go_simple_upload_server_go_root }}"
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+    creates: "{{ go_simple_upload_server_go_root }}/bin/go"
+
+- name: Check out the pinned Mayth source release
+  ansible.builtin.git:
+    repo: "{{ go_simple_upload_server_repository }}"
+    dest: "{{ go_simple_upload_server_source_directory }}"
+    version: "{{ go_simple_upload_server_version }}"
+    depth: 1
+  register: go_simple_upload_server_source_checkout
+
+- name: Inspect the installed binary
+  ansible.builtin.stat:
+    path: "{{ go_simple_upload_server_binary_path }}"
+  register: go_simple_upload_server_binary
+
+- name: Inspect the build fingerprint
+  ansible.builtin.stat:
+    path: "{{ go_simple_upload_server_install_root }}/.build-fingerprint"
+  register: go_simple_upload_server_build_fingerprint_file
+
+- name: Read the build fingerprint
+  ansible.builtin.slurp:
+    path: "{{ go_simple_upload_server_install_root }}/.build-fingerprint"
+  register: go_simple_upload_server_build_fingerprint_content
+  when: go_simple_upload_server_build_fingerprint_file.stat.exists
+
+- name: Determine whether the server must be rebuilt
+  ansible.builtin.set_fact:
+    go_simple_upload_server_expected_build_fingerprint: >-
+      {{
+        [
+          go_simple_upload_server_version,
+          'go' ~ go_simple_upload_server_go_version,
+          go_simple_upload_server_go_arch
+        ] | join(':')
+      }}
+    go_simple_upload_server_installed_build_fingerprint: >-
+      {{
+        (go_simple_upload_server_build_fingerprint_content.content | b64decode | trim)
+        if go_simple_upload_server_build_fingerprint_file.stat.exists
+        else ''
+      }}
+
+- name: Build mayth/go-simple-upload-server
+  ansible.builtin.command:
+    argv:
+      - "{{ go_simple_upload_server_go_root }}/bin/go"
+      - build
+      - -trimpath
+      - -ldflags=-s -w
+      - -o
+      - "{{ go_simple_upload_server_binary_path }}"
+      - .
+    chdir: "{{ go_simple_upload_server_source_directory }}"
+  environment:
+    CGO_ENABLED: "0"
+    GOTOOLCHAIN: local
+  changed_when: true
+  when: >-
+    go_simple_upload_server_source_checkout.changed
+    or not go_simple_upload_server_binary.stat.exists
+    or go_simple_upload_server_installed_build_fingerprint != go_simple_upload_server_expected_build_fingerprint
+  notify: Restart go-simple-upload-server
+
+- name: Record the successful build fingerprint
+  ansible.builtin.copy:
+    content: "{{ go_simple_upload_server_expected_build_fingerprint }}\n"
+    dest: "{{ go_simple_upload_server_install_root }}/.build-fingerprint"
+    owner: root
+    group: root
+    mode: "0644"
+  when: >-
+    go_simple_upload_server_source_checkout.changed
+    or not go_simple_upload_server_binary.stat.exists
+    or go_simple_upload_server_installed_build_fingerprint != go_simple_upload_server_expected_build_fingerprint
+
+- name: Set binary ownership and permissions
+  ansible.builtin.file:
+    path: "{{ go_simple_upload_server_binary_path }}"
+    state: file
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Restart go-simple-upload-server
+
+- name: Inspect the retained server configuration
+  ansible.builtin.stat:
+    path: "{{ go_simple_upload_server_config_path }}"
+  register: go_simple_upload_server_config_file
+
+- name: Read the retained server configuration
+  ansible.builtin.slurp:
+    path: "{{ go_simple_upload_server_config_path }}"
+  register: go_simple_upload_server_config_content
+  when: go_simple_upload_server_config_file.stat.exists
+  no_log: true
+
+- name: Load retained read-write tokens
+  ansible.builtin.set_fact:
+    go_simple_upload_server_retained_tokens: >-
+      {{
+        ((go_simple_upload_server_config_content.content | b64decode | from_json).get('read_write_tokens', []))
+        if go_simple_upload_server_config_file.stat.exists
+        else []
+      }}
+  no_log: true
+
+- name: Select or generate the retained backend token
+  ansible.builtin.set_fact:
+    go_simple_upload_server_effective_token: >-
+      {{
+        go_simple_upload_server_token
+        if go_simple_upload_server_token | trim | length > 0
+        else (
+          go_simple_upload_server_retained_tokens[0]
+          if go_simple_upload_server_retained_tokens | length > 0
+          else lookup('password', '/dev/null length=20 chars=ascii_letters,digits')
+        )
+      }}
+  no_log: true
+
+- name: Render the retained server configuration
+  ansible.builtin.template:
+    src: config.json.j2
+    dest: "{{ go_simple_upload_server_config_path }}"
+    owner: root
+    group: go-simple-upload-server
+    mode: "0640"
+  notify: Restart go-simple-upload-server
+  no_log: true
+
+- name: Install the go-simple-upload-server service unit
+  ansible.builtin.template:
+    src: go-simple-upload-server.service.j2
+    dest: /etc/systemd/system/go-simple-upload-server.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart go-simple-upload-server
+
+- name: Enable and start go-simple-upload-server
+  ansible.builtin.systemd:
+    name: go-simple-upload-server
+    daemon_reload: true
+    enabled: true
+    state: started
+
+- name: Apply pending go-simple-upload-server changes
+  ansible.builtin.meta: flush_handlers
+
+- name: Require the go-simple-upload-server listener after convergence
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ go_simple_upload_server_bind_address.rsplit(':', 1)[1] | int }}"
+    timeout: 30

@@ -1,0 +1,34 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+[Unit]
+Description=Barragan production FastAPI API
+After=network-online.target
+
+[Service]
+EnvironmentFile=-/etc/barragan/barragan.env
+Type=simple
+User=barragan
+Group=barragan
+WorkingDirectory=/opt/redteam-infra/barragan/backend
+Environment=PYTHONUNBUFFERED=1
+Environment=BARRAGAN_ENV=production
+Environment=BARRAGAN_HOST=127.0.0.1
+Environment=BARRAGAN_PORT=5002
+Environment=BARRAGAN_SERVE_FRONTEND=0
+Environment=BARRAGAN_START_SCHEDULERS=1
+Environment=BARRAGAN_AUTH_REQUIRED=1
+Environment=BARRAGAN_AUTH_SESSION_COOKIE_NAME=barragan_prod_session
+Environment=BARRAGAN_AUTH_COOKIE_SECURE=0
+Environment=BARRAGAN_DATA_DIR=/var/lib/barragan/data
+Environment=BARRAGAN_OCI_DEPLOYMENT_TARGETS_FILE=/var/lib/barragan/config/oci-deployment-targets.json
+Environment=BARRAGAN_OCI_COMPUTE_PROFILES_FILE=/var/lib/barragan/config/oci-compute-profiles.json
+Environment=BARRAGAN_PROVIDER_RECONCILIATION_LIVE=true
+Environment=BARRAGAN_CREDENTIAL_MASTER_KEY_FILE=/var/lib/barragan/secrets/credential-master.key
+Environment=BARRAGAN_VALIDATION_SSH_PRIVATE_KEY=/var/lib/barragan/.ssh/barragan_testing
+Environment=BARRAGAN_VALIDATION_SSH_PUBLIC_KEY=/var/lib/barragan/.ssh/barragan_testing.pub
+Environment=OCI_CLI_PATH=/var/lib/barragan/.local/bin/oci
+ExecStart=/opt/redteam-infra/barragan/backend/.venv/bin/uvicorn app.asgi:app --host 127.0.0.1 --port 5002
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

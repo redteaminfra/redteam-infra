@@ -95,3 +95,8 @@ This can probably be abbreviated, this is what I do.
     git push --force origin master
     git push --force homebase-opname:/var/lib/git/infra
     ```
+
+## Barragan control plane
+
+See [Barragan](barragan/README.md) for the optional control plane, installation
+configuration, and the separate pinned provider-template checkout.
