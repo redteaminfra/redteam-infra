@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026, Oracle and/or its affiliates.
+set -euo pipefail
+
+ROOT=${BARRAGAN_ROOT:-/opt/redteam-infra/barragan}
+PREFIX=${BARRAGAN_OPENRESTY_PREFIX:-/var/lib/barragan/openresty}
+CONFIG=${BARRAGAN_OPENRESTY_CONFIG:-${ROOT}/ops/openresty/barragan.conf}
+RUNTIME_CONFIG=${PREFIX}/run/barragan.conf
+
+mkdir -p "${PREFIX}/logs" "${PREFIX}/run" "${PREFIX}/client_body_temp" "${PREFIX}/proxy_temp" "${PREFIX}/fastcgi_temp" "${PREFIX}/uwsgi_temp" "${PREFIX}/scgi_temp"
+
+if [[ ! -e "${PREFIX}/mime.types" ]]; then
+  if [[ -f /etc/nginx/mime.types ]]; then
+    ln -sfn /etc/nginx/mime.types "${PREFIX}/mime.types"
+  elif [[ -f /usr/local/openresty/nginx/conf/mime.types ]]; then
+    ln -sfn /usr/local/openresty/nginx/conf/mime.types "${PREFIX}/mime.types"
+  fi
+fi
+
+if command -v openresty >/dev/null 2>&1; then
+  BIN=$(command -v openresty)
+elif command -v nginx >/dev/null 2>&1; then
+  BIN=$(command -v nginx)
+else
+  echo "Neither openresty nor nginx was found in PATH" >&2
+  exit 127
+fi
+
+if [[ ! -f "${CONFIG}" ]]; then
+  echo "OpenResty configuration template not found: ${CONFIG}" >&2
+  exit 1
+fi
+
+# The checked-in config is deliberately a template: an isolated production
+# release must serve its own built assets and proxy parameters, not whatever
+# happens to be in the canonical checkout under /opt.
+ROOT_FOR_SED=${ROOT//\\/\\\\}
+ROOT_FOR_SED=${ROOT_FOR_SED//&/\\&}
+ROOT_FOR_SED=${ROOT_FOR_SED//|/\\|}
+sed "s|__BARRAGAN_ROOT__|${ROOT_FOR_SED}|g" "${CONFIG}" > "${RUNTIME_CONFIG}"
+
+exec "${BIN}" -p "${PREFIX}" -c "${RUNTIME_CONFIG}" -g "daemon off;"

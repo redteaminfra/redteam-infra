@@ -1,0 +1,26 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+apiVersion: barragan/v1
+kind: AnsibleCapability
+metadata:
+  id: inference-proxy
+  name: Inference Proxy
+  category: homebase/ai
+  description: Install a loopback-only OCI inference gateway on Homebase with per-agent authentication and usage metering. Configure OCI policies separately.
+implementation:
+  type: role
+  role: inference_proxy
+  path: ansible/roles/inference_proxy
+placement:
+  allowedHostClasses:
+    - homebase
+classification: optional
+profiles:
+  standard-rti:
+    classification: optional
+operator:
+  visible: true
+  selectable: true
+lifecycle:
+  apply: supported
+  remove: manual
+  managedBy: redteam-infra

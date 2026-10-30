@@ -1,0 +1,297 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+- name: Validate explicit installation inputs before changes
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'Ubuntu'
+      - ansible_distribution_version == '24.04'
+      - ansible_architecture == 'x86_64'
+      - ansible_memtotal_mb | int >= 10240
+      - loottool_v2_source_archive is match('^/')
+      - loottool_v2_source_sha256 is match('^[0-9a-f]{64}$')
+      - loottool_v2_source_revision is match('^[0-9a-f]{40}$')
+      - loottool_v2_app_image is match('^([^\s]+@)?sha256:[0-9a-f]{64}$')
+      - not loottool_v2_app_image.startswith('sha256:') or loottool_v2_app_archive is match('^/')
+      - not loottool_v2_app_image.startswith('sha256:') or loottool_v2_app_archive_sha256 is match('^[0-9a-f]{64}$')
+      - not loottool_v2_app_image.startswith('sha256:') or loottool_v2_app_config_digest is match('^sha256:[0-9a-f]{64}$')
+      - loottool_v2_elasticsearch_image is match('^[^\s]+@sha256:[0-9a-f]{64}$')
+      - loottool_v2_python_image is match('^[^\s]+@sha256:[0-9a-f]{64}$')
+      - loottool_v2_evidence_scope is match('^[a-z0-9][a-z0-9_-]{0,62}$')
+      - loottool_v2_api_port | int >= 1024
+      - loottool_v2_api_port | int <= 65535
+      - loottool_v2_answer_port | int >= 1024
+      - loottool_v2_answer_port | int <= 65535
+      - loottool_v2_api_port | int != loottool_v2_answer_port | int
+      - loottool_v2_health_timeout | int > 0
+      - loottool_v2_health_timeout | int <= 900
+    fail_msg: LootTool requires qualified platform, immutable artifacts and valid private configuration.
+
+- name: Establish proposed configuration
+  ansible.builtin.set_fact:
+    loottool_v2_proposed:
+      LOOTTOOL_GIT_COMMIT: '{{ loottool_v2_source_revision }}'
+      LOOTTOOL_APP_IMAGE: '{{ loottool_v2_app_image }}'
+      LOOTTOOL_APP_ARCHIVE_SHA256: '{{ loottool_v2_app_archive_sha256 }}'
+      LOOTTOOL_APP_PLATFORM: linux/amd64
+      ELASTICSEARCH_IMAGE: '{{ loottool_v2_elasticsearch_image }}'
+      PYTHON_IMAGE: '{{ loottool_v2_python_image }}'
+      LOOTTOOL_EVIDENCE_SCOPE: '{{ loottool_v2_evidence_scope }}'
+      LOOTTOOL_SOURCE_ROOT: '{{ loottool_v2_source_root }}'
+      LOOTTOOL_API_LISTEN_PORT: '{{ loottool_v2_api_port | string }}'
+      LOOTTOOL_ANSWER_LISTEN_PORT: '{{ loottool_v2_answer_port | string }}'
+
+- name: Read protected retained configuration and target prerequisites
+  ansible.builtin.script:
+    cmd: '{{ role_path }}/files/runtime.py {{ {"action": "inspect", "proposed": loottool_v2_proposed} | to_json | quote }}'
+    executable: python3
+  register: loottool_v2_inspection
+  changed_when: false
+  no_log: true
+
+- name: Verify archive and pinned application preflight before target writes
+  ansible.builtin.command:
+    argv:
+      - '{{ ansible_playbook_python }}'
+      - '{{ role_path }}/files/validate_source.py'
+      - '{{ loottool_v2_source_archive }}'
+      - '{{ loottool_v2_source_sha256 }}'
+      - '{{ loottool_v2_source_revision }}'
+    stdin: '{{ loottool_v2_inspection.stdout }}'
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  no_log: true
+
+- name: Verify reviewed Docker-save archive before target writes
+  ansible.builtin.command:
+    argv:
+      - '{{ ansible_playbook_python }}'
+      - '{{ role_path }}/files/verify_image_archive.py'
+      - '{{ loottool_v2_app_archive }}'
+      - '{{ loottool_v2_app_archive_sha256 }}'
+      - '{{ loottool_v2_app_config_digest }}'
+      - '{{ loottool_v2_source_revision }}'
+      - '{{ loottool_v2_app_image }}'
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  when: loottool_v2_app_image.startswith('sha256:')
+
+- name: Assess genuine Docker absence without changing the host
+  ansible.builtin.script:
+    cmd: '{{ role_path }}/files/docker_presence.py'
+    executable: python3
+  register: loottool_v2_docker_presence
+  changed_when: false
+  check_mode: false
+
+- name: Refuse to recreate missing Docker beneath retained LootTool state
+  ansible.builtin.assert:
+    that:
+      - (loottool_v2_docker_presence.stdout | from_json).mode != 'absent' or (loottool_v2_inspection.stdout | from_json).existing is none
+    fail_msg: Retained LootTool with missing Docker requires operator recovery; automatic daemon recreation is refused.
+  no_log: true
+
+- name: Require normal apply before installing a missing Docker prerequisite
+  ansible.builtin.assert:
+    that:
+      - not ansible_check_mode or (loottool_v2_docker_presence.stdout | from_json).mode == 'existing'
+    fail_msg: Missing Docker requires a normal apply after preflight; check mode does not install prerequisites.
+
+- name: Install Docker through the existing upstream role only when genuinely absent
+  ansible.builtin.include_role:
+    name: docker
+  when: (loottool_v2_docker_presence.stdout | from_json).mode == 'absent'
+
+- name: Check Docker prerequisite without changing shared daemon
+  ansible.builtin.command: docker version --format '{{ "{{.Server.Version}}" }}'
+  register: loottool_v2_docker_version
+  changed_when: false
+  check_mode: false
+
+- name: Check Compose prerequisite
+  ansible.builtin.command: docker compose version --short
+  register: loottool_v2_compose_version
+  changed_when: false
+  check_mode: false
+
+- name: Require supported Docker and Compose versions
+  ansible.builtin.assert:
+    that:
+      - loottool_v2_docker_version.stdout is version('24.0', '>=')
+      - loottool_v2_compose_version.stdout | regex_replace('^v', '') is version('2.20', '>=')
+
+- name: Detect a conflicting existing Compose project
+  ansible.builtin.command:
+    argv: [docker, ps, -aq, --filter, label=com.docker.compose.project=loottool-v2]
+  register: loottool_v2_existing_containers
+  changed_when: false
+
+- name: Refuse to adopt an unmanaged Compose project
+  ansible.builtin.assert:
+    that:
+      - (loottool_v2_inspection.stdout | from_json).existing is not none or loottool_v2_existing_containers.stdout | trim == ''
+    fail_msg: Existing LootTool containers require explicit reconciliation.
+  no_log: true
+
+- name: Preserve or create protected installation configuration once
+  ansible.builtin.script:
+    cmd: '{{ role_path }}/files/runtime.py {{ {"action": "write", "proposed": loottool_v2_proposed} | to_json | quote }}'
+    executable: python3
+  register: loottool_v2_configuration
+  changed_when: (loottool_v2_configuration.stdout | from_json).changed
+  no_log: true
+
+- name: Create owned release parent without modifying original loot
+  ansible.builtin.file:
+    path: /opt/loottool-v2/releases
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Transfer reviewed source archive
+  ansible.builtin.copy:
+    src: '{{ loottool_v2_source_archive }}'
+    dest: '/opt/loottool-v2/releases/{{ loottool_v2_source_revision }}.tar.gz'
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Refuse retained release changes before extraction or normalization
+  ansible.builtin.script:
+    cmd: >-
+      {{ role_path }}/files/verify_release.py --before-extract
+      /opt/loottool-v2/releases/{{ loottool_v2_source_revision }}.tar.gz
+      /opt/loottool-v2/releases/{{ loottool_v2_source_revision }}
+    executable: python3
+  changed_when: false
+
+- name: Create exact release directory after retained member verification
+  ansible.builtin.file:
+    path: '/opt/loottool-v2/releases/{{ loottool_v2_source_revision }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Extract immutable source release
+  ansible.builtin.unarchive:
+    src: '/opt/loottool-v2/releases/{{ loottool_v2_source_revision }}.tar.gz'
+    dest: '/opt/loottool-v2/releases/{{ loottool_v2_source_revision }}'
+    remote_src: true
+    owner: root
+    group: root
+    mode: 'u=rwX,go=rX'
+
+- name: Verify retained release files before executing them
+  ansible.builtin.script:
+    cmd: >-
+      {{ role_path }}/files/verify_release.py
+      /opt/loottool-v2/releases/{{ loottool_v2_source_revision }}.tar.gz
+      /opt/loottool-v2/releases/{{ loottool_v2_source_revision }}
+    executable: python3
+  changed_when: false
+
+- name: Create private separate state directories
+  ansible.builtin.file:
+    path: '/var/lib/loottool-v2/{{ item.name }}'
+    state: directory
+    owner: '{{ item.uid }}'
+    group: '{{ item.gid }}'
+    mode: '{{ item.mode }}'
+  loop:
+    - {name: elasticsearch, uid: '1000', gid: '0', mode: '0750'}
+    - {name: certs, uid: '1000', gid: '0', mode: '0755'}
+    - {name: manifests, uid: '10001', gid: '10001', mode: '0700'}
+    - {name: reviews, uid: '10001', gid: '10001', mode: '0700'}
+    - {name: explorer, uid: '10001', gid: '10001', mode: '0700'}
+    - {name: atc-outbox, uid: '10001', gid: '10001', mode: '0700'}
+
+- name: Pull immutable registry images
+  ansible.builtin.command:
+    argv: [docker, pull, --platform, linux/amd64, '{{ item }}']
+  loop: '{{ [loottool_v2_elasticsearch_image] if loottool_v2_app_image.startswith("sha256:") else [loottool_v2_app_image, loottool_v2_elasticsearch_image] }}'
+  register: loottool_v2_pull
+  changed_when: "'Downloaded newer image' in loottool_v2_pull.stdout"
+
+- name: Transfer reviewed Docker-save application artifact
+  ansible.builtin.copy:
+    src: '{{ loottool_v2_app_archive }}'
+    dest: '/opt/loottool-v2/releases/{{ loottool_v2_source_revision }}-image.tar'
+    owner: root
+    group: root
+    mode: '0600'
+  when: loottool_v2_app_image.startswith('sha256:')
+
+- name: Verify and import exact application archive without a mutable tag
+  ansible.builtin.script:
+    cmd: >-
+      {{ role_path }}/files/verify_image_archive.py
+      /opt/loottool-v2/releases/{{ loottool_v2_source_revision }}-image.tar
+      {{ loottool_v2_app_archive_sha256 }}
+      {{ loottool_v2_app_config_digest }}
+      {{ loottool_v2_source_revision }}
+      {{ loottool_v2_app_image | quote }} load
+    executable: python3
+  register: loottool_v2_import
+  changed_when: (loottool_v2_import.stdout | from_json).changed
+  when: loottool_v2_app_image.startswith('sha256:')
+
+- name: Verify pulled image identities and platform
+  ansible.builtin.script:
+    cmd: >-
+      {{ role_path }}/files/verify_images.py
+      {{ loottool_v2_app_image | quote }}
+      {{ loottool_v2_elasticsearch_image | quote }}
+      {{ loottool_v2_source_revision }}
+    executable: python3
+  changed_when: false
+
+- name: Start only baseline Compose services without builds or optional profiles
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - --project-name
+      - loottool-v2
+      - --project-directory
+      - '/opt/loottool-v2/releases/{{ loottool_v2_source_revision }}'
+      - --file
+      - /opt/loottool-v2/releases/{{ loottool_v2_source_revision }}/compose.yaml
+      - --env-file
+      - /etc/loottool-v2/runtime.env
+      - up
+      - --detach
+      - --no-build
+      - --pull
+      - never
+      - --wait
+      - --wait-timeout
+      - '{{ loottool_v2_health_timeout | string }}'
+      - cert-setup
+      - elasticsearch
+      - security-setup
+      - api
+  register: loottool_v2_up
+  changed_when: loottool_v2_up.stderr is search('(?i)\b(created|recreated|started)\b')
+  no_log: true
+
+- name: Check local search and Elasticsearch readiness only
+  ansible.builtin.uri:
+    url: 'http://127.0.0.1:{{ loottool_v2_api_port }}/health'
+    use_proxy: false
+    follow_redirects: none
+    status_code: 200
+    timeout: 5
+  register: loottool_v2_health
+  retries: 6
+  delay: 5
+  until: loottool_v2_health.status == 200
+
+- name: Verify actual baseline bindings and optional-service isolation
+  ansible.builtin.script:
+    cmd: '{{ role_path }}/files/verify_bindings.py {{ loottool_v2_api_port | int }}'
+    executable: python3
+  changed_when: false
+  no_log: true

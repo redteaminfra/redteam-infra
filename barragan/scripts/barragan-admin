@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# Copyright (c) 2026, Oracle and/or its affiliates.
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$SOURCE_DIR/$SOURCE"
+done
+ROOT="$(cd "$(dirname "$SOURCE")/.." && pwd)"
+SYSTEMD_DIR="/etc/systemd/system"
+LOCAL_BIN="/usr/local/bin"
+PROD_SERVICES=(barragan-fastapi.service barragan-openresty.service)
+DEVTEST_SERVICES=(barragan-api-devtest.service barragan-vite.service)
+INSTALL_UNITS=(barragan-fastapi.service barragan-openresty.service barragan-api-devtest.service barragan-vite.service)
+OBSOLETE_UNITS=(barragan-api.service)
+
+usage() {
+  cat <<'EOF'
+Usage: barragan-admin <command> [service]
+
+Commands:
+  install       Install systemd units and barragan-admin into /usr/local/bin
+  start         Start Barragan services
+  stop          Stop Barragan services
+  restart      Restart Barragan services
+  reload        Reload unit files and restart Barragan services
+  status        Show service status
+  logs          Follow service logs
+  enable        Enable Barragan services at boot
+  disable       Disable Barragan services at boot
+  users         Break-glass Barragan user lifecycle (requires --environment)
+
+Services:
+  all           Production service group (default)
+  prod          Production OpenResty/FastAPI group on 127.0.0.1:5173
+  api           Production FastAPI API service on 127.0.0.1:5002
+  fastapi       Production FastAPI API service on 127.0.0.1:5002
+  openresty     Production OpenResty frontend service on 127.0.0.1:5173
+  devtest       Dev/test API and Vite services on 127.0.0.1:5001/5174
+  api-devtest   Dev/test API service
+  vite          Dev/test Vite frontend service
+EOF
+}
+
+users_admin() {
+  local environment=""
+  local previous=""
+  for value in "$@"; do
+    if [[ "$previous" == "--environment" ]]; then environment="$value"; break; fi
+    previous="$value"
+  done
+  case "$environment" in
+    prod) services=("${PROD_SERVICES[@]}") ;;
+    devtest) services=("${DEVTEST_SERVICES[@]}") ;;
+    *) echo "users commands require --environment prod|devtest" >&2; exit 2 ;;
+  esac
+  for service in "${services[@]}"; do
+    if systemctl is-active --quiet "$service"; then
+      echo "Stop the $environment Barragan service group before modifying users ($service is active)." >&2
+      exit 1
+    fi
+  done
+  local python="$ROOT/backend/.venv/bin/python"
+  [[ -x "$python" ]] || { echo "Barragan backend virtualenv not found: $python" >&2; exit 1; }
+  if [[ "${EUID:-$(id -u)}" -eq 0 || "$(id -un)" == "barragan" ]]; then
+    PYTHONPATH="$ROOT/backend" BARRAGAN_BREAKGLASS_ACTOR="${SUDO_USER:-$(id -un)}" "$python" -m app.cli.users_admin "$@"
+  else
+    sudo -u barragan env PYTHONPATH="$ROOT/backend" BARRAGAN_BREAKGLASS_ACTOR="$(id -un)" "$python" -m app.cli.users_admin "$@"
+  fi
+}
+
+selected_services() {
+  local target="${1:-all}"
+  case "$target" in
+    all|prod|production) printf '%s\n' "${PROD_SERVICES[@]}" ;;
+    api|fastapi|barragan-fastapi|barragan-fastapi.service) printf '%s\n' "barragan-fastapi.service" ;;
+    openresty|nginx|frontend-prod|barragan-openresty|barragan-openresty.service) printf '%s\n' "barragan-openresty.service" ;;
+    devtest|dev|test) printf '%s\n' "${DEVTEST_SERVICES[@]}" ;;
+    api-devtest|devtest-api|barragan-api-devtest|barragan-api-devtest.service) printf '%s\n' "barragan-api-devtest.service" ;;
+    vite|frontend|barragan-vite|barragan-vite.service) printf '%s\n' "barragan-vite.service" ;;
+    *)
+      echo "Unknown service: $target" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+}
+
+run_systemctl() {
+  sudo systemctl "$@"
+}
+
+run_journalctl() {
+  sudo journalctl "$@"
+}
+
+install_root() {
+  if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
+install_units() {
+  install_root install -d -m 0755 "$SYSTEMD_DIR" "$LOCAL_BIN"
+  for unit in "${INSTALL_UNITS[@]}"; do
+    install_root install -m 0644 "$ROOT/ops/systemd/system/$unit" "$SYSTEMD_DIR/$unit"
+  done
+  for unit in "${OBSOLETE_UNITS[@]}"; do
+    run_systemctl disable --now "$unit" 2>/dev/null || true
+    install_root rm -f "$SYSTEMD_DIR/$unit"
+  done
+  install_root ln -sfn "$ROOT/scripts/barragan-admin" "$LOCAL_BIN/barragan-admin"
+  run_systemctl daemon-reload
+  echo "Installed Barragan system services under $SYSTEMD_DIR"
+  echo "Installed barragan-admin at $LOCAL_BIN/barragan-admin"
+}
+
+require_command() {
+  if [[ $# -lt 1 ]]; then
+    usage >&2
+    exit 2
+  fi
+}
+
+main() {
+  require_command "$@"
+  local command="$1"
+  local target="${2:-all}"
+
+  case "$command" in
+    -h|--help|help)
+      usage
+      return 0
+      ;;
+    users)
+      shift
+      users_admin "$@"
+      return 0
+      ;;
+  esac
+
+  local selected=()
+  while IFS= read -r service; do
+    selected+=("$service")
+  done < <(selected_services "$target")
+
+  case "$command" in
+    install)
+      install_units
+      ;;
+    start|stop|restart)
+      run_systemctl "$command" "${selected[@]}"
+      ;;
+    reload)
+      run_systemctl daemon-reload
+      run_systemctl restart "${selected[@]}"
+      ;;
+    status)
+      run_systemctl status --no-pager "${selected[@]}"
+      ;;
+    logs)
+      run_journalctl -u "${selected[@]}" -f
+      ;;
+    enable|disable)
+      run_systemctl "$command" "${selected[@]}"
+      ;;
+    *)
+      echo "Unknown command: $command" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+}
+
+main "$@"

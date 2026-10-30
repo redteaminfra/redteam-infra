@@ -1,0 +1,25 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+apiVersion: barragan/v1
+kind: AnsibleCapability
+metadata:
+  id: c2-observer
+  name: C2 Observer
+  category: homebase/analysis
+  description: Install C2 Observer command-line tools on Homebase. Collection, credentials and publishing evidence to ATC are separate operator actions.
+implementation:
+  type: role
+  role: c2_observer
+  path: ansible/roles/c2_observer
+placement:
+  allowedHostClasses: [homebase]
+classification: optional
+profiles:
+  standard-rti:
+    classification: optional
+operator:
+  visible: true
+  selectable: true
+lifecycle:
+  apply: supported
+  remove: manual
+  managedBy: redteam-infra

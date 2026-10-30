@@ -1,0 +1,3302 @@
+{
+  "applyable": true,
+  "checks": [
+    {
+      "address": {
+        "kind": "var",
+        "name": "<redacted-898ec6b0f7e34f1b>",
+        "to_display": "var.var_005"
+      },
+      "instances": [
+        {
+          "address": {
+            "to_display": "<redacted-e4c7b9201865cb3a>"
+          },
+          "status": "<redacted-971d44a08b89e559>"
+        }
+      ],
+      "status": "<redacted-971d44a08b89e559>"
+    },
+    {
+      "address": {
+        "kind": "var",
+        "name": "<redacted-f46c8cdd2d5dc1b1>",
+        "to_display": "var.var_010"
+      },
+      "instances": [
+        {
+          "address": {
+            "to_display": "<redacted-ca24e312be5f1c81>"
+          },
+          "status": "<redacted-971d44a08b89e559>"
+        }
+      ],
+      "status": "<redacted-971d44a08b89e559>"
+    }
+  ],
+  "complete": true,
+  "configuration": {
+    "provider_config": {
+      "provider_alias_001": {
+        "expressions": {
+          "data_key_043": {
+            "references": [
+              "<redacted-2b5492754d7885b8>"
+            ]
+          }
+        },
+        "full_name": "<redacted-e2baebc1db36c599>",
+        "name": "<redacted-e8aac4ba6309aadb>",
+        "version_constraint": "<redacted-301e102e92845b46>"
+      },
+      "provider_alias_002": {
+        "full_name": "<redacted-458a577ab03f7013>",
+        "name": "<redacted-34d9e5002d4a8842>"
+      }
+    },
+    "root_module": {
+      "outputs": {
+        "output_001": {
+          "expression": {
+            "references": [
+              "digitalocean_droplet.resource_001"
+            ]
+          }
+        },
+        "output_002": {
+          "expression": {
+            "references": [
+              "digitalocean_droplet.resource_001"
+            ]
+          }
+        },
+        "output_003": {
+          "depends_on": [
+            "<redacted-ec662abee007c7a8>"
+          ],
+          "expression": {
+            "constant_value": "<redacted-a04bc2f2e8948055>"
+          }
+        },
+        "output_004": {
+          "expression": {
+            "references": [
+              "digitalocean_droplet.resource_002"
+            ]
+          }
+        },
+        "output_005": {
+          "expression": {
+            "references": [
+              "digitalocean_droplet.resource_002"
+            ]
+          }
+        },
+        "output_006": {
+          "expression": {
+            "references": [
+              "local.local_004"
+            ]
+          }
+        },
+        "output_007": {
+          "depends_on": [
+            "<redacted-ec662abee007c7a8>"
+          ],
+          "expression": {
+            "references": [
+              "local.local_004",
+              "local.local_001"
+            ]
+          }
+        }
+      },
+      "resources": [
+        {
+          "address": "digitalocean_droplet.resource_001",
+          "count_expression": {
+            "references": [
+              "<redacted-e4c7b9201865cb3a>",
+              "<redacted-daa060399bee42ca>"
+            ]
+          },
+          "expressions": {
+            "data_key_017": {
+              "references": [
+                "var.var_004"
+              ]
+            },
+            "data_key_027": {
+              "references": [
+                "var.var_009",
+                "var.var_007",
+                "count.index",
+                "var.var_005",
+                "count.index",
+                "var.var_005",
+                "var.var_006",
+                "var.var_015"
+              ]
+            },
+            "data_key_034": {
+              "references": [
+                "var.var_007",
+                "count.index",
+                "var.var_005"
+              ]
+            },
+            "data_key_037": {
+              "references": [
+                "var.var_008"
+              ]
+            },
+            "data_key_039": {
+              "references": [
+                "local.local_002"
+              ]
+            },
+            "data_key_041": {
+              "references": [
+                "var.var_009"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "resource_001",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 1,
+          "type": "digitalocean_droplet"
+        },
+        {
+          "address": "digitalocean_droplet.resource_002",
+          "count_expression": {
+            "references": [
+              "<redacted-ca24e312be5f1c81>"
+            ]
+          },
+          "expressions": {
+            "data_key_017": {
+              "references": [
+                "var.var_004"
+              ]
+            },
+            "data_key_027": {
+              "references": [
+                "count.index",
+                "var.var_011",
+                "var.var_009",
+                "var.var_015"
+              ]
+            },
+            "data_key_034": {
+              "references": [
+                "var.var_012"
+              ]
+            },
+            "data_key_037": {
+              "references": [
+                "var.var_013"
+              ]
+            },
+            "data_key_039": {
+              "references": [
+                "local.local_002"
+              ]
+            },
+            "data_key_041": {
+              "references": [
+                "var.var_009"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "resource_002",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 1,
+          "type": "digitalocean_droplet"
+        },
+        {
+          "address": "digitalocean_firewall.firewall",
+          "expressions": {
+            "data_key_009": {
+              "references": [
+                "digitalocean_droplet.resource_002",
+                "digitalocean_droplet.resource_001"
+              ]
+            },
+            "data_key_027": {
+              "references": [
+                "var.var_009",
+                "var.var_015"
+              ]
+            },
+            "data_key_028": [
+              {
+                "destination_addresses": {
+                  "constant_value": [
+                    "<redacted-8539f6e569ce09b0>"
+                  ]
+                },
+                "port_range": {
+                  "constant_value": "<redacted-79556c8dec836f6b>"
+                },
+                "protocol": {
+                  "constant_value": "<redacted-d14a34a09907e18e>"
+                }
+              },
+              {
+                "destination_addresses": {
+                  "constant_value": [
+                    "<redacted-8539f6e569ce09b0>"
+                  ]
+                },
+                "port_range": {
+                  "constant_value": "<redacted-79556c8dec836f6b>"
+                },
+                "protocol": {
+                  "constant_value": "<redacted-5988a2fe56750e1f>"
+                }
+              },
+              {
+                "destination_addresses": {
+                  "constant_value": [
+                    "<redacted-8539f6e569ce09b0>"
+                  ]
+                },
+                "protocol": {
+                  "constant_value": "<redacted-d71ef2f590f7aba2>"
+                }
+              }
+            ],
+            "data_key_041": {
+              "references": [
+                "var.var_009"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "firewall",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 0,
+          "type": "digitalocean_firewall"
+        },
+        {
+          "address": "digitalocean_ssh_key.resource_003",
+          "count_expression": {
+            "constant_value": 37410228114729
+          },
+          "expressions": {
+            "data_key_027": {
+              "constant_value": "<redacted-3cfc89d505556ccf>"
+            },
+            "data_key_032": {
+              "references": [
+                "local.local_004"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "resource_003",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 0,
+          "type": "digitalocean_ssh_key"
+        },
+        {
+          "address": "local_file.resource_005",
+          "count_expression": {
+            "constant_value": 37410228114729
+          },
+          "depends_on": [
+            "<redacted-6b8c7d245b4f660b>",
+            "<redacted-5aff42ff60a0a8f6>"
+          ],
+          "expressions": {
+            "data_key_004": {
+              "references": [
+                "digitalocean_droplet.resource_002",
+                "digitalocean_droplet.resource_001",
+                "local.local_003",
+                "var.var_009"
+              ]
+            },
+            "data_key_010": {
+              "constant_value": "<redacted-0f22474cd034d5dd>"
+            },
+            "data_key_011": {
+              "constant_value": "<redacted-0d579ea28054b771>"
+            }
+          },
+          "mode": "managed",
+          "name": "resource_005",
+          "provider_config_key": "provider_alias_002",
+          "schema_version": 0,
+          "type": "local_file"
+        },
+        {
+          "address": "local_file.resource_006",
+          "count_expression": {
+            "constant_value": 37410228114729
+          },
+          "depends_on": [
+            "<redacted-6b8c7d245b4f660b>",
+            "<redacted-5aff42ff60a0a8f6>"
+          ],
+          "expressions": {
+            "data_key_004": {
+              "references": [
+                "var.var_009",
+                "local.local_003",
+                "digitalocean_droplet.resource_002",
+                "digitalocean_droplet.resource_001"
+              ]
+            },
+            "data_key_010": {
+              "constant_value": "<redacted-0f22474cd034d5dd>"
+            },
+            "data_key_011": {
+              "references": [
+                "var.var_016",
+                "var.var_009"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "resource_006",
+          "provider_config_key": "provider_alias_002",
+          "schema_version": 0,
+          "type": "local_file"
+        },
+        {
+          "address": "data.digitalocean_ssh_keys.resource_004",
+          "expressions": {
+            "data_key_012": [
+              {
+                "key": {
+                  "constant_value": "<redacted-9ffbdf487d74f086>"
+                },
+                "values": {
+                  "references": [
+                    "<redacted-1687b0b29c662dbc>"
+                  ]
+                }
+              }
+            ]
+          },
+          "mode": "data",
+          "name": "resource_004",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 0,
+          "type": "digitalocean_ssh_keys"
+        }
+      ],
+      "variables": {
+        "var_001": {
+          "default": [
+            "<redacted-d627d94a026f379d>",
+            "<redacted-acee6c469b972c52>",
+            "<redacted-1cc513ee779d05ca>",
+            "<redacted-6ad383bac3ecfa59>"
+          ],
+          "description": "<redacted-5c4adeb51cbb1b48>"
+        },
+        "var_002": {
+          "default": [],
+          "description": "<redacted-9bdade5f97fb2641>"
+        },
+        "var_003": {},
+        "var_004": {},
+        "var_005": {
+          "default": 44423030531443,
+          "description": "<redacted-2ededaa9893e56b8>"
+        },
+        "var_006": {
+          "default": 44423030531443,
+          "description": "<redacted-920a3e7aa054087a>"
+        },
+        "var_007": {},
+        "var_008": {
+          "default": "<redacted-ef0c9e5765557d51>",
+          "description": "<redacted-cd508ecf8ee74110>"
+        },
+        "var_009": {},
+        "var_010": {
+          "default": 44423030531443,
+          "description": "<redacted-0a174ac7ca90a7da>"
+        },
+        "var_011": {
+          "default": 44423030531443,
+          "description": "<redacted-bba1d28b44e09041>"
+        },
+        "var_012": {},
+        "var_013": {
+          "default": "<redacted-ef0c9e5765557d51>",
+          "description": "<redacted-62c0e490c9038911>"
+        },
+        "var_014": {
+          "default": []
+        },
+        "var_015": {
+          "default": "<redacted-2a7b3a9da7524d38>",
+          "description": "<redacted-81b6895ea742afd5>"
+        },
+        "var_016": {
+          "default": "<redacted-be35dbd5435a776b>",
+          "description": "<redacted-4e9aa0bb477e6e67>"
+        },
+        "var_017": {
+          "default": "<redacted-2a7b3a9da7524d38>",
+          "description": "<redacted-9e2f09660b8a2e83>"
+        },
+        "var_018": {
+          "default": "<redacted-2a7b3a9da7524d38>",
+          "description": "<redacted-535e171fbe2ea649>"
+        }
+      }
+    }
+  },
+  "errored": false,
+  "format_version": "1.2",
+  "output_changes": {
+    "output_001": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [
+        "<redacted-bd0826b3d275520d>"
+      ],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [
+        "<redacted-bd0826b3d275520d>"
+      ],
+      "before_sensitive": false
+    },
+    "output_002": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [
+        "<redacted-a4182628f0e97c0d>"
+      ],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [
+        "<redacted-a4182628f0e97c0d>"
+      ],
+      "before_sensitive": false
+    },
+    "output_003": {
+      "actions": [
+        "no-op"
+      ],
+      "after": "<redacted-a04bc2f2e8948055>",
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": "<redacted-a04bc2f2e8948055>",
+      "before_sensitive": false
+    },
+    "output_004": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [],
+      "before_sensitive": false
+    },
+    "output_005": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [],
+      "before_sensitive": false
+    },
+    "output_006": {
+      "actions": [
+        "update"
+      ],
+      "after": "<redacted-f2bc76587604ffe1>",
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": "<redacted-41d2bd6184b0e804>",
+      "before_sensitive": false
+    },
+    "output_007": {
+      "actions": [
+        "update"
+      ],
+      "after": "<redacted-ee0ca901e2829860>",
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": "<redacted-7d808290df2eb7d4>",
+      "before_sensitive": false
+    }
+  },
+  "planned_values": {
+    "outputs": {
+      "output_001": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          [
+            "<redacted-9aebe0b8205b2c3c>"
+          ]
+        ],
+        "value": [
+          "<redacted-bd0826b3d275520d>"
+        ]
+      },
+      "output_002": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          [
+            "<redacted-9aebe0b8205b2c3c>"
+          ]
+        ],
+        "value": [
+          "<redacted-a4182628f0e97c0d>"
+        ]
+      },
+      "output_003": {
+        "sensitive": false,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-a04bc2f2e8948055>"
+      },
+      "output_004": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          []
+        ],
+        "value": []
+      },
+      "output_005": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          []
+        ],
+        "value": []
+      },
+      "output_006": {
+        "sensitive": false,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-f2bc76587604ffe1>"
+      },
+      "output_007": {
+        "sensitive": false,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-ee0ca901e2829860>"
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "digitalocean_droplet.resource_001[0]",
+          "index": 0,
+          "mode": "managed",
+          "name": "resource_001",
+          "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+          "schema_version": 1,
+          "sensitive_values": {
+            "data_key_002": [],
+            "data_key_039": [
+              false
+            ],
+            "data_key_041": [
+              false
+            ],
+            "data_key_048": []
+          },
+          "type": "digitalocean_droplet",
+          "values": {
+            "data_key_002": [],
+            "data_key_003": false,
+            "data_key_005": "<redacted-0b18b3351279539f>",
+            "data_key_006": 17420498984910,
+            "data_key_007": null,
+            "data_key_014": null,
+            "data_key_015": false,
+            "data_key_016": "<redacted-bd0826b3d275520d>",
+            "data_key_017": "<redacted-4cd09082979b6f39>",
+            "data_key_018": "<redacted-a4182628f0e97c0d>",
+            "data_key_019": "<redacted-961a7eb02a922164>",
+            "data_key_020": false,
+            "data_key_021": "<redacted-2a7b3a9da7524d38>",
+            "data_key_023": false,
+            "data_key_025": 125433402807936,
+            "data_key_026": false,
+            "data_key_027": "<redacted-eb8936227814c43b>",
+            "data_key_029": 0.9251256161408179,
+            "data_key_030": 131501445240205,
+            "data_key_031": true,
+            "data_key_033": true,
+            "data_key_034": "<redacted-3fcedfc67ec0f9ce>",
+            "data_key_036": true,
+            "data_key_037": "<redacted-ed53b6c989c8afab>",
+            "data_key_039": [
+              "<redacted-a42f2e1c25efce72>"
+            ],
+            "data_key_040": "<redacted-5caf48fd7cd6eed5>",
+            "data_key_041": [
+              "<redacted-4a4b49fa8703f8d6>"
+            ],
+            "data_key_042": null,
+            "data_key_044": "<redacted-0a35b65714f9cbce>",
+            "data_key_045": null,
+            "data_key_047": 44423030531443,
+            "data_key_048": [],
+            "data_key_049": "<redacted-1435b4310da59487>"
+          }
+        },
+        {
+          "address": "digitalocean_firewall.firewall",
+          "mode": "managed",
+          "name": "firewall",
+          "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+          "schema_version": 0,
+          "sensitive_values": {
+            "droplet_ids": [
+              false
+            ],
+            "inbound_rule": [
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "source_addresses": [
+                  false
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              }
+            ],
+            "outbound_rule": [
+              {
+                "destination_addresses": [
+                  false
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": []
+              },
+              {
+                "destination_addresses": [
+                  false
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": []
+              },
+              {
+                "destination_addresses": [
+                  false
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": []
+              },
+              {
+                "destination_addresses": [
+                  false
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": []
+              },
+              {
+                "destination_addresses": [
+                  false
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": []
+              },
+              {
+                "destination_addresses": [
+                  false
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": []
+              }
+            ],
+            "pending_changes": [],
+            "tags": [
+              false
+            ]
+          },
+          "type": "digitalocean_firewall",
+          "values": {
+            "created_at": "<redacted-09c9fbc678907b0d>",
+            "droplet_ids": [
+              1496780590179
+            ],
+            "id": "<redacted-9be55035c83a3c9e>",
+            "inbound_rule": [
+              {
+                "port_range": "1-65535",
+                "protocol": "icmp",
+                "source_addresses": [
+                  "<ip-289176bc2d829679>"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "1-65535",
+                "protocol": "icmp",
+                "source_addresses": [
+                  "::/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "1-65535",
+                "protocol": "tcp",
+                "source_addresses": [
+                  "<ip-289176bc2d829679>"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "1-65535",
+                "protocol": "tcp",
+                "source_addresses": [
+                  "::/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "1-65535",
+                "protocol": "udp",
+                "source_addresses": [
+                  "<ip-289176bc2d829679>"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "1-65535",
+                "protocol": "udp",
+                "source_addresses": [
+                  "::/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "22",
+                "protocol": "tcp",
+                "source_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "2222",
+                "protocol": "tcp",
+                "source_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "34791",
+                "protocol": "udp",
+                "source_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "443",
+                "protocol": "tcp",
+                "source_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              },
+              {
+                "port_range": "80",
+                "protocol": "tcp",
+                "source_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "source_droplet_ids": [],
+                "source_kubernetes_ids": [],
+                "source_load_balancer_uids": [],
+                "source_tags": []
+              }
+            ],
+            "name": "<redacted-4ce4f698f3e6b044>",
+            "outbound_rule": [
+              {
+                "destination_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": [],
+                "port_range": "",
+                "protocol": "icmp"
+              },
+              {
+                "destination_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": [],
+                "port_range": "1-65535",
+                "protocol": "tcp"
+              },
+              {
+                "destination_addresses": [
+                  "0.0.0.0/0"
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": [],
+                "port_range": "1-65535",
+                "protocol": "udp"
+              },
+              {
+                "destination_addresses": [
+                  "::/0"
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": [],
+                "port_range": "1-65535",
+                "protocol": "icmp"
+              },
+              {
+                "destination_addresses": [
+                  "::/0"
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": [],
+                "port_range": "1-65535",
+                "protocol": "tcp"
+              },
+              {
+                "destination_addresses": [
+                  "::/0"
+                ],
+                "destination_droplet_ids": [],
+                "destination_kubernetes_ids": [],
+                "destination_load_balancer_uids": [],
+                "destination_tags": [],
+                "port_range": "1-65535",
+                "protocol": "udp"
+              }
+            ],
+            "pending_changes": [],
+            "status": "<redacted-c9950073a4399b99>",
+            "tags": [
+              "<redacted-4a4b49fa8703f8d6>"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "prior_state": {
+    "format_version": "<redacted-cab6a8bf092d490a>",
+    "terraform_version": "<redacted-71ff809c06d12c29>",
+    "values": {
+      "outputs": {
+        "output_001": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            [
+              "<redacted-9aebe0b8205b2c3c>"
+            ]
+          ],
+          "value": [
+            "<redacted-bd0826b3d275520d>"
+          ]
+        },
+        "output_002": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            [
+              "<redacted-9aebe0b8205b2c3c>"
+            ]
+          ],
+          "value": [
+            "<redacted-a4182628f0e97c0d>"
+          ]
+        },
+        "output_003": {
+          "sensitive": false,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-a04bc2f2e8948055>"
+        },
+        "output_004": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            []
+          ],
+          "value": []
+        },
+        "output_005": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            []
+          ],
+          "value": []
+        },
+        "output_006": {
+          "sensitive": false,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-f2bc76587604ffe1>"
+        },
+        "output_007": {
+          "sensitive": false,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-ee0ca901e2829860>"
+        }
+      },
+      "root_module": {
+        "resources": [
+          {
+            "address": "data.digitalocean_ssh_keys.resource_004",
+            "mode": "data",
+            "name": "resource_004",
+            "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+            "schema_version": 0,
+            "sensitive_values": {
+              "data_key_012": [
+                {
+                  "data_key_046": [
+                    false
+                  ]
+                }
+              ],
+              "data_key_039": [
+                {}
+              ]
+            },
+            "type": "digitalocean_ssh_keys",
+            "values": {
+              "data_key_012": [
+                {
+                  "data_key_001": false,
+                  "data_key_022": "<redacted-9ffbdf487d74f086>",
+                  "data_key_024": "<redacted-72155b837393124a>",
+                  "data_key_046": [
+                    "<redacted-27de7099246fe1ec>"
+                  ]
+                }
+              ],
+              "data_key_016": "<redacted-604fe3fedf324f8c>",
+              "data_key_038": null,
+              "data_key_039": [
+                {
+                  "data_key_013": "<redacted-b5da4a4b2313385f>",
+                  "data_key_016": 67114013240740,
+                  "data_key_027": "<redacted-3cfc89d505556ccf>",
+                  "data_key_032": "<redacted-27de7099246fe1ec>"
+                }
+              ]
+            }
+          },
+          {
+            "address": "digitalocean_droplet.resource_001[0]",
+            "depends_on": [
+              "<redacted-01ca634a4fd251b5>"
+            ],
+            "index": 0,
+            "mode": "managed",
+            "name": "resource_001",
+            "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+            "schema_version": 1,
+            "sensitive_values": {
+              "data_key_002": [],
+              "data_key_039": [
+                false
+              ],
+              "data_key_041": [
+                false
+              ],
+              "data_key_048": []
+            },
+            "type": "digitalocean_droplet",
+            "values": {
+              "data_key_002": [],
+              "data_key_003": false,
+              "data_key_005": "<redacted-0b18b3351279539f>",
+              "data_key_006": 17420498984910,
+              "data_key_007": null,
+              "data_key_014": null,
+              "data_key_015": false,
+              "data_key_016": "<redacted-bd0826b3d275520d>",
+              "data_key_017": "<redacted-4cd09082979b6f39>",
+              "data_key_018": "<redacted-a4182628f0e97c0d>",
+              "data_key_019": "<redacted-961a7eb02a922164>",
+              "data_key_020": false,
+              "data_key_021": "<redacted-2a7b3a9da7524d38>",
+              "data_key_023": false,
+              "data_key_025": 125433402807936,
+              "data_key_026": false,
+              "data_key_027": "<redacted-eb8936227814c43b>",
+              "data_key_029": 0.9251256161408179,
+              "data_key_030": 131501445240205,
+              "data_key_031": true,
+              "data_key_033": true,
+              "data_key_034": "<redacted-3fcedfc67ec0f9ce>",
+              "data_key_036": true,
+              "data_key_037": "<redacted-ed53b6c989c8afab>",
+              "data_key_039": [
+                "<redacted-a42f2e1c25efce72>"
+              ],
+              "data_key_040": "<redacted-5caf48fd7cd6eed5>",
+              "data_key_041": [
+                "<redacted-4a4b49fa8703f8d6>"
+              ],
+              "data_key_042": null,
+              "data_key_044": "<redacted-0a35b65714f9cbce>",
+              "data_key_045": null,
+              "data_key_047": 44423030531443,
+              "data_key_048": [],
+              "data_key_049": "<redacted-1435b4310da59487>"
+            }
+          },
+          {
+            "address": "digitalocean_firewall.firewall",
+            "depends_on": [
+              "<redacted-01ca634a4fd251b5>",
+              "<redacted-5aff42ff60a0a8f6>",
+              "<redacted-6b8c7d245b4f660b>"
+            ],
+            "mode": "managed",
+            "name": "firewall",
+            "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+            "schema_version": 0,
+            "sensitive_values": {
+              "droplet_ids": [
+                false
+              ],
+              "inbound_rule": [
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "source_addresses": [
+                    false
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                }
+              ],
+              "outbound_rule": [
+                {
+                  "destination_addresses": [
+                    false
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": []
+                },
+                {
+                  "destination_addresses": [
+                    false
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": []
+                },
+                {
+                  "destination_addresses": [
+                    false
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": []
+                },
+                {
+                  "destination_addresses": [
+                    false
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": []
+                },
+                {
+                  "destination_addresses": [
+                    false
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": []
+                },
+                {
+                  "destination_addresses": [
+                    false
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": []
+                }
+              ],
+              "pending_changes": [],
+              "tags": [
+                false
+              ]
+            },
+            "type": "digitalocean_firewall",
+            "values": {
+              "created_at": "<redacted-09c9fbc678907b0d>",
+              "droplet_ids": [
+                1496780590179
+              ],
+              "id": "<redacted-9be55035c83a3c9e>",
+              "inbound_rule": [
+                {
+                  "port_range": "1-65535",
+                  "protocol": "icmp",
+                  "source_addresses": [
+                    "<ip-289176bc2d829679>"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "1-65535",
+                  "protocol": "icmp",
+                  "source_addresses": [
+                    "::/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "1-65535",
+                  "protocol": "tcp",
+                  "source_addresses": [
+                    "<ip-289176bc2d829679>"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "1-65535",
+                  "protocol": "tcp",
+                  "source_addresses": [
+                    "::/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "1-65535",
+                  "protocol": "udp",
+                  "source_addresses": [
+                    "<ip-289176bc2d829679>"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "1-65535",
+                  "protocol": "udp",
+                  "source_addresses": [
+                    "::/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "22",
+                  "protocol": "tcp",
+                  "source_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "2222",
+                  "protocol": "tcp",
+                  "source_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "34791",
+                  "protocol": "udp",
+                  "source_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "443",
+                  "protocol": "tcp",
+                  "source_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                },
+                {
+                  "port_range": "80",
+                  "protocol": "tcp",
+                  "source_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "source_droplet_ids": [],
+                  "source_kubernetes_ids": [],
+                  "source_load_balancer_uids": [],
+                  "source_tags": []
+                }
+              ],
+              "name": "<redacted-4ce4f698f3e6b044>",
+              "outbound_rule": [
+                {
+                  "destination_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": [],
+                  "port_range": "",
+                  "protocol": "icmp"
+                },
+                {
+                  "destination_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": [],
+                  "port_range": "1-65535",
+                  "protocol": "tcp"
+                },
+                {
+                  "destination_addresses": [
+                    "0.0.0.0/0"
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": [],
+                  "port_range": "1-65535",
+                  "protocol": "udp"
+                },
+                {
+                  "destination_addresses": [
+                    "::/0"
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": [],
+                  "port_range": "1-65535",
+                  "protocol": "icmp"
+                },
+                {
+                  "destination_addresses": [
+                    "::/0"
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": [],
+                  "port_range": "1-65535",
+                  "protocol": "tcp"
+                },
+                {
+                  "destination_addresses": [
+                    "::/0"
+                  ],
+                  "destination_droplet_ids": [],
+                  "destination_kubernetes_ids": [],
+                  "destination_load_balancer_uids": [],
+                  "destination_tags": [],
+                  "port_range": "1-65535",
+                  "protocol": "udp"
+                }
+              ],
+              "pending_changes": [],
+              "status": "<redacted-c9950073a4399b99>",
+              "tags": [
+                "<redacted-4a4b49fa8703f8d6>"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "digitalocean_droplet.resource_001[0]",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "data_key_002": [],
+          "data_key_003": false,
+          "data_key_005": "<redacted-0b18b3351279539f>",
+          "data_key_006": 17420498984910,
+          "data_key_007": null,
+          "data_key_014": null,
+          "data_key_015": false,
+          "data_key_016": "<redacted-bd0826b3d275520d>",
+          "data_key_017": "<redacted-4cd09082979b6f39>",
+          "data_key_018": "<redacted-a4182628f0e97c0d>",
+          "data_key_019": "<redacted-961a7eb02a922164>",
+          "data_key_020": false,
+          "data_key_021": "<redacted-2a7b3a9da7524d38>",
+          "data_key_023": false,
+          "data_key_025": 125433402807936,
+          "data_key_026": false,
+          "data_key_027": "<redacted-eb8936227814c43b>",
+          "data_key_029": 0.9251256161408179,
+          "data_key_030": 131501445240205,
+          "data_key_031": true,
+          "data_key_033": true,
+          "data_key_034": "<redacted-3fcedfc67ec0f9ce>",
+          "data_key_036": true,
+          "data_key_037": "<redacted-ed53b6c989c8afab>",
+          "data_key_039": [
+            "<redacted-a42f2e1c25efce72>"
+          ],
+          "data_key_040": "<redacted-5caf48fd7cd6eed5>",
+          "data_key_041": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "data_key_042": null,
+          "data_key_044": "<redacted-0a35b65714f9cbce>",
+          "data_key_045": null,
+          "data_key_047": 44423030531443,
+          "data_key_048": [],
+          "data_key_049": "<redacted-1435b4310da59487>"
+        },
+        "after_sensitive": {
+          "data_key_002": [],
+          "data_key_039": [
+            false
+          ],
+          "data_key_041": [
+            false
+          ],
+          "data_key_048": []
+        },
+        "after_unknown": {},
+        "before": {
+          "data_key_002": [],
+          "data_key_003": false,
+          "data_key_005": "<redacted-0b18b3351279539f>",
+          "data_key_006": 17420498984910,
+          "data_key_007": null,
+          "data_key_014": null,
+          "data_key_015": false,
+          "data_key_016": "<redacted-bd0826b3d275520d>",
+          "data_key_017": "<redacted-4cd09082979b6f39>",
+          "data_key_018": "<redacted-a4182628f0e97c0d>",
+          "data_key_019": "<redacted-961a7eb02a922164>",
+          "data_key_020": false,
+          "data_key_021": "<redacted-2a7b3a9da7524d38>",
+          "data_key_023": false,
+          "data_key_025": 125433402807936,
+          "data_key_026": false,
+          "data_key_027": "<redacted-eb8936227814c43b>",
+          "data_key_029": 0.9251256161408179,
+          "data_key_030": 131501445240205,
+          "data_key_031": true,
+          "data_key_033": true,
+          "data_key_034": "<redacted-3fcedfc67ec0f9ce>",
+          "data_key_036": true,
+          "data_key_037": "<redacted-ed53b6c989c8afab>",
+          "data_key_039": [
+            "<redacted-a42f2e1c25efce72>"
+          ],
+          "data_key_040": "<redacted-5caf48fd7cd6eed5>",
+          "data_key_041": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "data_key_042": null,
+          "data_key_044": "<redacted-0a35b65714f9cbce>",
+          "data_key_045": null,
+          "data_key_047": 44423030531443,
+          "data_key_048": [],
+          "data_key_049": "<redacted-1435b4310da59487>"
+        },
+        "before_sensitive": {
+          "data_key_002": [],
+          "data_key_039": [
+            false
+          ],
+          "data_key_041": [
+            false
+          ],
+          "data_key_048": []
+        }
+      },
+      "index": 0,
+      "mode": "managed",
+      "name": "resource_001",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_droplet"
+    },
+    {
+      "address": "digitalocean_firewall.firewall",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "created_at": "<redacted-09c9fbc678907b0d>",
+          "droplet_ids": [
+            1496780590179
+          ],
+          "id": "<redacted-9be55035c83a3c9e>",
+          "inbound_rule": [
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "22",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "2222",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "34791",
+              "protocol": "udp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "443",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "80",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "name": "<redacted-4ce4f698f3e6b044>",
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            }
+          ],
+          "pending_changes": [],
+          "status": "<redacted-c9950073a4399b99>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ]
+        },
+        "after_sensitive": {
+          "droplet_ids": [
+            false
+          ],
+          "inbound_rule": [
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            }
+          ],
+          "pending_changes": [],
+          "tags": [
+            false
+          ]
+        },
+        "after_unknown": {},
+        "before": {
+          "created_at": "<redacted-09c9fbc678907b0d>",
+          "droplet_ids": [
+            1496780590179
+          ],
+          "id": "<redacted-9be55035c83a3c9e>",
+          "inbound_rule": [
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "22",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "2222",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "34791",
+              "protocol": "udp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "443",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "80",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "name": "<redacted-4ce4f698f3e6b044>",
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            }
+          ],
+          "pending_changes": [],
+          "status": "<redacted-c9950073a4399b99>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ]
+        },
+        "before_sensitive": {
+          "droplet_ids": [
+            false
+          ],
+          "inbound_rule": [
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            }
+          ],
+          "pending_changes": [],
+          "tags": [
+            false
+          ]
+        }
+      },
+      "mode": "managed",
+      "name": "firewall",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_firewall"
+    }
+  ],
+  "resource_drift": [
+    {
+      "address": "digitalocean_firewall.firewall",
+      "change": {
+        "actions": [
+          "update"
+        ],
+        "after": {
+          "created_at": "<redacted-09c9fbc678907b0d>",
+          "droplet_ids": [
+            1496780590179
+          ],
+          "id": "<redacted-9be55035c83a3c9e>",
+          "inbound_rule": [
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "22",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "2222",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "34791",
+              "protocol": "udp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "443",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "80",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "name": "<redacted-4ce4f698f3e6b044>",
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            }
+          ],
+          "pending_changes": [],
+          "status": "<redacted-c9950073a4399b99>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ]
+        },
+        "after_sensitive": {
+          "droplet_ids": [
+            false
+          ],
+          "inbound_rule": [
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            }
+          ],
+          "pending_changes": [],
+          "tags": [
+            false
+          ]
+        },
+        "after_unknown": {},
+        "before": {
+          "created_at": "<redacted-09c9fbc678907b0d>",
+          "droplet_ids": [
+            1496780590179
+          ],
+          "id": "<redacted-9be55035c83a3c9e>",
+          "inbound_rule": [
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "icmp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "tcp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "<ip-289176bc2d829679>"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "1-65535",
+              "protocol": "udp",
+              "source_addresses": [
+                "::/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "22",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "2222",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "34791",
+              "protocol": "udp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "443",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "port_range": "80",
+              "protocol": "tcp",
+              "source_addresses": [
+                "0.0.0.0/0"
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "name": "<redacted-4ce4f698f3e6b044>",
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "0.0.0.0/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "icmp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "tcp"
+            },
+            {
+              "destination_addresses": [
+                "::/0"
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": [],
+              "port_range": "1-65535",
+              "protocol": "udp"
+            }
+          ],
+          "pending_changes": [
+            {
+              "data_key_008": 113746962143742,
+              "data_key_035": false,
+              "data_key_040": "<redacted-ea0e06a7df27f46a>"
+            },
+            {
+              "data_key_008": 89203718052261,
+              "data_key_035": false,
+              "data_key_040": "<redacted-ea0e06a7df27f46a>"
+            },
+            {
+              "data_key_008": 1496780590179,
+              "data_key_035": false,
+              "data_key_040": "<redacted-ea0e06a7df27f46a>"
+            }
+          ],
+          "status": "<redacted-ea0e06a7df27f46a>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ]
+        },
+        "before_sensitive": {
+          "droplet_ids": [
+            false
+          ],
+          "inbound_rule": [
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            },
+            {
+              "source_addresses": [
+                false
+              ],
+              "source_droplet_ids": [],
+              "source_kubernetes_ids": [],
+              "source_load_balancer_uids": [],
+              "source_tags": []
+            }
+          ],
+          "outbound_rule": [
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            },
+            {
+              "destination_addresses": [
+                false
+              ],
+              "destination_droplet_ids": [],
+              "destination_kubernetes_ids": [],
+              "destination_load_balancer_uids": [],
+              "destination_tags": []
+            }
+          ],
+          "pending_changes": [
+            {},
+            {},
+            {}
+          ],
+          "tags": [
+            false
+          ]
+        }
+      },
+      "mode": "managed",
+      "name": "firewall",
+      "provider_name": "registry.terraform.io/digitalocean/digitalocean",
+      "type": "digitalocean_firewall"
+    }
+  ],
+  "terraform_version": "1.15.5",
+  "timestamp": "<redacted-4cfea8ec69bb4d2c>",
+  "variables": {
+    "var_001": {
+      "value": [
+        "<redacted-d627d94a026f379d>",
+        "<redacted-acee6c469b972c52>",
+        "<redacted-1cc513ee779d05ca>",
+        "<redacted-6ad383bac3ecfa59>"
+      ]
+    },
+    "var_002": {
+      "value": [
+        "<redacted-2479523d141b3645>"
+      ]
+    },
+    "var_003": {
+      "value": "<redacted-11d8d1e42653a216>"
+    },
+    "var_004": {
+      "value": "<redacted-4cd09082979b6f39>"
+    },
+    "var_005": {
+      "value": "<redacted-501535a93d9816ce>"
+    },
+    "var_006": {
+      "value": "<redacted-501535a93d9816ce>"
+    },
+    "var_007": {
+      "value": [
+        "<redacted-3fcedfc67ec0f9ce>"
+      ]
+    },
+    "var_008": {
+      "value": "<redacted-ed53b6c989c8afab>"
+    },
+    "var_009": {
+      "value": "<redacted-4a4b49fa8703f8d6>"
+    },
+    "var_010": {
+      "value": "<redacted-0deed29899bfed42>"
+    },
+    "var_011": {
+      "value": "<redacted-501535a93d9816ce>"
+    },
+    "var_012": {
+      "value": "<redacted-3fcedfc67ec0f9ce>"
+    },
+    "var_013": {
+      "value": "<redacted-ef0c9e5765557d51>"
+    },
+    "var_014": {
+      "value": [
+        "<redacted-4a4b49fa8703f8d6>"
+      ]
+    },
+    "var_015": {
+      "value": "<redacted-575eaad2f5a4197a>"
+    },
+    "var_016": {
+      "value": "<redacted-be35dbd5435a776b>"
+    },
+    "var_017": {
+      "value": "<redacted-34e3869c2be1bcba>"
+    },
+    "var_018": {
+      "value": "<redacted-f2bc76587604ffe1>"
+    }
+  }
+}

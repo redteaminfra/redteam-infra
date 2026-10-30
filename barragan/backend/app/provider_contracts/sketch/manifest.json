@@ -1,0 +1,81 @@
+{
+  "contractVersion": 1,
+  "plan": {
+    "firewallResourceSchemaVersion": 0,
+    "formatVersion": "1.2"
+  },
+  "providers": {
+    "digitalocean": {
+      "lockFile": "digitalocean/.terraform.lock.hcl",
+      "lockSha256": "75c01fafe73aba516cbca859c1fada513534d759542ea54c43be8c7d591daa0c",
+      "materializedPathOutputs": {
+        "output_006": {
+          "retainedBefore": "<redacted-dbdfc452a6ccea03>",
+          "semantic": "public-key"
+        },
+        "output_007": {
+          "retainedBefore": "<redacted-bc312aadca7ae665>",
+          "semantic": "run-ansible"
+        }
+      },
+      "selections": {
+        "registry.terraform.io/digitalocean/digitalocean": "2.100.0",
+        "registry.terraform.io/hashicorp/local": "2.9.1"
+      }
+    },
+    "linode": {
+      "lockFile": "linode/.terraform.lock.hcl",
+      "lockSha256": "b318f6e4c5b2eef54d859f285007ef1d98e927ca36d1433ded4f622dc4dea3e7",
+      "materializedPathOutputs": {
+        "output_006": {
+          "retainedBefore": "<redacted-dbdfc452a6ccea03>",
+          "semantic": "public-key"
+        },
+        "output_009": {
+          "retainedBefore": "<redacted-bc312aadca7ae665>",
+          "semantic": "run-ansible"
+        }
+      },
+      "selections": {
+        "registry.terraform.io/hashicorp/local": "2.9.1",
+        "registry.terraform.io/hashicorp/random": "3.9.1",
+        "registry.terraform.io/linode/linode": "4.5.0"
+      }
+    }
+  },
+  "reviewedFixtures": {
+    "no-op": {
+      "captureId": "c4m8v2q9",
+      "manifestSha256": "cc000a566ec0474345abf5cb264edc34b5b624a7c7419d196b03c3868791cd2c",
+      "providers": {
+        "digitalocean": {
+          "projectionFile": "projections/no-op/digitalocean-edge.terraform-show.json",
+          "sha256": "17757defb38cf9f2d762f795dc5c5a0078bbb0220bebcefcf124a3d8da1d887f"
+        },
+        "linode": {
+          "projectionFile": "projections/no-op/linode-middle.terraform-show.json",
+          "sha256": "2cce287ce21b491a5b8040e56a9c1a1c714a57182ac912d674e230ec7207d4c1"
+        }
+      }
+    },
+    "remove": {
+      "captureId": "e7q2m5v8",
+      "manifestSha256": "c3f9aef435e45454e8e15a085a5d593c7d935fb115e8851ccd5b22118cfbf408",
+      "providers": {
+        "digitalocean": {
+          "projectionFile": "projections/remove/digitalocean-edge.terraform-show.json",
+          "sha256": "c5d03de21b6de1077a164684869fed2166e2e0a7c4e0666fbbe02799c0a69b77"
+        },
+        "linode": {
+          "projectionFile": "projections/remove/linode-middle.terraform-show.json",
+          "sha256": "2ce0bbd4b67a5dd93786f9595825ab8f7894884f1f85c70cc086dcbc7fd37473"
+        }
+      }
+    }
+  },
+  "templateRevision": "cb5b63d41c0d639e5ddec888342ac6afa938a770",
+  "terraform": {
+    "platform": "linux_amd64",
+    "version": "1.15.5"
+  }
+}

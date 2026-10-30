@@ -1,0 +1,4 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+keepassxc_database_path: /engagement/keepass.kdbx
+keepassxc_password_path: /engagement/keepass.txt

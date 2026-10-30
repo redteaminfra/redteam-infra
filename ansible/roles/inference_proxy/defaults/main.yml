@@ -1,0 +1,11 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Supply a reviewed, flat `git archive --format=tar.gz COMMIT` on the controller.
+# No SCM credentials are copied to the managed host.
+inference_proxy_source_archive: ""
+inference_proxy_source_sha256: ""
+inference_proxy_source_revision: ""
+inference_proxy_region: "us-chicago-1"
+inference_proxy_compartment_id: ""
+inference_proxy_port: 8787
+inference_proxy_health_timeout: 60

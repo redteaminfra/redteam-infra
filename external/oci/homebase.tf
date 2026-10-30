@@ -1,11 +1,19 @@
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2026, Oracle and/or its affiliates.
 
 resource "oci_core_instance" "homebase" {
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_id
   display_name        = "homebase-${var.engagement_name}"
-  shape               = var.is_production ? "BM.Standard2.52" : var.homebase_shape
+  shape               = var.is_production ? var.production_homebase_shape : var.homebase_shape
   freeform_tags       = local.tags
+
+  dynamic "shape_config" {
+    for_each = can(regex("Flex", var.is_production ? var.production_homebase_shape : var.homebase_shape)) && var.homebase_ocpus != null && var.homebase_memory_in_gbs != null ? [1] : []
+    content {
+      ocpus         = var.homebase_ocpus
+      memory_in_gbs = var.homebase_memory_in_gbs
+    }
+  }
 
   instance_options {
     are_legacy_imds_endpoints_disabled = true
@@ -18,7 +26,7 @@ resource "oci_core_instance" "homebase" {
   }
 
   create_vnic_details {
-    subnet_id      = oci_core_subnet.infra.id
+    subnet_id = oci_core_subnet.infra.id
 
     private_ip       = cidrhost(var.subnet_cidr_blocks["infra"], 10)
     assign_public_ip = true
@@ -38,4 +46,14 @@ resource "oci_core_instance" "homebase" {
   }
 
   preserve_boot_volume = var.preserve_boot_volume
+
+  lifecycle {
+    precondition {
+      condition = (
+        !can(regex("Flex", var.is_production ? var.production_homebase_shape : var.homebase_shape)) ||
+        (var.homebase_ocpus != null && var.homebase_memory_in_gbs != null)
+      )
+      error_message = "Flex homebase shapes require homebase_ocpus and homebase_memory_in_gbs."
+    }
+  }
 }

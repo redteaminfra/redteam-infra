@@ -12,3 +12,6 @@ puppet/modules/cobaltstrike/files/cobaltstrike.tgz
 terraform.tfstate*
 variables.tfvars
 **/.DS_Store
+# Pinned provider overlays used by Barragan.
+!external/sketch/digitalocean/barragan-v2/.terraform.lock.hcl
+!external/sketch/linode/barragan-v2/.terraform.lock.hcl

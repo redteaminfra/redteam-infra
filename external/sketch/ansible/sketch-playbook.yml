@@ -1,10 +1,18 @@
 ---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Opt-in host vars (set separately for each middle/edge in inventory):
+# sketch_firewall_v2_enabled: true
+# sketch_firewall_v2_ssh_sources: ["<immediate-predecessor-ip>/32"]
+# sketch_firewall_v2_rules: [{from_ip: "<source-cidr>", port: 443, proto: tcp}]
+# The opt-in policy is for fresh bootstrap only. Do not rerun it on an active
+# v2 host or use it to append rules there; update active hosts separately.
 - name: Gather IPs
   hosts: all
   tasks:
     - name: Store the IP of each host in its own variable
       set_fact:
         host_ip_address: "{{ ansible_facts['default_ipv4']['address'] }}"
+      when: not (sketch_firewall_v2_enabled | default(false) | bool)
 
 - name: Configure sketch hosts
   hosts: all
@@ -25,6 +33,63 @@
       set_fact:
         aggregated_ips: "{{ groups['all'] | map('extract', hostvars, 'host_ip_address') | list }}"
       delegate_to: localhost
+      when: not (sketch_firewall_v2_enabled | default(false) | bool)
+
+    - name: Require host-specific Sketch firewall inputs
+      assert:
+        that:
+          - sketch_firewall_v2_ssh_sources is defined
+          - sketch_firewall_v2_ssh_sources is sequence
+          - sketch_firewall_v2_ssh_sources is not string
+          - sketch_firewall_v2_ssh_sources | length > 0
+          - sketch_firewall_v2_rules is defined
+          - sketch_firewall_v2_rules is sequence
+          - sketch_firewall_v2_rules is not string
+        fail_msg: "Opt-in Sketch firewall requires this host's SSH /32 sources and TCP/UDP rules."
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Validate this host's SSH sources
+      assert:
+        that:
+          - item is string
+          - item is match('^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])/32$')
+          - item != '0.0.0.0/32'
+        fail_msg: "Sketch SSH sources must be explicit IPv4 /32 predecessor addresses."
+      loop: "{{ sketch_firewall_v2_ssh_sources | default([]) }}"
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Validate this host's traffic rules
+      assert:
+        that:
+          - item is mapping
+          - item.proto is defined and item.proto in ['tcp', 'udp']
+          - item.port is defined and (item.port | string) is match('^[0-9]{1,5}$')
+          - item.port | int >= 1
+          - item.port | int <= 65535
+          - item.port | int != 22
+          - item.from_ip is defined and item.from_ip is string and item.from_ip | length > 0
+        fail_msg: "Sketch traffic rules need a source, TCP/UDP protocol, and port other than 22."
+      loop: "{{ sketch_firewall_v2_rules | default([]) }}"
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Ensure UFW is installed for the opt-in policy
+      apt:
+        name: ufw
+        state: present
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Inspect existing UFW state before replacing rules
+      command: ufw status
+      register: sketch_firewall_v2_status
+      changed_when: false
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Refuse opt-in policy on a host with active UFW
+      assert:
+        that:
+          - "'Status: inactive' in sketch_firewall_v2_status.stdout"
+        fail_msg: "UFW is already active; review and migrate its rules before opting in."
+      when: sketch_firewall_v2_enabled | default(false) | bool
 
     - name: Set the hostname
       hostname:
@@ -34,6 +99,10 @@
       apt:
         update_cache: yes
         upgrade: dist
+      register: sketch_apt_update_upgrade
+      retries: 20
+      delay: 30
+      until: sketch_apt_update_upgrade is succeeded
 
     - name: Install required packages
       apt:
@@ -41,6 +110,10 @@
           - unattended-upgrades
           - nginx
         state: present
+      register: sketch_apt_required_packages
+      retries: 20
+      delay: 30
+      until: sketch_apt_required_packages is succeeded
 
     - name: Create user
       user:
@@ -91,12 +164,25 @@
         line: 'ChallengeResponseAuthentication no'
       notify:
       - Reload sshd
+    - name: Allow Backflips forwarding for the sketch transport account
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        insertafter: EOF
+        marker: '# {mark} ANSIBLE MANAGED BLOCK: Backflips sketch forwarding'
+        block: |
+          Match User sketchssh
+            AllowTcpForwarding remote
+            GatewayPorts yes
+        validate: '/usr/sbin/sshd -t -f %s'
+      notify:
+      - Reload sshd
 
     - name: Allow all IPs in aggregated_ips to allow in ufw
       ufw:
         rule: allow
         from_ip: "{{ item }}"
-      with_items: "{{ aggregated_ips }}"
+      with_items: "{{ aggregated_ips | default([]) }}"
+      when: not (sketch_firewall_v2_enabled | default(false) | bool)
 
     - name: Open required ports
       ufw:
@@ -104,6 +190,7 @@
         port: "{{ item }}"
         proto: tcp
       with_items: "{{ required_ports }}"
+      when: not (sketch_firewall_v2_enabled | default(false) | bool)
 
     - name: Block incoming/outgoing ipv6
       ufw:
@@ -113,6 +200,36 @@
       with_items:
         - in
         - out
+      when: not (sketch_firewall_v2_enabled | default(false) | bool)
+
+    - name: Clear inactive UFW rules for the opt-in policy
+      ufw:
+        state: reset
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Deny unsolicited incoming traffic for the opt-in policy
+      ufw:
+        default: deny
+        direction: incoming
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Allow this host's predecessor SSH sources
+      ufw:
+        rule: allow
+        from_ip: "{{ item }}"
+        port: '22'
+        proto: tcp
+      loop: "{{ sketch_firewall_v2_ssh_sources | default([]) }}"
+      when: sketch_firewall_v2_enabled | default(false) | bool
+
+    - name: Allow this host's selected traffic
+      ufw:
+        rule: allow
+        from_ip: "{{ item.from_ip }}"
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+      loop: "{{ sketch_firewall_v2_rules | default([]) }}"
+      when: sketch_firewall_v2_enabled | default(false) | bool
 
     - name: Enable ufw
       ufw:

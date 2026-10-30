@@ -1,0 +1,3977 @@
+{
+  "applyable": true,
+  "checks": [
+    {
+      "address": {
+        "kind": "var",
+        "name": "<redacted-898ec6b0f7e34f1b>",
+        "to_display": "var.var_003"
+      },
+      "instances": [
+        {
+          "address": {
+            "to_display": "<redacted-e4c7b9201865cb3a>"
+          },
+          "status": "<redacted-971d44a08b89e559>"
+        }
+      ],
+      "status": "<redacted-971d44a08b89e559>"
+    },
+    {
+      "address": {
+        "kind": "var",
+        "name": "<redacted-f46c8cdd2d5dc1b1>",
+        "to_display": "var.var_010"
+      },
+      "instances": [
+        {
+          "address": {
+            "to_display": "<redacted-ca24e312be5f1c81>"
+          },
+          "status": "<redacted-971d44a08b89e559>"
+        }
+      ],
+      "status": "<redacted-971d44a08b89e559>"
+    }
+  ],
+  "complete": true,
+  "configuration": {
+    "provider_config": {
+      "provider_alias_001": {
+        "expressions": {
+          "data_key_159": {
+            "references": [
+              "<redacted-4d1ed90918337c69>"
+            ]
+          }
+        },
+        "full_name": "<redacted-b469c4359bce0d7a>",
+        "name": "<redacted-3ed517e0514ad4d5>"
+      },
+      "provider_alias_002": {
+        "full_name": "<redacted-458a577ab03f7013>",
+        "name": "<redacted-34d9e5002d4a8842>"
+      },
+      "provider_alias_003": {
+        "full_name": "<redacted-61ffba4e3b8f13ea>",
+        "name": "<redacted-4c6edd9eba2171a1>"
+      }
+    },
+    "root_module": {
+      "outputs": {
+        "output_001": {
+          "expression": {
+            "references": [
+              "linode_instance.resource_001"
+            ]
+          }
+        },
+        "output_002": {
+          "expression": {
+            "references": [
+              "linode_instance.resource_001"
+            ]
+          }
+        },
+        "output_003": {
+          "depends_on": [
+            "<redacted-ec662abee007c7a8>"
+          ],
+          "expression": {
+            "constant_value": "<redacted-a04bc2f2e8948055>"
+          }
+        },
+        "output_004": {
+          "expression": {
+            "references": [
+              "linode_instance.resource_002"
+            ]
+          }
+        },
+        "output_005": {
+          "expression": {
+            "references": [
+              "linode_instance.resource_002"
+            ]
+          }
+        },
+        "output_006": {
+          "expression": {
+            "references": [
+              "local.local_003"
+            ]
+          }
+        },
+        "output_007": {
+          "depends_on": [
+            "<redacted-ec662abee007c7a8>"
+          ],
+          "expression": {
+            "references": [
+              "random_password.resource_005.result",
+              "random_password.resource_005"
+            ]
+          },
+          "sensitive": true
+        },
+        "output_008": {
+          "depends_on": [
+            "<redacted-ec662abee007c7a8>"
+          ],
+          "expression": {
+            "constant_value": "<redacted-88954d6ead7bcc7f>"
+          }
+        },
+        "output_009": {
+          "depends_on": [
+            "<redacted-ec662abee007c7a8>"
+          ],
+          "expression": {
+            "references": [
+              "local.local_003",
+              "local.local_001"
+            ]
+          }
+        }
+      },
+      "resources": [
+        {
+          "address": "linode_firewall.firewall",
+          "expressions": {
+            "data_key_038": {
+              "constant_value": "<redacted-0b46ea4474a269c9>"
+            },
+            "data_key_048": {
+              "references": [
+                "var.var_007",
+                "var.var_015"
+              ]
+            },
+            "data_key_051": {
+              "references": [
+                "linode_instance.resource_002",
+                "linode_instance.resource_001"
+              ]
+            },
+            "data_key_071": {
+              "constant_value": "<redacted-f0dabf39ebb3d4eb>"
+            },
+            "data_key_157": {
+              "references": [
+                "var.var_014"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "firewall",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 0,
+          "type": "linode_firewall"
+        },
+        {
+          "address": "linode_instance.resource_001",
+          "count_expression": {
+            "references": [
+              "<redacted-e4c7b9201865cb3a>",
+              "<redacted-daa060399bee42ca>"
+            ]
+          },
+          "expressions": {
+            "data_key_003": {
+              "references": [
+                "local.local_003"
+              ]
+            },
+            "data_key_037": {
+              "references": [
+                "var.var_009"
+              ]
+            },
+            "data_key_048": {
+              "references": [
+                "var.var_007",
+                "var.var_005",
+                "count.index",
+                "var.var_003",
+                "count.index",
+                "var.var_003",
+                "var.var_004",
+                "var.var_015"
+              ]
+            },
+            "data_key_078": {
+              "references": [
+                "var.var_005",
+                "count.index",
+                "var.var_003"
+              ]
+            },
+            "data_key_082": {
+              "references": [
+                "random_password.resource_005.result",
+                "random_password.resource_005"
+              ]
+            },
+            "data_key_157": {
+              "references": [
+                "var.var_007"
+              ]
+            },
+            "data_key_162": {
+              "references": [
+                "var.var_006"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "resource_001",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 0,
+          "type": "linode_instance"
+        },
+        {
+          "address": "linode_instance.resource_002",
+          "count_expression": {
+            "references": [
+              "<redacted-ca24e312be5f1c81>"
+            ]
+          },
+          "expressions": {
+            "data_key_003": {
+              "references": [
+                "local.local_003"
+              ]
+            },
+            "data_key_037": {
+              "references": [
+                "var.var_009"
+              ]
+            },
+            "data_key_048": {
+              "references": [
+                "count.index",
+                "var.var_011",
+                "var.var_007",
+                "var.var_015"
+              ]
+            },
+            "data_key_078": {
+              "references": [
+                "var.var_012"
+              ]
+            },
+            "data_key_082": {
+              "references": [
+                "random_password.resource_005.result",
+                "random_password.resource_005"
+              ]
+            },
+            "data_key_157": {
+              "references": [
+                "var.var_007"
+              ]
+            },
+            "data_key_162": {
+              "references": [
+                "var.var_013"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "resource_002",
+          "provider_config_key": "provider_alias_001",
+          "schema_version": 0,
+          "type": "linode_instance"
+        },
+        {
+          "address": "local_file.resource_003",
+          "count_expression": {
+            "constant_value": 37410228114729
+          },
+          "depends_on": [
+            "<redacted-dfe239c0ec6122d4>",
+            "<redacted-46f165529c92b8fa>"
+          ],
+          "expressions": {
+            "data_key_016": {
+              "references": [
+                "linode_instance.resource_002",
+                "linode_instance.resource_001",
+                "local.local_002",
+                "var.var_007"
+              ]
+            },
+            "data_key_028": {
+              "constant_value": "<redacted-0f22474cd034d5dd>"
+            },
+            "data_key_029": {
+              "constant_value": "<redacted-0d579ea28054b771>"
+            }
+          },
+          "mode": "managed",
+          "name": "resource_003",
+          "provider_config_key": "provider_alias_002",
+          "schema_version": 0,
+          "type": "local_file"
+        },
+        {
+          "address": "local_file.resource_004",
+          "count_expression": {
+            "constant_value": 37410228114729
+          },
+          "depends_on": [
+            "<redacted-dfe239c0ec6122d4>",
+            "<redacted-46f165529c92b8fa>"
+          ],
+          "expressions": {
+            "data_key_016": {
+              "references": [
+                "var.var_007",
+                "local.local_002",
+                "linode_instance.resource_002",
+                "linode_instance.resource_001"
+              ]
+            },
+            "data_key_028": {
+              "constant_value": "<redacted-0f22474cd034d5dd>"
+            },
+            "data_key_029": {
+              "references": [
+                "var.var_016",
+                "var.var_007"
+              ]
+            }
+          },
+          "mode": "managed",
+          "name": "resource_004",
+          "provider_config_key": "provider_alias_002",
+          "schema_version": 0,
+          "type": "local_file"
+        },
+        {
+          "address": "random_password.resource_005",
+          "expressions": {
+            "data_key_049": {
+              "constant_value": 24695750223494
+            }
+          },
+          "mode": "managed",
+          "name": "resource_005",
+          "provider_config_key": "provider_alias_003",
+          "schema_version": 3,
+          "type": "random_password"
+        }
+      ],
+      "variables": {
+        "var_001": {
+          "default": [
+            "<redacted-d627d94a026f379d>",
+            "<redacted-acee6c469b972c52>",
+            "<redacted-1cc513ee779d05ca>",
+            "<redacted-6ad383bac3ecfa59>"
+          ],
+          "description": "<redacted-5c4adeb51cbb1b48>"
+        },
+        "var_002": {
+          "default": []
+        },
+        "var_003": {
+          "default": 44423030531443,
+          "description": "<redacted-2ededaa9893e56b8>"
+        },
+        "var_004": {
+          "default": 44423030531443,
+          "description": "<redacted-920a3e7aa054087a>"
+        },
+        "var_005": {},
+        "var_006": {
+          "default": "<redacted-dd5dddbf7bf59643>",
+          "description": "<redacted-927fb56c2d2b4b41>"
+        },
+        "var_007": {},
+        "var_008": {},
+        "var_009": {},
+        "var_010": {
+          "default": 44423030531443,
+          "description": "<redacted-0a174ac7ca90a7da>"
+        },
+        "var_011": {
+          "default": 44423030531443,
+          "description": "<redacted-bba1d28b44e09041>"
+        },
+        "var_012": {},
+        "var_013": {
+          "default": "<redacted-dd5dddbf7bf59643>",
+          "description": "<redacted-e53a26bfbc0954cc>"
+        },
+        "var_014": {
+          "default": []
+        },
+        "var_015": {
+          "default": "<redacted-2a7b3a9da7524d38>",
+          "description": "<redacted-81b6895ea742afd5>"
+        },
+        "var_016": {
+          "default": "<redacted-be35dbd5435a776b>",
+          "description": "<redacted-4e9aa0bb477e6e67>"
+        },
+        "var_017": {
+          "default": "<redacted-2a7b3a9da7524d38>",
+          "description": "<redacted-3dac3eea912c4db3>"
+        },
+        "var_018": {
+          "default": "<redacted-2a7b3a9da7524d38>",
+          "description": "<redacted-800aa5322228cae0>"
+        }
+      }
+    }
+  },
+  "errored": false,
+  "format_version": "1.2",
+  "output_changes": {
+    "output_001": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [],
+      "before_sensitive": false
+    },
+    "output_002": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [],
+      "before_sensitive": false
+    },
+    "output_003": {
+      "actions": [
+        "no-op"
+      ],
+      "after": "<redacted-a04bc2f2e8948055>",
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": "<redacted-a04bc2f2e8948055>",
+      "before_sensitive": false
+    },
+    "output_004": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [
+        "<redacted-485ead0eaa0a23e0>"
+      ],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [
+        "<redacted-485ead0eaa0a23e0>"
+      ],
+      "before_sensitive": false
+    },
+    "output_005": {
+      "actions": [
+        "no-op"
+      ],
+      "after": [
+        "<redacted-9a219d15e9e543f2>"
+      ],
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": [
+        "<redacted-9a219d15e9e543f2>"
+      ],
+      "before_sensitive": false
+    },
+    "output_006": {
+      "actions": [
+        "update"
+      ],
+      "after": "<redacted-a875a4c18170ee96>",
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": "<redacted-41d2bd6184b0e804>",
+      "before_sensitive": false
+    },
+    "output_007": {
+      "actions": [
+        "no-op"
+      ],
+      "after": "<redacted-2236390e5ba65dab>",
+      "after_sensitive": true,
+      "after_unknown": false,
+      "before": "<redacted-2236390e5ba65dab>",
+      "before_sensitive": true
+    },
+    "output_008": {
+      "actions": [
+        "no-op"
+      ],
+      "after": "<redacted-88954d6ead7bcc7f>",
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": "<redacted-88954d6ead7bcc7f>",
+      "before_sensitive": false
+    },
+    "output_009": {
+      "actions": [
+        "update"
+      ],
+      "after": "<redacted-27ed7686cd05d5ec>",
+      "after_sensitive": false,
+      "after_unknown": false,
+      "before": "<redacted-7d808290df2eb7d4>",
+      "before_sensitive": false
+    }
+  },
+  "planned_values": {
+    "outputs": {
+      "output_001": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          []
+        ],
+        "value": []
+      },
+      "output_002": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          []
+        ],
+        "value": []
+      },
+      "output_003": {
+        "sensitive": false,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-a04bc2f2e8948055>"
+      },
+      "output_004": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          [
+            "<redacted-9aebe0b8205b2c3c>"
+          ]
+        ],
+        "value": [
+          "<redacted-485ead0eaa0a23e0>"
+        ]
+      },
+      "output_005": {
+        "sensitive": false,
+        "type": [
+          "<redacted-810229ff3d8afea4>",
+          [
+            "<redacted-9aebe0b8205b2c3c>"
+          ]
+        ],
+        "value": [
+          "<redacted-9a219d15e9e543f2>"
+        ]
+      },
+      "output_006": {
+        "sensitive": false,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-a875a4c18170ee96>"
+      },
+      "output_007": {
+        "sensitive": true,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-2236390e5ba65dab>"
+      },
+      "output_008": {
+        "sensitive": false,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-88954d6ead7bcc7f>"
+      },
+      "output_009": {
+        "sensitive": false,
+        "type": "<redacted-9aebe0b8205b2c3c>",
+        "value": "<redacted-27ed7686cd05d5ec>"
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "linode_firewall.firewall",
+          "mode": "managed",
+          "name": "firewall",
+          "provider_name": "registry.terraform.io/linode/linode",
+          "schema_version": 0,
+          "sensitive_values": {
+            "data_key_041": [],
+            "devices": [
+              {}
+            ],
+            "inbound": [
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv4": [
+                  false
+                ]
+              },
+              {
+                "ipv6": [
+                  false
+                ]
+              },
+              {
+                "ipv6": [
+                  false
+                ]
+              },
+              {
+                "ipv6": [
+                  false
+                ]
+              }
+            ],
+            "linodes": [
+              false
+            ],
+            "nodebalancers": [],
+            "outbound": [
+              {
+                "ipv6": [
+                  false
+                ]
+              },
+              {
+                "ipv6": [
+                  false
+                ]
+              },
+              {
+                "ipv6": [
+                  false
+                ]
+              }
+            ],
+            "tags": [
+              false
+            ]
+          },
+          "type": "linode_firewall",
+          "values": {
+            "created": "<redacted-ee74f8197cebf5f8>",
+            "data_key_021": false,
+            "data_key_041": [],
+            "devices": [
+              {
+                "entity_id": 2409665757992,
+                "id": 115116003450623,
+                "label": "<label-38ada140f2766fec>",
+                "type": "<type-93f505703d558c5b>",
+                "url": "<url-05e83b140b41da78>"
+              }
+            ],
+            "fingerprint": "<redacted-2a732d0b8ce1b29e>",
+            "id": "<redacted-f942fe1639688055>",
+            "inbound": [
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6": null,
+                "label": "allow-tcp-22",
+                "ports": "22",
+                "protocol": "TCP"
+              },
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6": null,
+                "label": "allow-tcp-80",
+                "ports": "80",
+                "protocol": "TCP"
+              },
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6": null,
+                "label": "allow-tcp-443",
+                "ports": "443",
+                "protocol": "TCP"
+              },
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6": null,
+                "label": "allow-tcp-2222",
+                "ports": "2222",
+                "protocol": "TCP"
+              },
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6": null,
+                "label": "allow-udp-8000",
+                "ports": "8000",
+                "protocol": "UDP"
+              },
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "<ip-70b6008cb14d4d3b>"
+                ],
+                "ipv6": null,
+                "label": "rule_label_002",
+                "ports": null,
+                "protocol": "TCP"
+              },
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "<ip-70b6008cb14d4d3b>"
+                ],
+                "ipv6": null,
+                "label": "rule_label_003",
+                "ports": null,
+                "protocol": "UDP"
+              },
+              {
+                "action": "ACCEPT",
+                "description": "",
+                "ipv4": [
+                  "<ip-70b6008cb14d4d3b>"
+                ],
+                "ipv6": null,
+                "label": "rule_label_001",
+                "ports": null,
+                "protocol": "ICMP"
+              },
+              {
+                "action": "DROP",
+                "description": "",
+                "ipv4": null,
+                "ipv6": [
+                  "::/0"
+                ],
+                "label": "rule_label_005",
+                "ports": null,
+                "protocol": "TCP"
+              },
+              {
+                "action": "DROP",
+                "description": "",
+                "ipv4": null,
+                "ipv6": [
+                  "::/0"
+                ],
+                "label": "rule_label_006",
+                "ports": null,
+                "protocol": "UDP"
+              },
+              {
+                "action": "DROP",
+                "description": "",
+                "ipv4": null,
+                "ipv6": [
+                  "::/0"
+                ],
+                "label": "rule_label_004",
+                "ports": null,
+                "protocol": "ICMP"
+              }
+            ],
+            "inbound_policy": "DROP",
+            "label": "<redacted-3116e72b07b9766a>",
+            "linodes": [
+              2409665757992
+            ],
+            "nodebalancers": [],
+            "outbound": [
+              {
+                "action": "DROP",
+                "description": "",
+                "ipv4": null,
+                "ipv6": [
+                  "::/0"
+                ],
+                "label": "rule_label_005",
+                "ports": null,
+                "protocol": "TCP"
+              },
+              {
+                "action": "DROP",
+                "description": "",
+                "ipv4": null,
+                "ipv6": [
+                  "::/0"
+                ],
+                "label": "rule_label_006",
+                "ports": null,
+                "protocol": "UDP"
+              },
+              {
+                "action": "DROP",
+                "description": "",
+                "ipv4": null,
+                "ipv6": [
+                  "::/0"
+                ],
+                "label": "rule_label_004",
+                "ports": null,
+                "protocol": "ICMP"
+              }
+            ],
+            "outbound_policy": "ACCEPT",
+            "status": "<redacted-11ad0e0b77539806>",
+            "tags": [
+              "<redacted-4a4b49fa8703f8d6>"
+            ],
+            "updated": "<redacted-9e6f0cecdd1957e8>",
+            "version": 109550207297041
+          }
+        },
+        {
+          "address": "linode_instance.resource_002[0]",
+          "index": 0,
+          "mode": "managed",
+          "name": "resource_002",
+          "provider_name": "registry.terraform.io/linode/linode",
+          "schema_version": 0,
+          "sensitive_values": {
+            "data_key_002": [
+              {}
+            ],
+            "data_key_003": [
+              false
+            ],
+            "data_key_007": [
+              {
+                "data_key_084": [
+                  {}
+                ]
+              }
+            ],
+            "data_key_013": [
+              false,
+              false
+            ],
+            "data_key_015": [
+              {
+                "data_key_019": [
+                  {
+                    "data_key_085": [
+                      {}
+                    ],
+                    "data_key_086": [],
+                    "data_key_087": [],
+                    "data_key_088": [],
+                    "data_key_089": [],
+                    "data_key_090": [],
+                    "data_key_091": [],
+                    "data_key_092": [],
+                    "data_key_093": [],
+                    "data_key_094": [],
+                    "data_key_095": [],
+                    "data_key_096": [],
+                    "data_key_097": [],
+                    "data_key_098": [],
+                    "data_key_099": [],
+                    "data_key_100": [],
+                    "data_key_101": [],
+                    "data_key_102": [],
+                    "data_key_103": [],
+                    "data_key_104": [],
+                    "data_key_105": [],
+                    "data_key_106": [],
+                    "data_key_107": [],
+                    "data_key_108": [],
+                    "data_key_109": [],
+                    "data_key_110": [],
+                    "data_key_111": [],
+                    "data_key_112": [
+                      {}
+                    ],
+                    "data_key_113": [],
+                    "data_key_114": [],
+                    "data_key_115": [],
+                    "data_key_116": [],
+                    "data_key_117": [],
+                    "data_key_118": [],
+                    "data_key_119": [],
+                    "data_key_120": [],
+                    "data_key_121": [],
+                    "data_key_122": [],
+                    "data_key_123": [],
+                    "data_key_124": [],
+                    "data_key_125": [],
+                    "data_key_126": [],
+                    "data_key_127": [],
+                    "data_key_128": [],
+                    "data_key_129": [],
+                    "data_key_130": [],
+                    "data_key_131": [],
+                    "data_key_132": [],
+                    "data_key_133": [],
+                    "data_key_134": [],
+                    "data_key_135": [],
+                    "data_key_136": [],
+                    "data_key_137": [],
+                    "data_key_138": [],
+                    "data_key_139": [],
+                    "data_key_140": [],
+                    "data_key_141": [],
+                    "data_key_142": [],
+                    "data_key_143": [],
+                    "data_key_144": [],
+                    "data_key_145": [],
+                    "data_key_146": [],
+                    "data_key_147": [],
+                    "data_key_148": []
+                  }
+                ],
+                "data_key_034": [
+                  {}
+                ],
+                "data_key_039": []
+              }
+            ],
+            "data_key_022": [
+              {
+                "data_key_003": [],
+                "data_key_004": [],
+                "data_key_082": true,
+                "data_key_153": true
+              },
+              {
+                "data_key_003": [],
+                "data_key_004": [],
+                "data_key_082": true,
+                "data_key_153": true
+              }
+            ],
+            "data_key_039": [],
+            "data_key_044": [
+              false
+            ],
+            "data_key_050": [],
+            "data_key_053": [],
+            "data_key_058": [],
+            "data_key_073": [],
+            "data_key_082": true,
+            "data_key_149": [],
+            "data_key_152": [
+              {}
+            ],
+            "data_key_153": true,
+            "data_key_157": [
+              false
+            ]
+          },
+          "type": "linode_instance",
+          "values": {
+            "data_key_002": [
+              {
+                "data_key_017": 30533709456738,
+                "data_key_042": 53266605065560,
+                "data_key_067": 17420498984910,
+                "data_key_068": 17420498984910,
+                "data_key_161": 62028378709716
+              }
+            ],
+            "data_key_003": [
+              "<redacted-27de7099246fe1ec>"
+            ],
+            "data_key_004": null,
+            "data_key_006": null,
+            "data_key_007": [
+              {
+                "data_key_005": false,
+                "data_key_027": false,
+                "data_key_084": [
+                  {
+                    "data_key_018": "<redacted-2a7b3a9da7524d38>",
+                    "data_key_169": "<redacted-2a7b3a9da7524d38>"
+                  }
+                ]
+              }
+            ],
+            "data_key_008": false,
+            "data_key_010": "<redacted-60d64e8c384d2c2a>",
+            "data_key_011": null,
+            "data_key_012": true,
+            "data_key_013": [
+              "<redacted-d0b62f5a73cfa7b5>",
+              "<redacted-3b04f78690b10b9f>"
+            ],
+            "data_key_015": [
+              {
+                "data_key_014": "<redacted-2a7b3a9da7524d38>",
+                "data_key_019": [
+                  {
+                    "data_key_085": [
+                      {
+                        "data_key_024": 118014212061783,
+                        "data_key_025": "<redacted-2cfdc0a1366a7148>",
+                        "data_key_167": 37410228114729
+                      }
+                    ],
+                    "data_key_086": [],
+                    "data_key_087": [],
+                    "data_key_088": [],
+                    "data_key_089": [],
+                    "data_key_090": [],
+                    "data_key_091": [],
+                    "data_key_092": [],
+                    "data_key_093": [],
+                    "data_key_094": [],
+                    "data_key_095": [],
+                    "data_key_096": [],
+                    "data_key_097": [],
+                    "data_key_098": [],
+                    "data_key_099": [],
+                    "data_key_100": [],
+                    "data_key_101": [],
+                    "data_key_102": [],
+                    "data_key_103": [],
+                    "data_key_104": [],
+                    "data_key_105": [],
+                    "data_key_106": [],
+                    "data_key_107": [],
+                    "data_key_108": [],
+                    "data_key_109": [],
+                    "data_key_110": [],
+                    "data_key_111": [],
+                    "data_key_112": [
+                      {
+                        "data_key_024": 28143597274208,
+                        "data_key_025": "<redacted-1231104a944e8e8c>",
+                        "data_key_167": 37410228114729
+                      }
+                    ],
+                    "data_key_113": [],
+                    "data_key_114": [],
+                    "data_key_115": [],
+                    "data_key_116": [],
+                    "data_key_117": [],
+                    "data_key_118": [],
+                    "data_key_119": [],
+                    "data_key_120": [],
+                    "data_key_121": [],
+                    "data_key_122": [],
+                    "data_key_123": [],
+                    "data_key_124": [],
+                    "data_key_125": [],
+                    "data_key_126": [],
+                    "data_key_127": [],
+                    "data_key_128": [],
+                    "data_key_129": [],
+                    "data_key_130": [],
+                    "data_key_131": [],
+                    "data_key_132": [],
+                    "data_key_133": [],
+                    "data_key_134": [],
+                    "data_key_135": [],
+                    "data_key_136": [],
+                    "data_key_137": [],
+                    "data_key_138": [],
+                    "data_key_139": [],
+                    "data_key_140": [],
+                    "data_key_141": [],
+                    "data_key_142": [],
+                    "data_key_143": [],
+                    "data_key_144": [],
+                    "data_key_145": [],
+                    "data_key_146": [],
+                    "data_key_147": [],
+                    "data_key_148": []
+                  }
+                ],
+                "data_key_034": [
+                  {
+                    "data_key_020": true,
+                    "data_key_026": true,
+                    "data_key_064": true,
+                    "data_key_065": true,
+                    "data_key_163": true
+                  }
+                ],
+                "data_key_036": 88110740954914,
+                "data_key_039": [],
+                "data_key_047": "<redacted-191ef6f48bf93db9>",
+                "data_key_048": "<redacted-60d64e8c384d2c2a>",
+                "data_key_057": 37410228114729,
+                "data_key_081": "<redacted-a5a7d403c95e8434>",
+                "data_key_083": "<redacted-d55af787a39a5b84>",
+                "data_key_166": "<redacted-2c9ef21b8e1bbca5>"
+              }
+            ],
+            "data_key_022": [
+              {
+                "data_key_003": [],
+                "data_key_004": [],
+                "data_key_030": "<redacted-496196bd2f23292f>",
+                "data_key_036": 118014212061783,
+                "data_key_037": "<redacted-2a7b3a9da7524d38>",
+                "data_key_048": "<redacted-2cfdc0a1366a7148>",
+                "data_key_077": false,
+                "data_key_082": "<redacted-2a7b3a9da7524d38>",
+                "data_key_150": 141551296037663,
+                "data_key_153": {},
+                "data_key_154": 37410228114729
+              },
+              {
+                "data_key_003": [],
+                "data_key_004": [],
+                "data_key_030": "<redacted-663a5dd9079d6be9>",
+                "data_key_036": 28143597274208,
+                "data_key_037": "<redacted-2a7b3a9da7524d38>",
+                "data_key_048": "<redacted-1231104a944e8e8c>",
+                "data_key_077": false,
+                "data_key_082": "<redacted-2a7b3a9da7524d38>",
+                "data_key_150": 125433402807936,
+                "data_key_153": {},
+                "data_key_154": 37410228114729
+              }
+            ],
+            "data_key_023": "<redacted-11ad0e0b77539806>",
+            "data_key_031": null,
+            "data_key_033": false,
+            "data_key_035": "<redacted-b7552defc97021a8>",
+            "data_key_036": "<redacted-485ead0eaa0a23e0>",
+            "data_key_037": "<redacted-409633cd016a066a>",
+            "data_key_039": [],
+            "data_key_040": "<redacted-b06bb6a7f09bc9d7>",
+            "data_key_043": "<redacted-9a219d15e9e543f2>",
+            "data_key_044": [
+              "<redacted-9a219d15e9e543f2>"
+            ],
+            "data_key_045": "<redacted-a389f7a51f5ba2a3>",
+            "data_key_047": null,
+            "data_key_048": "<redacted-c8e9ba62b53f35df>",
+            "data_key_050": [],
+            "data_key_052": 37410228114729,
+            "data_key_053": [],
+            "data_key_055": "<redacted-7dcb76bbb50864bb>",
+            "data_key_058": [],
+            "data_key_059": "<redacted-810863cd4e2b9208>",
+            "data_key_066": null,
+            "data_key_073": [],
+            "data_key_074": null,
+            "data_key_075": false,
+            "data_key_076": null,
+            "data_key_078": "<redacted-c9affa1b29ff18aa>",
+            "data_key_079": false,
+            "data_key_082": "<redacted-8d0aa6ebbcc0f86f>",
+            "data_key_149": [],
+            "data_key_152": [
+              {
+                "data_key_001": 37410228114729,
+                "data_key_022": 21488366021516,
+                "data_key_032": 37410228114729,
+                "data_key_056": 88308691614971,
+                "data_key_160": 91693227799011,
+                "data_key_165": 44423030531443
+              }
+            ],
+            "data_key_153": null,
+            "data_key_154": null,
+            "data_key_155": "<redacted-3f8c845aab04b2df>",
+            "data_key_156": 125433402807936,
+            "data_key_157": [
+              "<redacted-4a4b49fa8703f8d6>"
+            ],
+            "data_key_158": null,
+            "data_key_162": "<redacted-dd5dddbf7bf59643>",
+            "data_key_168": true
+          }
+        },
+        {
+          "address": "random_password.resource_005",
+          "mode": "managed",
+          "name": "resource_005",
+          "provider_name": "registry.terraform.io/hashicorp/random",
+          "schema_version": 3,
+          "sensitive_values": {
+            "data_key_009": true,
+            "data_key_080": true
+          },
+          "type": "random_password",
+          "values": {
+            "data_key_009": "<redacted-e773f97afe2400c4>",
+            "data_key_036": "<redacted-d0dc7df88d5f74b8>",
+            "data_key_046": null,
+            "data_key_049": 24695750223494,
+            "data_key_054": true,
+            "data_key_060": 37410228114729,
+            "data_key_061": 37410228114729,
+            "data_key_062": 37410228114729,
+            "data_key_063": 37410228114729,
+            "data_key_069": true,
+            "data_key_070": true,
+            "data_key_072": null,
+            "data_key_080": "<redacted-2236390e5ba65dab>",
+            "data_key_151": true,
+            "data_key_164": true
+          }
+        }
+      ]
+    }
+  },
+  "prior_state": {
+    "format_version": "<redacted-cab6a8bf092d490a>",
+    "terraform_version": "<redacted-71ff809c06d12c29>",
+    "values": {
+      "outputs": {
+        "output_001": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            []
+          ],
+          "value": []
+        },
+        "output_002": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            []
+          ],
+          "value": []
+        },
+        "output_003": {
+          "sensitive": false,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-a04bc2f2e8948055>"
+        },
+        "output_004": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            [
+              "<redacted-9aebe0b8205b2c3c>"
+            ]
+          ],
+          "value": [
+            "<redacted-485ead0eaa0a23e0>"
+          ]
+        },
+        "output_005": {
+          "sensitive": false,
+          "type": [
+            "<redacted-810229ff3d8afea4>",
+            [
+              "<redacted-9aebe0b8205b2c3c>"
+            ]
+          ],
+          "value": [
+            "<redacted-9a219d15e9e543f2>"
+          ]
+        },
+        "output_006": {
+          "sensitive": false,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-a875a4c18170ee96>"
+        },
+        "output_007": {
+          "sensitive": true,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-2236390e5ba65dab>"
+        },
+        "output_008": {
+          "sensitive": false,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-88954d6ead7bcc7f>"
+        },
+        "output_009": {
+          "sensitive": false,
+          "type": "<redacted-9aebe0b8205b2c3c>",
+          "value": "<redacted-27ed7686cd05d5ec>"
+        }
+      },
+      "root_module": {
+        "resources": [
+          {
+            "address": "linode_firewall.firewall",
+            "depends_on": [
+              "<redacted-46f165529c92b8fa>",
+              "<redacted-dfe239c0ec6122d4>",
+              "<redacted-0693a1abad4b2ee6>"
+            ],
+            "mode": "managed",
+            "name": "firewall",
+            "provider_name": "registry.terraform.io/linode/linode",
+            "schema_version": 0,
+            "sensitive_values": {
+              "data_key_041": [],
+              "devices": [
+                {}
+              ],
+              "inbound": [
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv4": [
+                    false
+                  ]
+                },
+                {
+                  "ipv6": [
+                    false
+                  ]
+                },
+                {
+                  "ipv6": [
+                    false
+                  ]
+                },
+                {
+                  "ipv6": [
+                    false
+                  ]
+                }
+              ],
+              "linodes": [
+                false
+              ],
+              "nodebalancers": [],
+              "outbound": [
+                {
+                  "ipv6": [
+                    false
+                  ]
+                },
+                {
+                  "ipv6": [
+                    false
+                  ]
+                },
+                {
+                  "ipv6": [
+                    false
+                  ]
+                }
+              ],
+              "tags": [
+                false
+              ]
+            },
+            "type": "linode_firewall",
+            "values": {
+              "created": "<redacted-ee74f8197cebf5f8>",
+              "data_key_021": false,
+              "data_key_041": [],
+              "devices": [
+                {
+                  "entity_id": 2409665757992,
+                  "id": 115116003450623,
+                  "label": "<label-38ada140f2766fec>",
+                  "type": "<type-93f505703d558c5b>",
+                  "url": "<url-05e83b140b41da78>"
+                }
+              ],
+              "fingerprint": "<redacted-2a732d0b8ce1b29e>",
+              "id": "<redacted-f942fe1639688055>",
+              "inbound": [
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "0.0.0.0/0"
+                  ],
+                  "ipv6": null,
+                  "label": "allow-tcp-22",
+                  "ports": "22",
+                  "protocol": "TCP"
+                },
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "0.0.0.0/0"
+                  ],
+                  "ipv6": null,
+                  "label": "allow-tcp-80",
+                  "ports": "80",
+                  "protocol": "TCP"
+                },
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "0.0.0.0/0"
+                  ],
+                  "ipv6": null,
+                  "label": "allow-tcp-443",
+                  "ports": "443",
+                  "protocol": "TCP"
+                },
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "0.0.0.0/0"
+                  ],
+                  "ipv6": null,
+                  "label": "allow-tcp-2222",
+                  "ports": "2222",
+                  "protocol": "TCP"
+                },
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "0.0.0.0/0"
+                  ],
+                  "ipv6": null,
+                  "label": "allow-udp-8000",
+                  "ports": "8000",
+                  "protocol": "UDP"
+                },
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "<ip-70b6008cb14d4d3b>"
+                  ],
+                  "ipv6": null,
+                  "label": "rule_label_002",
+                  "ports": null,
+                  "protocol": "TCP"
+                },
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "<ip-70b6008cb14d4d3b>"
+                  ],
+                  "ipv6": null,
+                  "label": "rule_label_003",
+                  "ports": null,
+                  "protocol": "UDP"
+                },
+                {
+                  "action": "ACCEPT",
+                  "description": "",
+                  "ipv4": [
+                    "<ip-70b6008cb14d4d3b>"
+                  ],
+                  "ipv6": null,
+                  "label": "rule_label_001",
+                  "ports": null,
+                  "protocol": "ICMP"
+                },
+                {
+                  "action": "DROP",
+                  "description": "",
+                  "ipv4": null,
+                  "ipv6": [
+                    "::/0"
+                  ],
+                  "label": "rule_label_005",
+                  "ports": null,
+                  "protocol": "TCP"
+                },
+                {
+                  "action": "DROP",
+                  "description": "",
+                  "ipv4": null,
+                  "ipv6": [
+                    "::/0"
+                  ],
+                  "label": "rule_label_006",
+                  "ports": null,
+                  "protocol": "UDP"
+                },
+                {
+                  "action": "DROP",
+                  "description": "",
+                  "ipv4": null,
+                  "ipv6": [
+                    "::/0"
+                  ],
+                  "label": "rule_label_004",
+                  "ports": null,
+                  "protocol": "ICMP"
+                }
+              ],
+              "inbound_policy": "DROP",
+              "label": "<redacted-3116e72b07b9766a>",
+              "linodes": [
+                2409665757992
+              ],
+              "nodebalancers": [],
+              "outbound": [
+                {
+                  "action": "DROP",
+                  "description": "",
+                  "ipv4": null,
+                  "ipv6": [
+                    "::/0"
+                  ],
+                  "label": "rule_label_005",
+                  "ports": null,
+                  "protocol": "TCP"
+                },
+                {
+                  "action": "DROP",
+                  "description": "",
+                  "ipv4": null,
+                  "ipv6": [
+                    "::/0"
+                  ],
+                  "label": "rule_label_006",
+                  "ports": null,
+                  "protocol": "UDP"
+                },
+                {
+                  "action": "DROP",
+                  "description": "",
+                  "ipv4": null,
+                  "ipv6": [
+                    "::/0"
+                  ],
+                  "label": "rule_label_004",
+                  "ports": null,
+                  "protocol": "ICMP"
+                }
+              ],
+              "outbound_policy": "ACCEPT",
+              "status": "<redacted-11ad0e0b77539806>",
+              "tags": [
+                "<redacted-4a4b49fa8703f8d6>"
+              ],
+              "updated": "<redacted-9e6f0cecdd1957e8>",
+              "version": 109550207297041
+            }
+          },
+          {
+            "address": "linode_instance.resource_002[0]",
+            "depends_on": [
+              "<redacted-0693a1abad4b2ee6>"
+            ],
+            "index": 0,
+            "mode": "managed",
+            "name": "resource_002",
+            "provider_name": "registry.terraform.io/linode/linode",
+            "schema_version": 0,
+            "sensitive_values": {
+              "data_key_002": [
+                {}
+              ],
+              "data_key_003": [
+                false
+              ],
+              "data_key_007": [
+                {
+                  "data_key_084": [
+                    {}
+                  ]
+                }
+              ],
+              "data_key_013": [
+                false,
+                false
+              ],
+              "data_key_015": [
+                {
+                  "data_key_019": [
+                    {
+                      "data_key_085": [
+                        {}
+                      ],
+                      "data_key_086": [],
+                      "data_key_087": [],
+                      "data_key_088": [],
+                      "data_key_089": [],
+                      "data_key_090": [],
+                      "data_key_091": [],
+                      "data_key_092": [],
+                      "data_key_093": [],
+                      "data_key_094": [],
+                      "data_key_095": [],
+                      "data_key_096": [],
+                      "data_key_097": [],
+                      "data_key_098": [],
+                      "data_key_099": [],
+                      "data_key_100": [],
+                      "data_key_101": [],
+                      "data_key_102": [],
+                      "data_key_103": [],
+                      "data_key_104": [],
+                      "data_key_105": [],
+                      "data_key_106": [],
+                      "data_key_107": [],
+                      "data_key_108": [],
+                      "data_key_109": [],
+                      "data_key_110": [],
+                      "data_key_111": [],
+                      "data_key_112": [
+                        {}
+                      ],
+                      "data_key_113": [],
+                      "data_key_114": [],
+                      "data_key_115": [],
+                      "data_key_116": [],
+                      "data_key_117": [],
+                      "data_key_118": [],
+                      "data_key_119": [],
+                      "data_key_120": [],
+                      "data_key_121": [],
+                      "data_key_122": [],
+                      "data_key_123": [],
+                      "data_key_124": [],
+                      "data_key_125": [],
+                      "data_key_126": [],
+                      "data_key_127": [],
+                      "data_key_128": [],
+                      "data_key_129": [],
+                      "data_key_130": [],
+                      "data_key_131": [],
+                      "data_key_132": [],
+                      "data_key_133": [],
+                      "data_key_134": [],
+                      "data_key_135": [],
+                      "data_key_136": [],
+                      "data_key_137": [],
+                      "data_key_138": [],
+                      "data_key_139": [],
+                      "data_key_140": [],
+                      "data_key_141": [],
+                      "data_key_142": [],
+                      "data_key_143": [],
+                      "data_key_144": [],
+                      "data_key_145": [],
+                      "data_key_146": [],
+                      "data_key_147": [],
+                      "data_key_148": []
+                    }
+                  ],
+                  "data_key_034": [
+                    {}
+                  ],
+                  "data_key_039": []
+                }
+              ],
+              "data_key_022": [
+                {
+                  "data_key_003": [],
+                  "data_key_004": [],
+                  "data_key_082": true,
+                  "data_key_153": true
+                },
+                {
+                  "data_key_003": [],
+                  "data_key_004": [],
+                  "data_key_082": true,
+                  "data_key_153": true
+                }
+              ],
+              "data_key_039": [],
+              "data_key_044": [
+                false
+              ],
+              "data_key_050": [],
+              "data_key_053": [],
+              "data_key_058": [],
+              "data_key_073": [],
+              "data_key_082": true,
+              "data_key_149": [],
+              "data_key_152": [
+                {}
+              ],
+              "data_key_153": true,
+              "data_key_157": [
+                false
+              ]
+            },
+            "type": "linode_instance",
+            "values": {
+              "data_key_002": [
+                {
+                  "data_key_017": 30533709456738,
+                  "data_key_042": 53266605065560,
+                  "data_key_067": 17420498984910,
+                  "data_key_068": 17420498984910,
+                  "data_key_161": 62028378709716
+                }
+              ],
+              "data_key_003": [
+                "<redacted-27de7099246fe1ec>"
+              ],
+              "data_key_004": null,
+              "data_key_006": null,
+              "data_key_007": [
+                {
+                  "data_key_005": false,
+                  "data_key_027": false,
+                  "data_key_084": [
+                    {
+                      "data_key_018": "<redacted-2a7b3a9da7524d38>",
+                      "data_key_169": "<redacted-2a7b3a9da7524d38>"
+                    }
+                  ]
+                }
+              ],
+              "data_key_008": false,
+              "data_key_010": "<redacted-60d64e8c384d2c2a>",
+              "data_key_011": null,
+              "data_key_012": true,
+              "data_key_013": [
+                "<redacted-d0b62f5a73cfa7b5>",
+                "<redacted-3b04f78690b10b9f>"
+              ],
+              "data_key_015": [
+                {
+                  "data_key_014": "<redacted-2a7b3a9da7524d38>",
+                  "data_key_019": [
+                    {
+                      "data_key_085": [
+                        {
+                          "data_key_024": 118014212061783,
+                          "data_key_025": "<redacted-2cfdc0a1366a7148>",
+                          "data_key_167": 37410228114729
+                        }
+                      ],
+                      "data_key_086": [],
+                      "data_key_087": [],
+                      "data_key_088": [],
+                      "data_key_089": [],
+                      "data_key_090": [],
+                      "data_key_091": [],
+                      "data_key_092": [],
+                      "data_key_093": [],
+                      "data_key_094": [],
+                      "data_key_095": [],
+                      "data_key_096": [],
+                      "data_key_097": [],
+                      "data_key_098": [],
+                      "data_key_099": [],
+                      "data_key_100": [],
+                      "data_key_101": [],
+                      "data_key_102": [],
+                      "data_key_103": [],
+                      "data_key_104": [],
+                      "data_key_105": [],
+                      "data_key_106": [],
+                      "data_key_107": [],
+                      "data_key_108": [],
+                      "data_key_109": [],
+                      "data_key_110": [],
+                      "data_key_111": [],
+                      "data_key_112": [
+                        {
+                          "data_key_024": 28143597274208,
+                          "data_key_025": "<redacted-1231104a944e8e8c>",
+                          "data_key_167": 37410228114729
+                        }
+                      ],
+                      "data_key_113": [],
+                      "data_key_114": [],
+                      "data_key_115": [],
+                      "data_key_116": [],
+                      "data_key_117": [],
+                      "data_key_118": [],
+                      "data_key_119": [],
+                      "data_key_120": [],
+                      "data_key_121": [],
+                      "data_key_122": [],
+                      "data_key_123": [],
+                      "data_key_124": [],
+                      "data_key_125": [],
+                      "data_key_126": [],
+                      "data_key_127": [],
+                      "data_key_128": [],
+                      "data_key_129": [],
+                      "data_key_130": [],
+                      "data_key_131": [],
+                      "data_key_132": [],
+                      "data_key_133": [],
+                      "data_key_134": [],
+                      "data_key_135": [],
+                      "data_key_136": [],
+                      "data_key_137": [],
+                      "data_key_138": [],
+                      "data_key_139": [],
+                      "data_key_140": [],
+                      "data_key_141": [],
+                      "data_key_142": [],
+                      "data_key_143": [],
+                      "data_key_144": [],
+                      "data_key_145": [],
+                      "data_key_146": [],
+                      "data_key_147": [],
+                      "data_key_148": []
+                    }
+                  ],
+                  "data_key_034": [
+                    {
+                      "data_key_020": true,
+                      "data_key_026": true,
+                      "data_key_064": true,
+                      "data_key_065": true,
+                      "data_key_163": true
+                    }
+                  ],
+                  "data_key_036": 88110740954914,
+                  "data_key_039": [],
+                  "data_key_047": "<redacted-191ef6f48bf93db9>",
+                  "data_key_048": "<redacted-60d64e8c384d2c2a>",
+                  "data_key_057": 37410228114729,
+                  "data_key_081": "<redacted-a5a7d403c95e8434>",
+                  "data_key_083": "<redacted-d55af787a39a5b84>",
+                  "data_key_166": "<redacted-2c9ef21b8e1bbca5>"
+                }
+              ],
+              "data_key_022": [
+                {
+                  "data_key_003": [],
+                  "data_key_004": [],
+                  "data_key_030": "<redacted-496196bd2f23292f>",
+                  "data_key_036": 118014212061783,
+                  "data_key_037": "<redacted-2a7b3a9da7524d38>",
+                  "data_key_048": "<redacted-2cfdc0a1366a7148>",
+                  "data_key_077": false,
+                  "data_key_082": "<redacted-2a7b3a9da7524d38>",
+                  "data_key_150": 141551296037663,
+                  "data_key_153": {},
+                  "data_key_154": 37410228114729
+                },
+                {
+                  "data_key_003": [],
+                  "data_key_004": [],
+                  "data_key_030": "<redacted-663a5dd9079d6be9>",
+                  "data_key_036": 28143597274208,
+                  "data_key_037": "<redacted-2a7b3a9da7524d38>",
+                  "data_key_048": "<redacted-1231104a944e8e8c>",
+                  "data_key_077": false,
+                  "data_key_082": "<redacted-2a7b3a9da7524d38>",
+                  "data_key_150": 125433402807936,
+                  "data_key_153": {},
+                  "data_key_154": 37410228114729
+                }
+              ],
+              "data_key_023": "<redacted-11ad0e0b77539806>",
+              "data_key_031": null,
+              "data_key_033": false,
+              "data_key_035": "<redacted-b7552defc97021a8>",
+              "data_key_036": "<redacted-485ead0eaa0a23e0>",
+              "data_key_037": "<redacted-409633cd016a066a>",
+              "data_key_039": [],
+              "data_key_040": "<redacted-b06bb6a7f09bc9d7>",
+              "data_key_043": "<redacted-9a219d15e9e543f2>",
+              "data_key_044": [
+                "<redacted-9a219d15e9e543f2>"
+              ],
+              "data_key_045": "<redacted-a389f7a51f5ba2a3>",
+              "data_key_047": null,
+              "data_key_048": "<redacted-c8e9ba62b53f35df>",
+              "data_key_050": [],
+              "data_key_052": 37410228114729,
+              "data_key_053": [],
+              "data_key_055": "<redacted-7dcb76bbb50864bb>",
+              "data_key_058": [],
+              "data_key_059": "<redacted-810863cd4e2b9208>",
+              "data_key_066": null,
+              "data_key_073": [],
+              "data_key_074": null,
+              "data_key_075": false,
+              "data_key_076": null,
+              "data_key_078": "<redacted-c9affa1b29ff18aa>",
+              "data_key_079": false,
+              "data_key_082": "<redacted-8d0aa6ebbcc0f86f>",
+              "data_key_149": [],
+              "data_key_152": [
+                {
+                  "data_key_001": 37410228114729,
+                  "data_key_022": 21488366021516,
+                  "data_key_032": 37410228114729,
+                  "data_key_056": 88308691614971,
+                  "data_key_160": 91693227799011,
+                  "data_key_165": 44423030531443
+                }
+              ],
+              "data_key_153": null,
+              "data_key_154": null,
+              "data_key_155": "<redacted-3f8c845aab04b2df>",
+              "data_key_156": 125433402807936,
+              "data_key_157": [
+                "<redacted-4a4b49fa8703f8d6>"
+              ],
+              "data_key_158": null,
+              "data_key_162": "<redacted-dd5dddbf7bf59643>",
+              "data_key_168": true
+            }
+          },
+          {
+            "address": "random_password.resource_005",
+            "mode": "managed",
+            "name": "resource_005",
+            "provider_name": "registry.terraform.io/hashicorp/random",
+            "schema_version": 3,
+            "sensitive_values": {
+              "data_key_009": true,
+              "data_key_080": true
+            },
+            "type": "random_password",
+            "values": {
+              "data_key_009": "<redacted-e773f97afe2400c4>",
+              "data_key_036": "<redacted-d0dc7df88d5f74b8>",
+              "data_key_046": null,
+              "data_key_049": 24695750223494,
+              "data_key_054": true,
+              "data_key_060": 37410228114729,
+              "data_key_061": 37410228114729,
+              "data_key_062": 37410228114729,
+              "data_key_063": 37410228114729,
+              "data_key_069": true,
+              "data_key_070": true,
+              "data_key_072": null,
+              "data_key_080": "<redacted-2236390e5ba65dab>",
+              "data_key_151": true,
+              "data_key_164": true
+            }
+          }
+        ]
+      }
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "linode_firewall.firewall",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "created": "<redacted-ee74f8197cebf5f8>",
+          "data_key_021": false,
+          "data_key_041": [],
+          "devices": [
+            {
+              "entity_id": 2409665757992,
+              "id": 115116003450623,
+              "label": "<label-38ada140f2766fec>",
+              "type": "<type-93f505703d558c5b>",
+              "url": "<url-05e83b140b41da78>"
+            }
+          ],
+          "fingerprint": "<redacted-2a732d0b8ce1b29e>",
+          "id": "<redacted-f942fe1639688055>",
+          "inbound": [
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-22",
+              "ports": "22",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-80",
+              "ports": "80",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-443",
+              "ports": "443",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-2222",
+              "ports": "2222",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-udp-8000",
+              "ports": "8000",
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_002",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_003",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_001",
+              "ports": null,
+              "protocol": "ICMP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "inbound_policy": "DROP",
+          "label": "<redacted-3116e72b07b9766a>",
+          "linodes": [
+            2409665757992
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "outbound_policy": "ACCEPT",
+          "status": "<redacted-11ad0e0b77539806>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "updated": "<redacted-9e6f0cecdd1957e8>",
+          "version": 109550207297041
+        },
+        "after_sensitive": {
+          "data_key_041": [],
+          "devices": [
+            {}
+          ],
+          "inbound": [
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "linodes": [
+            false
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "tags": [
+            false
+          ]
+        },
+        "after_unknown": {},
+        "before": {
+          "created": "<redacted-ee74f8197cebf5f8>",
+          "data_key_021": false,
+          "data_key_041": [],
+          "devices": [
+            {
+              "entity_id": 2409665757992,
+              "id": 115116003450623,
+              "label": "<label-38ada140f2766fec>",
+              "type": "<type-93f505703d558c5b>",
+              "url": "<url-05e83b140b41da78>"
+            }
+          ],
+          "fingerprint": "<redacted-2a732d0b8ce1b29e>",
+          "id": "<redacted-f942fe1639688055>",
+          "inbound": [
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-22",
+              "ports": "22",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-80",
+              "ports": "80",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-443",
+              "ports": "443",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-2222",
+              "ports": "2222",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-udp-8000",
+              "ports": "8000",
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_002",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_003",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_001",
+              "ports": null,
+              "protocol": "ICMP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "inbound_policy": "DROP",
+          "label": "<redacted-3116e72b07b9766a>",
+          "linodes": [
+            2409665757992
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "outbound_policy": "ACCEPT",
+          "status": "<redacted-11ad0e0b77539806>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "updated": "<redacted-9e6f0cecdd1957e8>",
+          "version": 109550207297041
+        },
+        "before_sensitive": {
+          "data_key_041": [],
+          "devices": [
+            {}
+          ],
+          "inbound": [
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "linodes": [
+            false
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "tags": [
+            false
+          ]
+        }
+      },
+      "mode": "managed",
+      "name": "firewall",
+      "provider_name": "registry.terraform.io/linode/linode",
+      "type": "linode_firewall"
+    },
+    {
+      "address": "linode_instance.resource_002[0]",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "data_key_002": [
+            {
+              "data_key_017": 30533709456738,
+              "data_key_042": 53266605065560,
+              "data_key_067": 17420498984910,
+              "data_key_068": 17420498984910,
+              "data_key_161": 62028378709716
+            }
+          ],
+          "data_key_003": [
+            "<redacted-27de7099246fe1ec>"
+          ],
+          "data_key_004": null,
+          "data_key_006": null,
+          "data_key_007": [
+            {
+              "data_key_005": false,
+              "data_key_027": false,
+              "data_key_084": [
+                {
+                  "data_key_018": "<redacted-2a7b3a9da7524d38>",
+                  "data_key_169": "<redacted-2a7b3a9da7524d38>"
+                }
+              ]
+            }
+          ],
+          "data_key_008": false,
+          "data_key_010": "<redacted-60d64e8c384d2c2a>",
+          "data_key_011": null,
+          "data_key_012": true,
+          "data_key_013": [
+            "<redacted-d0b62f5a73cfa7b5>",
+            "<redacted-3b04f78690b10b9f>"
+          ],
+          "data_key_015": [
+            {
+              "data_key_014": "<redacted-2a7b3a9da7524d38>",
+              "data_key_019": [
+                {
+                  "data_key_085": [
+                    {
+                      "data_key_024": 118014212061783,
+                      "data_key_025": "<redacted-2cfdc0a1366a7148>",
+                      "data_key_167": 37410228114729
+                    }
+                  ],
+                  "data_key_086": [],
+                  "data_key_087": [],
+                  "data_key_088": [],
+                  "data_key_089": [],
+                  "data_key_090": [],
+                  "data_key_091": [],
+                  "data_key_092": [],
+                  "data_key_093": [],
+                  "data_key_094": [],
+                  "data_key_095": [],
+                  "data_key_096": [],
+                  "data_key_097": [],
+                  "data_key_098": [],
+                  "data_key_099": [],
+                  "data_key_100": [],
+                  "data_key_101": [],
+                  "data_key_102": [],
+                  "data_key_103": [],
+                  "data_key_104": [],
+                  "data_key_105": [],
+                  "data_key_106": [],
+                  "data_key_107": [],
+                  "data_key_108": [],
+                  "data_key_109": [],
+                  "data_key_110": [],
+                  "data_key_111": [],
+                  "data_key_112": [
+                    {
+                      "data_key_024": 28143597274208,
+                      "data_key_025": "<redacted-1231104a944e8e8c>",
+                      "data_key_167": 37410228114729
+                    }
+                  ],
+                  "data_key_113": [],
+                  "data_key_114": [],
+                  "data_key_115": [],
+                  "data_key_116": [],
+                  "data_key_117": [],
+                  "data_key_118": [],
+                  "data_key_119": [],
+                  "data_key_120": [],
+                  "data_key_121": [],
+                  "data_key_122": [],
+                  "data_key_123": [],
+                  "data_key_124": [],
+                  "data_key_125": [],
+                  "data_key_126": [],
+                  "data_key_127": [],
+                  "data_key_128": [],
+                  "data_key_129": [],
+                  "data_key_130": [],
+                  "data_key_131": [],
+                  "data_key_132": [],
+                  "data_key_133": [],
+                  "data_key_134": [],
+                  "data_key_135": [],
+                  "data_key_136": [],
+                  "data_key_137": [],
+                  "data_key_138": [],
+                  "data_key_139": [],
+                  "data_key_140": [],
+                  "data_key_141": [],
+                  "data_key_142": [],
+                  "data_key_143": [],
+                  "data_key_144": [],
+                  "data_key_145": [],
+                  "data_key_146": [],
+                  "data_key_147": [],
+                  "data_key_148": []
+                }
+              ],
+              "data_key_034": [
+                {
+                  "data_key_020": true,
+                  "data_key_026": true,
+                  "data_key_064": true,
+                  "data_key_065": true,
+                  "data_key_163": true
+                }
+              ],
+              "data_key_036": 88110740954914,
+              "data_key_039": [],
+              "data_key_047": "<redacted-191ef6f48bf93db9>",
+              "data_key_048": "<redacted-60d64e8c384d2c2a>",
+              "data_key_057": 37410228114729,
+              "data_key_081": "<redacted-a5a7d403c95e8434>",
+              "data_key_083": "<redacted-d55af787a39a5b84>",
+              "data_key_166": "<redacted-2c9ef21b8e1bbca5>"
+            }
+          ],
+          "data_key_022": [
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_030": "<redacted-496196bd2f23292f>",
+              "data_key_036": 118014212061783,
+              "data_key_037": "<redacted-2a7b3a9da7524d38>",
+              "data_key_048": "<redacted-2cfdc0a1366a7148>",
+              "data_key_077": false,
+              "data_key_082": "<redacted-2a7b3a9da7524d38>",
+              "data_key_150": 141551296037663,
+              "data_key_153": {},
+              "data_key_154": 37410228114729
+            },
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_030": "<redacted-663a5dd9079d6be9>",
+              "data_key_036": 28143597274208,
+              "data_key_037": "<redacted-2a7b3a9da7524d38>",
+              "data_key_048": "<redacted-1231104a944e8e8c>",
+              "data_key_077": false,
+              "data_key_082": "<redacted-2a7b3a9da7524d38>",
+              "data_key_150": 125433402807936,
+              "data_key_153": {},
+              "data_key_154": 37410228114729
+            }
+          ],
+          "data_key_023": "<redacted-11ad0e0b77539806>",
+          "data_key_031": null,
+          "data_key_033": false,
+          "data_key_035": "<redacted-b7552defc97021a8>",
+          "data_key_036": "<redacted-485ead0eaa0a23e0>",
+          "data_key_037": "<redacted-409633cd016a066a>",
+          "data_key_039": [],
+          "data_key_040": "<redacted-b06bb6a7f09bc9d7>",
+          "data_key_043": "<redacted-9a219d15e9e543f2>",
+          "data_key_044": [
+            "<redacted-9a219d15e9e543f2>"
+          ],
+          "data_key_045": "<redacted-a389f7a51f5ba2a3>",
+          "data_key_047": null,
+          "data_key_048": "<redacted-c8e9ba62b53f35df>",
+          "data_key_050": [],
+          "data_key_052": 37410228114729,
+          "data_key_053": [],
+          "data_key_055": "<redacted-7dcb76bbb50864bb>",
+          "data_key_058": [],
+          "data_key_059": "<redacted-810863cd4e2b9208>",
+          "data_key_066": null,
+          "data_key_073": [],
+          "data_key_074": null,
+          "data_key_075": false,
+          "data_key_076": null,
+          "data_key_078": "<redacted-c9affa1b29ff18aa>",
+          "data_key_079": false,
+          "data_key_082": "<redacted-8d0aa6ebbcc0f86f>",
+          "data_key_149": [],
+          "data_key_152": [
+            {
+              "data_key_001": 37410228114729,
+              "data_key_022": 21488366021516,
+              "data_key_032": 37410228114729,
+              "data_key_056": 88308691614971,
+              "data_key_160": 91693227799011,
+              "data_key_165": 44423030531443
+            }
+          ],
+          "data_key_153": null,
+          "data_key_154": null,
+          "data_key_155": "<redacted-3f8c845aab04b2df>",
+          "data_key_156": 125433402807936,
+          "data_key_157": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "data_key_158": null,
+          "data_key_162": "<redacted-dd5dddbf7bf59643>",
+          "data_key_168": true
+        },
+        "after_sensitive": {
+          "data_key_002": [
+            {}
+          ],
+          "data_key_003": [
+            false
+          ],
+          "data_key_007": [
+            {
+              "data_key_084": [
+                {}
+              ]
+            }
+          ],
+          "data_key_013": [
+            false,
+            false
+          ],
+          "data_key_015": [
+            {
+              "data_key_019": [
+                {
+                  "data_key_085": [
+                    {}
+                  ],
+                  "data_key_086": [],
+                  "data_key_087": [],
+                  "data_key_088": [],
+                  "data_key_089": [],
+                  "data_key_090": [],
+                  "data_key_091": [],
+                  "data_key_092": [],
+                  "data_key_093": [],
+                  "data_key_094": [],
+                  "data_key_095": [],
+                  "data_key_096": [],
+                  "data_key_097": [],
+                  "data_key_098": [],
+                  "data_key_099": [],
+                  "data_key_100": [],
+                  "data_key_101": [],
+                  "data_key_102": [],
+                  "data_key_103": [],
+                  "data_key_104": [],
+                  "data_key_105": [],
+                  "data_key_106": [],
+                  "data_key_107": [],
+                  "data_key_108": [],
+                  "data_key_109": [],
+                  "data_key_110": [],
+                  "data_key_111": [],
+                  "data_key_112": [
+                    {}
+                  ],
+                  "data_key_113": [],
+                  "data_key_114": [],
+                  "data_key_115": [],
+                  "data_key_116": [],
+                  "data_key_117": [],
+                  "data_key_118": [],
+                  "data_key_119": [],
+                  "data_key_120": [],
+                  "data_key_121": [],
+                  "data_key_122": [],
+                  "data_key_123": [],
+                  "data_key_124": [],
+                  "data_key_125": [],
+                  "data_key_126": [],
+                  "data_key_127": [],
+                  "data_key_128": [],
+                  "data_key_129": [],
+                  "data_key_130": [],
+                  "data_key_131": [],
+                  "data_key_132": [],
+                  "data_key_133": [],
+                  "data_key_134": [],
+                  "data_key_135": [],
+                  "data_key_136": [],
+                  "data_key_137": [],
+                  "data_key_138": [],
+                  "data_key_139": [],
+                  "data_key_140": [],
+                  "data_key_141": [],
+                  "data_key_142": [],
+                  "data_key_143": [],
+                  "data_key_144": [],
+                  "data_key_145": [],
+                  "data_key_146": [],
+                  "data_key_147": [],
+                  "data_key_148": []
+                }
+              ],
+              "data_key_034": [
+                {}
+              ],
+              "data_key_039": []
+            }
+          ],
+          "data_key_022": [
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_082": true,
+              "data_key_153": true
+            },
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_082": true,
+              "data_key_153": true
+            }
+          ],
+          "data_key_039": [],
+          "data_key_044": [
+            false
+          ],
+          "data_key_050": [],
+          "data_key_053": [],
+          "data_key_058": [],
+          "data_key_073": [],
+          "data_key_082": true,
+          "data_key_149": [],
+          "data_key_152": [
+            {}
+          ],
+          "data_key_153": true,
+          "data_key_157": [
+            false
+          ]
+        },
+        "after_unknown": {},
+        "before": {
+          "data_key_002": [
+            {
+              "data_key_017": 30533709456738,
+              "data_key_042": 53266605065560,
+              "data_key_067": 17420498984910,
+              "data_key_068": 17420498984910,
+              "data_key_161": 62028378709716
+            }
+          ],
+          "data_key_003": [
+            "<redacted-27de7099246fe1ec>"
+          ],
+          "data_key_004": null,
+          "data_key_006": null,
+          "data_key_007": [
+            {
+              "data_key_005": false,
+              "data_key_027": false,
+              "data_key_084": [
+                {
+                  "data_key_018": "<redacted-2a7b3a9da7524d38>",
+                  "data_key_169": "<redacted-2a7b3a9da7524d38>"
+                }
+              ]
+            }
+          ],
+          "data_key_008": false,
+          "data_key_010": "<redacted-60d64e8c384d2c2a>",
+          "data_key_011": null,
+          "data_key_012": true,
+          "data_key_013": [
+            "<redacted-d0b62f5a73cfa7b5>",
+            "<redacted-3b04f78690b10b9f>"
+          ],
+          "data_key_015": [
+            {
+              "data_key_014": "<redacted-2a7b3a9da7524d38>",
+              "data_key_019": [
+                {
+                  "data_key_085": [
+                    {
+                      "data_key_024": 118014212061783,
+                      "data_key_025": "<redacted-2cfdc0a1366a7148>",
+                      "data_key_167": 37410228114729
+                    }
+                  ],
+                  "data_key_086": [],
+                  "data_key_087": [],
+                  "data_key_088": [],
+                  "data_key_089": [],
+                  "data_key_090": [],
+                  "data_key_091": [],
+                  "data_key_092": [],
+                  "data_key_093": [],
+                  "data_key_094": [],
+                  "data_key_095": [],
+                  "data_key_096": [],
+                  "data_key_097": [],
+                  "data_key_098": [],
+                  "data_key_099": [],
+                  "data_key_100": [],
+                  "data_key_101": [],
+                  "data_key_102": [],
+                  "data_key_103": [],
+                  "data_key_104": [],
+                  "data_key_105": [],
+                  "data_key_106": [],
+                  "data_key_107": [],
+                  "data_key_108": [],
+                  "data_key_109": [],
+                  "data_key_110": [],
+                  "data_key_111": [],
+                  "data_key_112": [
+                    {
+                      "data_key_024": 28143597274208,
+                      "data_key_025": "<redacted-1231104a944e8e8c>",
+                      "data_key_167": 37410228114729
+                    }
+                  ],
+                  "data_key_113": [],
+                  "data_key_114": [],
+                  "data_key_115": [],
+                  "data_key_116": [],
+                  "data_key_117": [],
+                  "data_key_118": [],
+                  "data_key_119": [],
+                  "data_key_120": [],
+                  "data_key_121": [],
+                  "data_key_122": [],
+                  "data_key_123": [],
+                  "data_key_124": [],
+                  "data_key_125": [],
+                  "data_key_126": [],
+                  "data_key_127": [],
+                  "data_key_128": [],
+                  "data_key_129": [],
+                  "data_key_130": [],
+                  "data_key_131": [],
+                  "data_key_132": [],
+                  "data_key_133": [],
+                  "data_key_134": [],
+                  "data_key_135": [],
+                  "data_key_136": [],
+                  "data_key_137": [],
+                  "data_key_138": [],
+                  "data_key_139": [],
+                  "data_key_140": [],
+                  "data_key_141": [],
+                  "data_key_142": [],
+                  "data_key_143": [],
+                  "data_key_144": [],
+                  "data_key_145": [],
+                  "data_key_146": [],
+                  "data_key_147": [],
+                  "data_key_148": []
+                }
+              ],
+              "data_key_034": [
+                {
+                  "data_key_020": true,
+                  "data_key_026": true,
+                  "data_key_064": true,
+                  "data_key_065": true,
+                  "data_key_163": true
+                }
+              ],
+              "data_key_036": 88110740954914,
+              "data_key_039": [],
+              "data_key_047": "<redacted-191ef6f48bf93db9>",
+              "data_key_048": "<redacted-60d64e8c384d2c2a>",
+              "data_key_057": 37410228114729,
+              "data_key_081": "<redacted-a5a7d403c95e8434>",
+              "data_key_083": "<redacted-d55af787a39a5b84>",
+              "data_key_166": "<redacted-2c9ef21b8e1bbca5>"
+            }
+          ],
+          "data_key_022": [
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_030": "<redacted-496196bd2f23292f>",
+              "data_key_036": 118014212061783,
+              "data_key_037": "<redacted-2a7b3a9da7524d38>",
+              "data_key_048": "<redacted-2cfdc0a1366a7148>",
+              "data_key_077": false,
+              "data_key_082": "<redacted-2a7b3a9da7524d38>",
+              "data_key_150": 141551296037663,
+              "data_key_153": {},
+              "data_key_154": 37410228114729
+            },
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_030": "<redacted-663a5dd9079d6be9>",
+              "data_key_036": 28143597274208,
+              "data_key_037": "<redacted-2a7b3a9da7524d38>",
+              "data_key_048": "<redacted-1231104a944e8e8c>",
+              "data_key_077": false,
+              "data_key_082": "<redacted-2a7b3a9da7524d38>",
+              "data_key_150": 125433402807936,
+              "data_key_153": {},
+              "data_key_154": 37410228114729
+            }
+          ],
+          "data_key_023": "<redacted-11ad0e0b77539806>",
+          "data_key_031": null,
+          "data_key_033": false,
+          "data_key_035": "<redacted-b7552defc97021a8>",
+          "data_key_036": "<redacted-485ead0eaa0a23e0>",
+          "data_key_037": "<redacted-409633cd016a066a>",
+          "data_key_039": [],
+          "data_key_040": "<redacted-b06bb6a7f09bc9d7>",
+          "data_key_043": "<redacted-9a219d15e9e543f2>",
+          "data_key_044": [
+            "<redacted-9a219d15e9e543f2>"
+          ],
+          "data_key_045": "<redacted-a389f7a51f5ba2a3>",
+          "data_key_047": null,
+          "data_key_048": "<redacted-c8e9ba62b53f35df>",
+          "data_key_050": [],
+          "data_key_052": 37410228114729,
+          "data_key_053": [],
+          "data_key_055": "<redacted-7dcb76bbb50864bb>",
+          "data_key_058": [],
+          "data_key_059": "<redacted-810863cd4e2b9208>",
+          "data_key_066": null,
+          "data_key_073": [],
+          "data_key_074": null,
+          "data_key_075": false,
+          "data_key_076": null,
+          "data_key_078": "<redacted-c9affa1b29ff18aa>",
+          "data_key_079": false,
+          "data_key_082": "<redacted-8d0aa6ebbcc0f86f>",
+          "data_key_149": [],
+          "data_key_152": [
+            {
+              "data_key_001": 37410228114729,
+              "data_key_022": 21488366021516,
+              "data_key_032": 37410228114729,
+              "data_key_056": 88308691614971,
+              "data_key_160": 91693227799011,
+              "data_key_165": 44423030531443
+            }
+          ],
+          "data_key_153": null,
+          "data_key_154": null,
+          "data_key_155": "<redacted-3f8c845aab04b2df>",
+          "data_key_156": 125433402807936,
+          "data_key_157": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "data_key_158": null,
+          "data_key_162": "<redacted-dd5dddbf7bf59643>",
+          "data_key_168": true
+        },
+        "before_sensitive": {
+          "data_key_002": [
+            {}
+          ],
+          "data_key_003": [
+            false
+          ],
+          "data_key_007": [
+            {
+              "data_key_084": [
+                {}
+              ]
+            }
+          ],
+          "data_key_013": [
+            false,
+            false
+          ],
+          "data_key_015": [
+            {
+              "data_key_019": [
+                {
+                  "data_key_085": [
+                    {}
+                  ],
+                  "data_key_086": [],
+                  "data_key_087": [],
+                  "data_key_088": [],
+                  "data_key_089": [],
+                  "data_key_090": [],
+                  "data_key_091": [],
+                  "data_key_092": [],
+                  "data_key_093": [],
+                  "data_key_094": [],
+                  "data_key_095": [],
+                  "data_key_096": [],
+                  "data_key_097": [],
+                  "data_key_098": [],
+                  "data_key_099": [],
+                  "data_key_100": [],
+                  "data_key_101": [],
+                  "data_key_102": [],
+                  "data_key_103": [],
+                  "data_key_104": [],
+                  "data_key_105": [],
+                  "data_key_106": [],
+                  "data_key_107": [],
+                  "data_key_108": [],
+                  "data_key_109": [],
+                  "data_key_110": [],
+                  "data_key_111": [],
+                  "data_key_112": [
+                    {}
+                  ],
+                  "data_key_113": [],
+                  "data_key_114": [],
+                  "data_key_115": [],
+                  "data_key_116": [],
+                  "data_key_117": [],
+                  "data_key_118": [],
+                  "data_key_119": [],
+                  "data_key_120": [],
+                  "data_key_121": [],
+                  "data_key_122": [],
+                  "data_key_123": [],
+                  "data_key_124": [],
+                  "data_key_125": [],
+                  "data_key_126": [],
+                  "data_key_127": [],
+                  "data_key_128": [],
+                  "data_key_129": [],
+                  "data_key_130": [],
+                  "data_key_131": [],
+                  "data_key_132": [],
+                  "data_key_133": [],
+                  "data_key_134": [],
+                  "data_key_135": [],
+                  "data_key_136": [],
+                  "data_key_137": [],
+                  "data_key_138": [],
+                  "data_key_139": [],
+                  "data_key_140": [],
+                  "data_key_141": [],
+                  "data_key_142": [],
+                  "data_key_143": [],
+                  "data_key_144": [],
+                  "data_key_145": [],
+                  "data_key_146": [],
+                  "data_key_147": [],
+                  "data_key_148": []
+                }
+              ],
+              "data_key_034": [
+                {}
+              ],
+              "data_key_039": []
+            }
+          ],
+          "data_key_022": [
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_082": true,
+              "data_key_153": true
+            },
+            {
+              "data_key_003": [],
+              "data_key_004": [],
+              "data_key_082": true,
+              "data_key_153": true
+            }
+          ],
+          "data_key_039": [],
+          "data_key_044": [
+            false
+          ],
+          "data_key_050": [],
+          "data_key_053": [],
+          "data_key_058": [],
+          "data_key_073": [],
+          "data_key_082": true,
+          "data_key_149": [],
+          "data_key_152": [
+            {}
+          ],
+          "data_key_153": true,
+          "data_key_157": [
+            false
+          ]
+        }
+      },
+      "index": 0,
+      "mode": "managed",
+      "name": "resource_002",
+      "provider_name": "registry.terraform.io/linode/linode",
+      "type": "linode_instance"
+    },
+    {
+      "address": "random_password.resource_005",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "data_key_009": "<redacted-e773f97afe2400c4>",
+          "data_key_036": "<redacted-d0dc7df88d5f74b8>",
+          "data_key_046": null,
+          "data_key_049": 24695750223494,
+          "data_key_054": true,
+          "data_key_060": 37410228114729,
+          "data_key_061": 37410228114729,
+          "data_key_062": 37410228114729,
+          "data_key_063": 37410228114729,
+          "data_key_069": true,
+          "data_key_070": true,
+          "data_key_072": null,
+          "data_key_080": "<redacted-2236390e5ba65dab>",
+          "data_key_151": true,
+          "data_key_164": true
+        },
+        "after_sensitive": {
+          "data_key_009": true,
+          "data_key_080": true
+        },
+        "after_unknown": {},
+        "before": {
+          "data_key_009": "<redacted-e773f97afe2400c4>",
+          "data_key_036": "<redacted-d0dc7df88d5f74b8>",
+          "data_key_046": null,
+          "data_key_049": 24695750223494,
+          "data_key_054": true,
+          "data_key_060": 37410228114729,
+          "data_key_061": 37410228114729,
+          "data_key_062": 37410228114729,
+          "data_key_063": 37410228114729,
+          "data_key_069": true,
+          "data_key_070": true,
+          "data_key_072": null,
+          "data_key_080": "<redacted-2236390e5ba65dab>",
+          "data_key_151": true,
+          "data_key_164": true
+        },
+        "before_sensitive": {
+          "data_key_009": true,
+          "data_key_080": true
+        }
+      },
+      "mode": "managed",
+      "name": "resource_005",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "type": "random_password"
+    }
+  ],
+  "resource_drift": [
+    {
+      "address": "linode_firewall.firewall",
+      "change": {
+        "actions": [
+          "update"
+        ],
+        "after": {
+          "created": "<redacted-ee74f8197cebf5f8>",
+          "data_key_021": false,
+          "data_key_041": [],
+          "devices": [
+            {
+              "entity_id": 2409665757992,
+              "id": 115116003450623,
+              "label": "<label-38ada140f2766fec>",
+              "type": "<type-93f505703d558c5b>",
+              "url": "<url-05e83b140b41da78>"
+            }
+          ],
+          "fingerprint": "<redacted-2a732d0b8ce1b29e>",
+          "id": "<redacted-f942fe1639688055>",
+          "inbound": [
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-22",
+              "ports": "22",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-80",
+              "ports": "80",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-443",
+              "ports": "443",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-2222",
+              "ports": "2222",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-udp-8000",
+              "ports": "8000",
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_002",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_003",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_001",
+              "ports": null,
+              "protocol": "ICMP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "inbound_policy": "DROP",
+          "label": "<redacted-3116e72b07b9766a>",
+          "linodes": [
+            2409665757992
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "outbound_policy": "ACCEPT",
+          "status": "<redacted-11ad0e0b77539806>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "updated": "<redacted-9e6f0cecdd1957e8>",
+          "version": 109550207297041
+        },
+        "after_sensitive": {
+          "data_key_041": [],
+          "devices": [
+            {}
+          ],
+          "inbound": [
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "linodes": [
+            false
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "tags": [
+            false
+          ]
+        },
+        "after_unknown": {},
+        "before": {
+          "created": "<redacted-ee74f8197cebf5f8>",
+          "data_key_021": false,
+          "data_key_041": [],
+          "devices": [
+            {
+              "entity_id": 2409665757992,
+              "id": 115116003450623,
+              "label": "<label-38ada140f2766fec>",
+              "type": "<type-93f505703d558c5b>",
+              "url": "<url-05e83b140b41da78>"
+            }
+          ],
+          "fingerprint": "<redacted-2a732d0b8ce1b29e>",
+          "id": "<redacted-f942fe1639688055>",
+          "inbound": [
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-22",
+              "ports": "22",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-80",
+              "ports": "80",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-443",
+              "ports": "443",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-tcp-2222",
+              "ports": "2222",
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "0.0.0.0/0"
+              ],
+              "ipv6": null,
+              "label": "allow-udp-8000",
+              "ports": "8000",
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_002",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_003",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "ACCEPT",
+              "description": "",
+              "ipv4": [
+                "<ip-70b6008cb14d4d3b>"
+              ],
+              "ipv6": null,
+              "label": "rule_label_001",
+              "ports": null,
+              "protocol": "ICMP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "inbound_policy": "DROP",
+          "label": "<redacted-3116e72b07b9766a>",
+          "linodes": [
+            2409665757992
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_005",
+              "ports": null,
+              "protocol": "TCP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_006",
+              "ports": null,
+              "protocol": "UDP"
+            },
+            {
+              "action": "DROP",
+              "description": "",
+              "ipv4": null,
+              "ipv6": [
+                "::/0"
+              ],
+              "label": "rule_label_004",
+              "ports": null,
+              "protocol": "ICMP"
+            }
+          ],
+          "outbound_policy": "ACCEPT",
+          "status": "<redacted-11ad0e0b77539806>",
+          "tags": [
+            "<redacted-4a4b49fa8703f8d6>"
+          ],
+          "updated": "<redacted-ee74f8197cebf5f8>",
+          "version": 109550207297041
+        },
+        "before_sensitive": {
+          "data_key_041": [],
+          "devices": [
+            {}
+          ],
+          "inbound": [
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv4": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "linodes": [
+            false
+          ],
+          "nodebalancers": [],
+          "outbound": [
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            },
+            {
+              "ipv6": [
+                false
+              ]
+            }
+          ],
+          "tags": [
+            false
+          ]
+        }
+      },
+      "mode": "managed",
+      "name": "firewall",
+      "provider_name": "registry.terraform.io/linode/linode",
+      "type": "linode_firewall"
+    }
+  ],
+  "terraform_version": "1.15.5",
+  "timestamp": "<redacted-3a322454fa5618f2>",
+  "variables": {
+    "var_001": {
+      "value": [
+        "<redacted-d627d94a026f379d>",
+        "<redacted-acee6c469b972c52>",
+        "<redacted-1cc513ee779d05ca>",
+        "<redacted-6ad383bac3ecfa59>"
+      ]
+    },
+    "var_002": {
+      "value": [
+        "<redacted-1f9dc0def937ff70>"
+      ]
+    },
+    "var_003": {
+      "value": "<redacted-0deed29899bfed42>"
+    },
+    "var_004": {
+      "value": "<redacted-501535a93d9816ce>"
+    },
+    "var_005": {
+      "value": [
+        "<redacted-c9affa1b29ff18aa>"
+      ]
+    },
+    "var_006": {
+      "value": "<redacted-dd5dddbf7bf59643>"
+    },
+    "var_007": {
+      "value": "<redacted-4a4b49fa8703f8d6>"
+    },
+    "var_008": {
+      "value": "<redacted-832d7de7189ae2f5>"
+    },
+    "var_009": {
+      "value": "<redacted-409633cd016a066a>"
+    },
+    "var_010": {
+      "value": "<redacted-501535a93d9816ce>"
+    },
+    "var_011": {
+      "value": "<redacted-501535a93d9816ce>"
+    },
+    "var_012": {
+      "value": "<redacted-c9affa1b29ff18aa>"
+    },
+    "var_013": {
+      "value": "<redacted-dd5dddbf7bf59643>"
+    },
+    "var_014": {
+      "value": [
+        "<redacted-4a4b49fa8703f8d6>"
+      ]
+    },
+    "var_015": {
+      "value": "<redacted-fdff722172e91d92>"
+    },
+    "var_016": {
+      "value": "<redacted-be35dbd5435a776b>"
+    },
+    "var_017": {
+      "value": "<redacted-5a2b91c48a2def9a>"
+    },
+    "var_018": {
+      "value": "<redacted-a875a4c18170ee96>"
+    }
+  }
+}

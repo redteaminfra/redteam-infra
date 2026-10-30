@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "expectedProductionTargetCount": 4,
+  "productionTargets": [
+    {
+      "name": "production-a",
+      "compartmentId": "REPLACE_WITH_APPROVED_COMPARTMENT_OCID_A",
+      "region": "us-sanjose-1"
+    },
+    {
+      "name": "production-b",
+      "compartmentId": "REPLACE_WITH_APPROVED_COMPARTMENT_OCID_B",
+      "region": "us-sanjose-1"
+    },
+    {
+      "name": "production-c",
+      "compartmentId": "REPLACE_WITH_APPROVED_COMPARTMENT_OCID_C",
+      "region": "us-sanjose-1"
+    },
+    {
+      "name": "production-d",
+      "compartmentId": "REPLACE_WITH_APPROVED_COMPARTMENT_OCID_D",
+      "region": "us-sanjose-1"
+    }
+  ]
+}

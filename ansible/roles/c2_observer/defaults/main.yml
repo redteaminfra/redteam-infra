@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Controller-local reviewed artifacts. Never fetch a mutable branch on Homebase.
+c2_observer_source_archive: ""
+c2_observer_source_sha256: ""
+c2_observer_source_revision: ""
+# Fully hashed pip lock, including build requirements, supplied by app maintainer.
+c2_observer_dependency_lock: ""
+c2_observer_dependency_sha256: ""

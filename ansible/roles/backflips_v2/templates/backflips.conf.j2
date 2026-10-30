@@ -1,0 +1,10 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+[DEFAULT]
+callbackHost = redteamexample.com
+internalIP = 127.0.0.1
+callbackPort = 2222
+callbackUser = flip
+baseDir = /opt/backflips/
+middleIP =
+middleUser = sketchssh
+middleKeyPath = {{ sketchkey | default('/opt/ssh-proxy/keys/sketchkey') }}

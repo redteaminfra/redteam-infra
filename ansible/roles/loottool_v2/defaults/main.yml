@@ -1,0 +1,18 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+loottool_v2_source_archive: ""
+loottool_v2_source_sha256: ""
+loottool_v2_source_revision: ""
+# Supply either a registry manifest reference or a reviewed Docker-save artifact.
+loottool_v2_app_image: ""
+loottool_v2_elasticsearch_image: ""
+loottool_v2_python_image: ""
+loottool_v2_evidence_scope: "shared-loot"
+loottool_v2_source_root: /engagement/loot
+loottool_v2_api_port: 8080
+loottool_v2_answer_port: 8082
+loottool_v2_health_timeout: 300
+# Local archive mode additionally needs the separately reviewed config identity.
+loottool_v2_app_archive: ""
+loottool_v2_app_archive_sha256: ""
+loottool_v2_app_config_digest: ""

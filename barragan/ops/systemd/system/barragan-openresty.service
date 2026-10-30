@@ -1,0 +1,23 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+[Unit]
+Description=Barragan production OpenResty frontend
+After=network-online.target barragan-fastapi.service
+Wants=barragan-fastapi.service
+
+[Service]
+EnvironmentFile=-/etc/barragan/barragan.env
+Type=simple
+User=barragan
+Group=barragan
+WorkingDirectory=/opt/redteam-infra/barragan
+Environment=BARRAGAN_ROOT=/opt/redteam-infra/barragan
+Environment=BARRAGAN_OPENRESTY_PREFIX=/var/lib/barragan/openresty
+Environment=BARRAGAN_OPENRESTY_CONFIG=/opt/redteam-infra/barragan/ops/openresty/barragan.conf
+ExecStartPre=/usr/bin/env npm --prefix /opt/redteam-infra/barragan/frontend run build -- --mode production
+ExecStart=/opt/redteam-infra/barragan/scripts/run-barragan-openresty
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

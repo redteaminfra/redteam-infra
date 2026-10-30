@@ -1,7 +1,8 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
 resource "linode_instance" "middle" {
-  label           = "middle${format("%02g", count.index + 1)}-${var.engagement_name}"
-  region          = var.middle_region
-  count           = var.middle_count
+  label           = "middle${format("%02g", each.value.ordinal)}-${var.engagement_name}"
+  region          = each.value.region
+  for_each        = local.middle_nodes
   type            = var.middle_type
   image           = var.linode_image
   tags            = [var.engagement_name]
