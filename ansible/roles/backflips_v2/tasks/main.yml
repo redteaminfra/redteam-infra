@@ -1,0 +1,67 @@
+---
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Bootstrap only: Backflips_V2 manages listener containers itself.
+
+- name: Ensure wamerican is installed
+  apt:
+    name: wamerican
+    state: present
+
+- name: Create flip group
+  group:
+    name: flip
+    state: present
+    system: true
+
+- name: Create flip user
+  user:
+    name: flip
+    group: flip
+    state: present
+    system: true
+    create_home: false
+    home: /opt/backflips
+    shell: /usr/sbin/nologin
+
+- name: Create home
+  file:
+    path: /opt/backflips
+    owner: flip
+    group: flip
+    mode: 0755
+    state: directory
+
+- name: Copy files to host
+  copy:
+    src: files/flip_files/
+    dest: /opt/backflips/
+    owner: flip
+    group: flip
+
+- name: Render Backflips configuration
+  template:
+    src: backflips.conf.j2
+    dest: /opt/backflips/etc/backflips.conf
+    owner: flip
+    group: flip
+    mode: '0644'
+    force: false
+
+- name: Configure the sketch transport key without replacing listener state
+  community.general.ini_file:
+    path: /opt/backflips/etc/backflips.conf
+    section: DEFAULT
+    option: middleKeyPath
+    value: "{{ sketchkey | default('/opt/ssh-proxy/keys/sketchkey') }}"
+    owner: flip
+    group: flip
+    mode: '0644'
+    no_extra_spaces: true
+
+- name: Create canonical authorized_keys file
+  file:
+    path: /opt/backflips/etc/authorized_keys
+    state: touch
+    owner: flip
+    group: flip
+    mode: '0600'

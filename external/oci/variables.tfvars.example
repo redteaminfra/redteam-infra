@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2026, Oracle and/or its affiliates.
 
 # Provider initialization
 config_file_profile = ""
@@ -22,13 +22,26 @@ ad_number      = "1"
 # The engagement's name, infrastructure will be named after this
 engagement_name = ""
 
-# define the shape for homebase
-homebase_shape = "VM.Standard2.1"
-# define the shape for proxies
-proxy_shape    = "VM.Standard2.1"
-proxy_count    = 2
-# define the shape for elk
-elk_shape      = "VM.Standard2.1"
+# Select the current production bare-metal homebase with is_production = true.
+# Development homebases use the Flex values below.
+is_production             = false
+production_homebase_shape = "BM.Standard3.64"
+homebase_shape            = "VM.Standard.E4.Flex"
+homebase_ocpus            = 16
+homebase_memory_in_gbs    = 512
+
+# Each proxy is sized independently from homebase.
+proxy_shape         = "VM.Standard.E4.Flex"
+proxy_ocpus         = 2
+proxy_memory_in_gbs = 32
+proxy_count         = 2
+
+# ELK uses its own Flex allocation.
+elk_shape         = "VM.Standard.E4.Flex"
+elk_ocpus         = 2
+elk_memory_in_gbs = 32
+
+boot_volume_size_in_gbs = 512
 
 # Set to IP's and/or IP ranges you would like to have SSH access to the infrastructure
 # Each item in range should be an address range in cidr format

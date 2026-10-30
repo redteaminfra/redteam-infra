@@ -7,6 +7,10 @@ This role is for Sketch specific changes and it does the following:
 * Copies and restores ip6tables rules
 * Stop, disable, and mask systemd service for local DNS resolver
 * Re-set DNS name servers
+* Prefer IPv4 address selection for dual-stack DNS answers
+
+The IPv4 address-selection preference helps sketch outbound proxy paths avoid
+attempting IPv6 connections when public IPv6 egress is intentionally blocked.
 
 
 Role Variables

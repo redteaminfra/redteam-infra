@@ -60,8 +60,12 @@ edge_regions   = ["REGION-B",  "REGION-C", "REGION-D"]
 Configure multiple edge instances. (Can also be done with middle)
 
 ```terraform
-edge_count_per_region = "N"
+edge_count_per_region = 2
 ```
+
+`middle_count` and `edge_count_per_region` are non-negative whole numbers.
+`edge_regions`, `allowed_tcp_ports`, and `allowed_udp_ports` are lists of
+strings.
 
 #### Multiple Regions and Instance Count > 1
 
@@ -85,5 +89,12 @@ You will produce a total of **6** instances:
 Can be done with both middle and edge instances.
 
 ```terraform
-middle_type = "g6-nanode-1"
+middle_size = "s-1vcpu-1gb"
 ```
+
+### Composed deployments
+
+Automation may set `middle_count = 0` for an edge-only run or use an empty
+`edge_regions` list with `edge_count_per_region = 0` for a middle-only run.
+These partial modes skip the local full-chain SSH stanza and Ansible inventory
+while still returning the applicable `middle_*` and `edge_*` outputs.

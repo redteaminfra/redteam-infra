@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
 resource "linode_firewall" "firewall" {
   label           = "${var.engagement_name}-firewall"
   linodes         = flatten([linode_instance.middle.*.id, linode_instance.edge.*.id])
@@ -21,12 +22,12 @@ resource "linode_firewall" "firewall" {
     // Allow engagement hosts to access each other
     for_each = ["TCP", "UDP", "ICMP"]
     content {
-      label    = "allow-${var.engagement_name}-host-${inbound.value}"
+      label    = "allow-${var.engagement_name}-host-${lower(inbound.value)}"
       action   = "ACCEPT"
       protocol = inbound.value
       // In all their genius, Linode doesn't append cidr /32 to their ipv4 addresses.
       // So we have to do it here with a for loop
-      ipv4     = [for ip in flatten([linode_instance.middle.*.ipv4, linode_instance.edge.*.ipv4]): "${ip}/32"]
+      ipv4 = [for ip in flatten([linode_instance.middle.*.ipv4, linode_instance.edge.*.ipv4]) : "${ip}/32"]
       // Uncomment to allow ipv6
       // ipv6     = flatten([linode_instance.middle.*.ipv6, linode_instance.edge.*.ipv6])
     }
@@ -36,7 +37,7 @@ resource "linode_firewall" "firewall" {
     // Block all IPv6 traffic inbound
     for_each = ["TCP", "UDP", "ICMP"]
     content {
-      label    = "block-ipv6-${inbound.value}"
+      label    = "block-ipv6-${lower(inbound.value)}"
       action   = "DROP"
       protocol = inbound.value
       ipv6     = ["::/0"]
@@ -47,7 +48,7 @@ resource "linode_firewall" "firewall" {
     // Block all IPv6 traffic outbound
     for_each = ["TCP", "UDP", "ICMP"]
     content {
-      label    = "block-ipv6-${outbound.value}"
+      label    = "block-ipv6-${lower(outbound.value)}"
       action   = "DROP"
       protocol = outbound.value
       ipv6     = ["::/0"]

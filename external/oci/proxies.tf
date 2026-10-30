@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2026, Oracle and/or its affiliates.
 
 resource "oci_core_instance" "proxy" {
   depends_on          = [oci_core_instance.homebase]
@@ -8,6 +8,14 @@ resource "oci_core_instance" "proxy" {
   shape               = var.proxy_shape
   count               = var.proxy_count
   freeform_tags       = local.tags
+
+  dynamic "shape_config" {
+    for_each = can(regex("Flex", var.proxy_shape)) && var.proxy_ocpus != null && var.proxy_memory_in_gbs != null ? [1] : []
+    content {
+      ocpus         = var.proxy_ocpus
+      memory_in_gbs = var.proxy_memory_in_gbs
+    }
+  }
 
   source_details {
     source_id               = data.oci_core_images.ubuntu-version.images.0.id
@@ -26,7 +34,7 @@ resource "oci_core_instance" "proxy" {
     private_ip             = cidrhost(var.subnet_cidr_blocks["proxy"], count.index + 11)
     assign_public_ip       = true
     skip_source_dest_check = true
-    nsg_ids                = [
+    nsg_ids = [
       oci_core_network_security_group.proxies.id
     ]
   }
@@ -41,6 +49,16 @@ resource "oci_core_instance" "proxy" {
     plugins_config {
       name          = "Compute Instance Monitoring"
       desired_state = "DISABLED"
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition = (
+        !can(regex("Flex", var.proxy_shape)) ||
+        (var.proxy_ocpus != null && var.proxy_memory_in_gbs != null)
+      )
+      error_message = "Flex proxy shapes require proxy_ocpus and proxy_memory_in_gbs."
     }
   }
 }

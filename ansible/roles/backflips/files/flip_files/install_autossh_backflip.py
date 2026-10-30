@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2023, Oracle and/or its affiliates.
+# Copyright (c) 2026, Oracle and/or its affiliates.
 
 import sys
 import os
@@ -12,8 +12,6 @@ After=network.target auditd.service
 
 [Service]
 ExecStart=/usr/bin/autossh -M0 -oServerAliveInterval=30 -oServerAliveCountMax=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -oBatchMode=yes -n -N -R 3004:192.168.0.10:3004 -D :%(proxyport)d -i %(key)s -p%(port)d %(user)s@localhost
-Restart=on-failure
-RestartSec=30s
 
 [Install]
 WantedBy=multi-user.target

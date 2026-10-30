@@ -1,0 +1,39 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Package generated configuration file
+
+Port 2222
+Protocol 2
+
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+SyslogFacility AUTH
+LogLevel INFO
+
+LoginGraceTime 120
+PermitRootLogin prohibit-password
+StrictModes yes
+
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+IgnoreRhosts yes
+HostbasedAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+
+X11Forwarding no
+X11DisplayOffset 10
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+AcceptEnv LANG LC_*
+UsePAM no
+
+PermitTTY no
+PermitOpen none
+GatewayPorts yes
+ForceCommand /bin/false
+AllowTcpForwarding remote
+ClientAliveInterval 3
